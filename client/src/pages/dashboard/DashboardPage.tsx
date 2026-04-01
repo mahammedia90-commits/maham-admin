@@ -99,19 +99,19 @@ export default function DashboardPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6 pb-8">
+      <div className="space-y-4 sm:space-y-5 lg:space-y-6 pb-6 sm:pb-8">
         {/* Hero Banner */}
         <motion.div {...fadeUp} className="relative rounded-2xl overflow-hidden border border-gold/15">
           <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${DASHBOARD_HERO_URL})` }} />
           <div className="absolute inset-0 bg-gradient-to-l from-black/90 via-black/70 to-black/50" />
-          <div className="relative p-8 flex items-center justify-between">
+          <div className="relative p-4 sm:p-6 lg:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">مركز القيادة</h1>
-              <p className="text-white/70 text-lg">المنظومة تعمل بكفاءة {aiHealthScore}% — العقل التنفيذي نشط</p>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2">مركز القيادة</h1>
+              <p className="text-white/70 text-sm sm:text-base lg:text-lg">المنظومة تعمل بكفاءة {aiHealthScore}% — العقل التنفيذي نشط</p>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="relative w-24 h-24">
-                <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24">
+                <svg className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 -rotate-90" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(201,168,76,0.1)" strokeWidth="8" />
                   <circle cx="50" cy="50" r="42" fill="none" stroke="url(#healthGradient)" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${aiHealthScore * 2.64} 264`} />
                   <defs>
@@ -122,11 +122,11 @@ export default function DashboardPage() {
                   </defs>
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-bold text-gold">{aiHealthScore}</span>
+                  <span className="text-lg sm:text-xl lg:text-2xl font-bold text-gold">{aiHealthScore}</span>
                   <span className="text-[9px] text-white/50">صحة النظام</span>
                 </div>
               </div>
-              <button onClick={() => navigate('/ai')} className="px-5 py-2.5 rounded-xl bg-gold/15 border border-gold/25 text-gold hover:bg-gold/25 transition-all text-sm font-medium flex items-center gap-2">
+              <button onClick={() => navigate('/ai')} className="hidden sm:flex px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gold/15 border border-gold/25 text-gold hover:bg-gold/25 transition-all text-xs sm:text-sm font-medium items-center gap-2">
                 <Brain size={16} />
                 العقل التنفيذي
               </button>
@@ -135,7 +135,7 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* KPI Stats */}
-        <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
           <StatsCard title="إجمالي الإيرادات" value="2.35M" icon={DollarSign} trend={18.5} trendLabel="عن الشهر السابق" />
           <StatsCard title="الفعاليات النشطة" value="12" icon={Calendar} trend={8} trendLabel="فعاليات جديدة" delay={0.05} />
           <StatsCard title="المستثمرون" value="102" icon={Building2} trend={15} trendLabel="مستثمر جديد" delay={0.1} />
@@ -145,12 +145,12 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
           {/* Charts - 2 cols */}
-          <motion.div {...fadeUp} transition={{ delay: 0.2 }} className="lg:col-span-2 space-y-6">
-            <div className="glass-card rounded-2xl p-6 border border-gold/10">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-bold text-foreground">التحليلات المالية</h3>
+          <motion.div {...fadeUp} transition={{ delay: 0.2 }} className="lg:col-span-2 space-y-3 sm:space-y-4 lg:space-y-6">
+            <div className="glass-card rounded-2xl p-3 sm:p-4 lg:p-6 border border-gold/10">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3 sm:mb-4 lg:mb-6">
+                <h3 className="text-sm sm:text-base lg:text-lg font-bold text-foreground">التحليلات المالية</h3>
                 <div className="flex gap-1 bg-card/50 rounded-lg p-1 border border-border/50">
                   {([
                     { key: 'revenue' as const, label: 'الإيرادات' },
@@ -163,7 +163,7 @@ export default function DashboardPage() {
                   ))}
                 </div>
               </div>
-              <div className="h-72">
+              <div className="h-48 sm:h-56 lg:h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   {activeChart === 'revenue' ? (
                     <BarChart data={revenueData}>
@@ -207,10 +207,10 @@ export default function DashboardPage() {
             </div>
 
             {/* Revenue Sources + Portal Status */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="glass-card rounded-2xl p-6 border border-gold/10">
-                <h3 className="text-sm font-bold text-foreground mb-4">توزيع الإيرادات</h3>
-                <div className="h-48">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+              <div className="glass-card rounded-2xl p-3 sm:p-4 lg:p-6 border border-gold/10">
+                <h3 className="text-xs sm:text-sm font-bold text-foreground mb-3 sm:mb-4">توزيع الإيرادات</h3>
+                <div className="h-36 sm:h-40 lg:h-48">
                   <ResponsiveContainer width="100%" height="100%">
                     <RPieChart>
                       <Pie data={revenueSourceData} cx="50%" cy="50%" innerRadius={50} outerRadius={75} dataKey="value" paddingAngle={3}>
@@ -233,8 +233,8 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="glass-card rounded-2xl p-6 border border-gold/10">
-                <h3 className="text-sm font-bold text-foreground mb-4">حالة البوابات</h3>
+              <div className="glass-card rounded-2xl p-3 sm:p-4 lg:p-6 border border-gold/10">
+                <h3 className="text-xs sm:text-sm font-bold text-foreground mb-3 sm:mb-4">حالة البوابات</h3>
                 <div className="space-y-3">
                   {portalStatus.map((portal) => (
                     <button key={portal.name} onClick={() => navigate(portal.path)} className={cn('w-full p-4 rounded-xl border border-gold/10 hover:border-gold/25 transition-all group text-right', `bg-gradient-to-l ${portal.color}`)}>
@@ -257,11 +257,11 @@ export default function DashboardPage() {
           </motion.div>
 
           {/* Right Column */}
-          <motion.div {...fadeUp} transition={{ delay: 0.3 }} className="space-y-6">
+          <motion.div {...fadeUp} transition={{ delay: 0.3 }} className="space-y-3 sm:space-y-4 lg:space-y-6">
             {/* Pending Requests */}
-            <div className="glass-card rounded-2xl p-6 border border-gold/10">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-foreground">طلبات تحتاج موافقة</h3>
+            <div className="glass-card rounded-2xl p-3 sm:p-4 lg:p-6 border border-gold/10">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-xs sm:text-sm font-bold text-foreground">طلبات تحتاج موافقة</h3>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/20">{pendingRequests.length} معلق</span>
               </div>
               <div className="space-y-3">
@@ -285,9 +285,9 @@ export default function DashboardPage() {
             </div>
 
             {/* AI Alerts */}
-            <div className="glass-card rounded-2xl p-6 border border-gold/10">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+            <div className="glass-card rounded-2xl p-3 sm:p-4 lg:p-6 border border-gold/10">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-xs sm:text-sm font-bold text-foreground flex items-center gap-2">
                   <Brain size={14} className="text-gold" />
                   تنبيهات ذكية
                 </h3>
@@ -309,8 +309,8 @@ export default function DashboardPage() {
             </div>
 
             {/* Recent Activity */}
-            <div className="glass-card rounded-2xl p-6 border border-gold/10">
-              <h3 className="text-sm font-bold text-foreground mb-4">النشاط الأخير</h3>
+            <div className="glass-card rounded-2xl p-3 sm:p-4 lg:p-6 border border-gold/10">
+              <h3 className="text-xs sm:text-sm font-bold text-foreground mb-3 sm:mb-4">النشاط الأخير</h3>
               <div className="space-y-3">
                 {recentActivity.map((item) => (
                   <div key={item.id} className="flex items-start gap-3">
@@ -333,8 +333,8 @@ export default function DashboardPage() {
 
         {/* Quick Access */}
         <motion.div {...fadeUp} transition={{ delay: 0.4 }}>
-          <h3 className="text-sm font-bold text-foreground mb-4">وصول سريع</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <h3 className="text-xs sm:text-sm font-bold text-foreground mb-3 sm:mb-4">وصول سريع</h3>
+          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
             {[
               { label: 'الفعاليات', icon: Calendar, path: '/events', color: 'from-blue-500/15 to-blue-600/5' },
               { label: 'المالية', icon: DollarSign, path: '/finance', color: 'from-emerald-500/15 to-emerald-600/5' },
@@ -343,7 +343,7 @@ export default function DashboardPage() {
               { label: 'العقل AI', icon: Brain, path: '/ai', color: 'from-gold/15 to-gold/5' },
               { label: 'الإعدادات', icon: Settings, path: '/settings', color: 'from-gray-500/15 to-gray-600/5' },
             ].map((item) => (
-              <button key={item.label} onClick={() => navigate(item.path)} className={cn('p-4 rounded-xl border border-gold/10 hover:border-gold/25 transition-all group text-center', `bg-gradient-to-b ${item.color}`)}>
+              <button key={item.label} onClick={() => navigate(item.path)} className={cn('p-3 sm:p-4 rounded-xl border border-gold/10 hover:border-gold/25 transition-all group text-center', `bg-gradient-to-b ${item.color}`)}>
                 <item.icon size={22} className="mx-auto mb-2 text-gold/60 group-hover:text-gold transition-colors" />
                 <span className="text-xs font-medium text-foreground">{item.label}</span>
               </button>

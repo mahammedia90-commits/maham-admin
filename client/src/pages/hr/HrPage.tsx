@@ -98,7 +98,7 @@ export default function HrPage() {
         }
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="إجمالي الموظفين" value={String(stats.total)} icon={Users} delay={0} />
         <StatsCard title="موظفون نشطون" value={String(stats.active)} icon={UserCheck} delay={0.05} />
         <StatsCard title="متوسط الأداء" value={`${stats.avgPerformance}%`} icon={TrendingUp} trend={3} trendLabel="تحسن" delay={0.1} />
@@ -106,7 +106,7 @@ export default function HrPage() {
       </div>
 
       {/* تبويبات */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-3 sm:mb-4">
         {[{ key: 'employees', label: 'الموظفون', icon: Users }, { key: 'attendance', label: 'الحضور', icon: Clock }, { key: 'departments', label: 'الأقسام', icon: Building2 }].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key)}
             className={cn('h-9 px-4 rounded-xl text-sm font-medium transition-all flex items-center gap-2', activeTab === t.key ? 'bg-gold/10 text-gold border border-gold/20' : 'bg-surface2/50 text-muted-foreground hover:text-foreground border border-transparent')}>
@@ -129,7 +129,7 @@ export default function HrPage() {
               ))}
             </div>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full">
               <thead><tr className="border-b border-border/50">
                 <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">الموظف</th>
@@ -183,7 +183,7 @@ export default function HrPage() {
                 <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center text-gold font-bold text-sm">{emp.name.charAt(0)}</div>
                 <div><h4 className="text-sm font-bold text-foreground">{emp.name}</h4><p className="text-[10px] text-muted-foreground">{emp.department}</p></div>
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 <div className="p-2 rounded-lg bg-success/5 border border-success/15 text-center"><p className="text-[9px] text-muted-foreground">الحضور</p><p className="text-sm font-bold font-mono text-success">{emp.attendance}%</p></div>
                 <div className="p-2 rounded-lg bg-warning/5 border border-warning/15 text-center"><p className="text-[9px] text-muted-foreground">الإجازات</p><p className="text-sm font-bold font-mono text-warning">{emp.leaves}</p></div>
                 <div className="p-2 rounded-lg bg-gold/5 border border-gold/15 text-center"><p className="text-[9px] text-muted-foreground">الأداء</p><p className="text-sm font-bold font-mono text-gold">{emp.performance}%</p></div>
@@ -200,12 +200,12 @@ export default function HrPage() {
             const avgPerf = deptEmps.length ? Math.round(deptEmps.reduce((s, e) => s + e.performance, 0) / deptEmps.length) : 0
             const totalSalary = deptEmps.reduce((s, e) => s + e.salary, 0)
             return (
-              <motion.div key={dept} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-card p-5">
+              <motion.div key={dept} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-card p-3 sm:p-4 lg:p-5">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Building2 size={18} className="text-gold" /></div>
                   <div><h3 className="text-sm font-bold text-foreground">{dept}</h3><p className="text-[10px] text-muted-foreground">{deptEmps.length} موظف</p></div>
                 </div>
-                <div className="grid grid-cols-2 gap-2 mb-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2 sm:mb-3">
                   <div className="p-2 rounded-lg bg-surface2/50"><p className="text-[9px] text-muted-foreground">الرواتب</p><p className="text-xs font-bold font-mono text-foreground">{formatCurrency(totalSalary)}</p></div>
                   <div className="p-2 rounded-lg bg-surface2/50"><p className="text-[9px] text-muted-foreground">متوسط الأداء</p><p className={cn('text-xs font-bold font-mono', avgPerf >= 90 ? 'text-success' : avgPerf >= 70 ? 'text-gold' : 'text-warning')}>{avgPerf}%</p></div>
                 </div>
@@ -228,7 +228,7 @@ export default function HrPage() {
       <AnimatePresence>
         {detailEmp && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDetailEmp(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-3">
                   <div className="w-14 h-14 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center text-gold font-bold text-xl">{detailEmp.name.charAt(0)}</div>
@@ -236,13 +236,13 @@ export default function HrPage() {
                 </div>
                 <button onClick={() => setDetailEmp(null)} className="p-2 rounded-lg hover:bg-surface2 text-muted-foreground"><X size={18} /></button>
               </div>
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 sm:mb-4">
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">البريد</p><p className="text-xs text-foreground flex items-center gap-1"><Mail size={10} className="text-gold" />{detailEmp.email}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">الجوال</p><p className="text-xs text-foreground flex items-center gap-1" dir="ltr"><Phone size={10} className="text-gold" />{detailEmp.phone}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">المدينة</p><p className="text-xs text-foreground flex items-center gap-1"><MapPin size={10} className="text-gold" />{detailEmp.city}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">تاريخ الالتحاق</p><p className="text-xs text-foreground flex items-center gap-1"><Calendar size={10} className="text-gold" />{formatDate(detailEmp.joinDate)}</p></div>
               </div>
-              <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
                 <div className="p-3 rounded-xl bg-gold/5 border border-gold/20 text-center"><p className="text-[10px] text-muted-foreground">الراتب</p><p className="text-sm font-bold font-mono text-gold">{formatCurrency(detailEmp.salary)}</p></div>
                 <div className="p-3 rounded-xl bg-success/5 border border-success/20 text-center"><p className="text-[10px] text-muted-foreground">الحضور</p><p className="text-sm font-bold font-mono text-success">{detailEmp.attendance}%</p></div>
                 <div className="p-3 rounded-xl bg-info/5 border border-info/20 text-center"><p className="text-[10px] text-muted-foreground">الأداء</p><p className="text-sm font-bold font-mono text-info">{detailEmp.performance}%</p></div>
@@ -257,18 +257,18 @@ export default function HrPage() {
       <AnimatePresence>
         {showAddModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowAddModal(false)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-3 mb-5">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
                 <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Users size={18} className="text-gold" /></div>
                 <div><h3 className="text-base font-bold text-foreground">موظف جديد</h3><p className="text-xs text-muted-foreground">إضافة موظف للنظام</p></div>
               </div>
               <div className="space-y-3">
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الاسم <span className="text-danger">*</span></label><input type="text" value={newEmp.name} onChange={(e) => setNewEmp(p => ({ ...p, name: e.target.value }))} placeholder="الاسم الكامل" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">القسم</label><select value={newEmp.department} onChange={(e) => setNewEmp(p => ({ ...p, department: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50">{departments.filter(d => d !== 'الكل').map(d => <option key={d}>{d}</option>)}</select></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">المنصب <span className="text-danger">*</span></label><input type="text" value={newEmp.position} onChange={(e) => setNewEmp(p => ({ ...p, position: e.target.value }))} placeholder="المسمى الوظيفي" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">البريد</label><input type="email" value={newEmp.email} onChange={(e) => setNewEmp(p => ({ ...p, email: e.target.value }))} placeholder="email@mahamexpo.sa" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الراتب (ر.س)</label><input type="number" value={newEmp.salary} onChange={(e) => setNewEmp(p => ({ ...p, salary: e.target.value }))} placeholder="0" dir="ltr" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 </div>
@@ -286,7 +286,7 @@ export default function HrPage() {
       <AnimatePresence>
         {deleteConfirm !== null && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDeleteConfirm(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-6 text-center" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-4 sm:p-6 text-center" onClick={(e) => e.stopPropagation()}>
               <div className="w-14 h-14 rounded-2xl bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={24} className="text-danger" /></div>
               <h3 className="text-base font-bold text-foreground mb-2">حذف الموظف</h3>
               <p className="text-sm text-muted-foreground mb-5">هل أنت متأكد من حذف <span className="text-foreground font-medium">{employees.find(e => e.id === deleteConfirm)?.name}</span>؟</p>

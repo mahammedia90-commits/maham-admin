@@ -37,10 +37,10 @@ export default function EventDetailPage() {
         }
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
         {/* Main Info */}
         <div className="lg:col-span-2 space-y-4">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-6">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-3 sm:p-4 lg:p-6">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h2 className="text-lg font-bold text-foreground">معرض ماهم إكسبو الدولي</h2>
@@ -78,7 +78,7 @@ export default function EventDetailPage() {
 
         {/* Sidebar Info */}
         <div className="space-y-4">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-5">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-3 sm:p-4 lg:p-5">
             <h3 className="text-sm font-bold text-foreground mb-4">معلومات الفعالية</h3>
             <div className="space-y-3">
               {[
@@ -101,7 +101,7 @@ export default function EventDetailPage() {
             </div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card p-5">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card p-3 sm:p-4 lg:p-5">
             <h3 className="text-sm font-bold text-foreground mb-3">نسبة الإشغال</h3>
             <div className="relative w-full h-3 rounded-full bg-surface3 overflow-hidden">
               <motion.div

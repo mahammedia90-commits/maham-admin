@@ -96,7 +96,7 @@ export default function AiPage() {
         }
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="رؤى نشطة" value={String(demoInsights.length)} icon={Lightbulb} delay={0} />
         <StatsCard title="تنبيهات عالية" value={String(demoInsights.filter(i => i.priority === 'high').length)} icon={AlertTriangle} delay={0.05} />
         <StatsCard title="وحدات AI" value={String(aiModules.length)} icon={Cpu} delay={0.1} />
@@ -104,7 +104,7 @@ export default function AiPage() {
       </div>
 
       {/* تبويبات */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-3 sm:mb-4">
         {[
           { key: 'chat' as const, label: 'المحادثة', icon: Bot },
           { key: 'insights' as const, label: 'الرؤى', icon: Sparkles },
@@ -192,7 +192,7 @@ export default function AiPage() {
             const IIcon = insightIcon(insight.type)
             return (
               <motion.div key={insight.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
-                className={cn('glass-card p-5 border', insightColor(insight.type))}>
+                className={cn('glass-card p-3 sm:p-4 lg:p-5 border', insightColor(insight.type))}>
                 <div className="flex items-start gap-4">
                   <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0', insightColor(insight.type))}>
                     <IIcon size={18} className={insightIconColor(insight.type)} />
@@ -219,7 +219,7 @@ export default function AiPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {aiModules.map((m, i) => (
             <motion.div key={m.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-              className="glass-card p-5 hover:border-gold/20 transition-all cursor-pointer group" onClick={() => { setActiveModule(m.id); setActiveTab('chat') }}>
+              className="glass-card p-3 sm:p-4 lg:p-5 hover:border-gold/20 transition-all cursor-pointer group" onClick={() => { setActiveModule(m.id); setActiveTab('chat') }}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center group-hover:scale-105 transition-transform"><m.icon size={22} className={m.color} /></div>
                 <div><h3 className="text-sm font-bold text-foreground">{m.label}</h3><p className="text-[10px] text-muted-foreground">{m.desc}</p></div>

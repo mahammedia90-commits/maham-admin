@@ -122,7 +122,7 @@ export default function OperationsPage() {
         }
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="إجمالي المهام" value={String(stats.total)} icon={ClipboardList} delay={0} />
         <StatsCard title="قيد التنفيذ" value={String(stats.inProgress)} icon={Activity} trend={3} trendLabel="هذا الأسبوع" delay={0.05} />
         <StatsCard title="مكتملة" value={String(stats.completed)} icon={CheckCircle} delay={0.1} />
@@ -180,7 +180,7 @@ export default function OperationsPage() {
               <button key={f.key} onClick={() => setFilterPriority(f.key)} className={cn('h-7 px-2.5 rounded-lg text-[11px] font-medium transition-all', filterPriority === f.key ? 'bg-gold/10 text-gold border border-gold/20' : 'text-muted-foreground hover:text-foreground')}>{f.label}</button>
             ))}
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full">
               <thead><tr className="border-b border-border/50">
                 <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">المهمة</th>
@@ -222,12 +222,12 @@ export default function OperationsPage() {
       <AnimatePresence>
         {detailTask && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDetailTask(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-base font-bold text-foreground">{detailTask.title}</h2>
                 <button onClick={() => setDetailTask(null)} className="p-2 rounded-lg hover:bg-surface2 text-muted-foreground"><X size={18} /></button>
               </div>
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 sm:mb-4">
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">الفعالية</p><p className="text-xs text-foreground">{detailTask.event}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">المسؤول</p><p className="text-xs text-foreground">{detailTask.assignee}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">الحالة</p><span className={cn('text-xs px-2 py-0.5 rounded-full', statusColors[detailTask.status])}>{statusLabels[detailTask.status]}</span></div>
@@ -252,14 +252,14 @@ export default function OperationsPage() {
       <AnimatePresence>
         {showAddModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowAddModal(false)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-3 mb-5">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
                 <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><ClipboardList size={18} className="text-gold" /></div>
                 <div><h3 className="text-base font-bold text-foreground">مهمة جديدة</h3><p className="text-xs text-muted-foreground">إضافة مهمة تشغيلية</p></div>
               </div>
               <div className="space-y-3">
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">عنوان المهمة <span className="text-danger">*</span></label><input type="text" value={newTask.title} onChange={(e) => setNewTask(p => ({ ...p, title: e.target.value }))} placeholder="عنوان المهمة" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">المسؤول</label><input type="text" value={newTask.assignee} onChange={(e) => setNewTask(p => ({ ...p, assignee: e.target.value }))} placeholder="الفريق/الشخص" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الأولوية</label><select value={newTask.priority} onChange={(e) => setNewTask(p => ({ ...p, priority: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option value="high">عالية</option><option value="medium">متوسطة</option><option value="low">منخفضة</option></select></div>
                 </div>
@@ -279,7 +279,7 @@ export default function OperationsPage() {
       <AnimatePresence>
         {deleteConfirm !== null && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDeleteConfirm(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-6 text-center" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-4 sm:p-6 text-center" onClick={(e) => e.stopPropagation()}>
               <div className="w-14 h-14 rounded-2xl bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={24} className="text-danger" /></div>
               <h3 className="text-base font-bold text-foreground mb-2">حذف المهمة</h3>
               <p className="text-sm text-muted-foreground mb-5">هل أنت متأكد من حذف <span className="text-foreground font-medium">{tasks.find(t => t.id === deleteConfirm)?.title}</span>؟</p>

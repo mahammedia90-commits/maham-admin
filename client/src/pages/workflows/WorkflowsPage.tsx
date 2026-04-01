@@ -88,7 +88,7 @@ export default function WorkflowsPage() {
       <PageHeader title="سير العمل والأتمتة" subtitle={`${stats.total} سير عمل — ${stats.active} نشط — ${stats.totalRuns} تشغيل`}
         actions={<button onClick={() => setShowAddModal(true)} className="h-9 px-4 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all flex items-center gap-2"><Plus size={16} /> سير عمل جديد</button>} />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="سير العمل النشط" value={String(stats.active)} icon={Workflow} delay={0} />
         <StatsCard title="إجمالي التشغيل" value={String(stats.totalRuns)} icon={Zap} delay={0.05} />
         <StatsCard title="نسبة النجاح" value="98.5%" icon={CheckCircle} trend={2} trendLabel="تحسن" delay={0.1} />
@@ -100,7 +100,7 @@ export default function WorkflowsPage() {
       <div className="space-y-3">
         {filtered.map((wf, i) => (
           <motion.div key={wf.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-            className="glass-card p-5 hover:border-gold/20 transition-all">
+            className="glass-card p-3 sm:p-4 lg:p-5 hover:border-gold/20 transition-all">
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-3">
                 <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', wf.status === 'active' ? 'bg-success/10' : 'bg-surface2')}>
@@ -143,7 +143,7 @@ export default function WorkflowsPage() {
       <AnimatePresence>
         {detailWf && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDetailWf(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-5"><div><h2 className="text-base font-bold text-foreground">{detailWf.name}</h2><p className="text-xs text-muted-foreground">{detailWf.category}</p></div><button onClick={() => setDetailWf(null)} className="p-2 rounded-lg hover:bg-surface2 text-muted-foreground"><X size={18} /></button></div>
               <p className="text-sm text-muted-foreground mb-4">{detailWf.description}</p>
               <h4 className="text-xs font-bold text-foreground mb-2">خطوات سير العمل</h4>
@@ -155,7 +155,7 @@ export default function WorkflowsPage() {
                   </div>
                 ))}
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 <div className="p-2 rounded-lg bg-surface2/50 text-center"><p className="text-[9px] text-muted-foreground">التشغيل</p><p className="text-sm font-bold font-mono text-foreground">{detailWf.runs}</p></div>
                 <div className="p-2 rounded-lg bg-surface2/50 text-center"><p className="text-[9px] text-muted-foreground">المشغّل</p><p className="text-[10px] font-medium text-foreground">{detailWf.trigger}</p></div>
                 <div className="p-2 rounded-lg bg-surface2/50 text-center"><p className="text-[9px] text-muted-foreground">الحالة</p><span className={cn('text-[10px] px-2 py-0.5 rounded-full', statusColors[detailWf.status])}>{statusLabels[detailWf.status]}</span></div>
@@ -169,12 +169,12 @@ export default function WorkflowsPage() {
       <AnimatePresence>
         {showAddModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowAddModal(false)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-3 mb-5"><div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Workflow size={18} className="text-gold" /></div><div><h3 className="text-base font-bold text-foreground">سير عمل جديد</h3><p className="text-xs text-muted-foreground">إنشاء أتمتة</p></div></div>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5"><div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Workflow size={18} className="text-gold" /></div><div><h3 className="text-base font-bold text-foreground">سير عمل جديد</h3><p className="text-xs text-muted-foreground">إنشاء أتمتة</p></div></div>
               <div className="space-y-3">
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الاسم <span className="text-danger">*</span></label><input type="text" value={newWf.name} onChange={(e) => setNewWf(p => ({ ...p, name: e.target.value }))} placeholder="اسم سير العمل" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الوصف</label><textarea value={newWf.description} onChange={(e) => setNewWf(p => ({ ...p, description: e.target.value }))} placeholder="وصف سير العمل..." rows={2} className="w-full p-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 resize-none transition-all" /></div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">المشغّل</label><input type="text" value={newWf.trigger} onChange={(e) => setNewWf(p => ({ ...p, trigger: e.target.value }))} placeholder="حدث التشغيل" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">التصنيف</label><select value={newWf.category} onChange={(e) => setNewWf(p => ({ ...p, category: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option>حجوزات</option><option>عقود</option><option>مالية</option><option>دعم</option><option>تقارير</option><option>CRM</option><option>تسويق</option></select></div>
                 </div>
@@ -192,7 +192,7 @@ export default function WorkflowsPage() {
       <AnimatePresence>
         {deleteConfirm !== null && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDeleteConfirm(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-6 text-center" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-4 sm:p-6 text-center" onClick={(e) => e.stopPropagation()}>
               <div className="w-14 h-14 rounded-2xl bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={24} className="text-danger" /></div>
               <h3 className="text-base font-bold text-foreground mb-2">حذف سير العمل</h3>
               <p className="text-sm text-muted-foreground mb-5">هل أنت متأكد من حذف <span className="text-foreground font-medium">{workflows.find(w => w.id === deleteConfirm)?.name}</span>؟</p>

@@ -74,7 +74,7 @@ export default function FilesPage() {
       <PageHeader title="إدارة الملفات" subtitle={`${stats.total} ملف — ${stats.totalSize} — ${stats.categories} تصنيف`}
         actions={<button onClick={() => setShowUploadModal(true)} className="h-9 px-4 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all flex items-center gap-2"><Upload size={16} /> رفع ملف</button>} />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="إجمالي الملفات" value={String(stats.total)} icon={FolderOpen} delay={0} />
         <StatsCard title="الحجم الكلي" value={stats.totalSize} icon={HardDrive} delay={0.05} />
         <StatsCard title="العقود" value={String(files.filter(f => f.category === 'عقود').length)} icon={FileText} delay={0.1} />
@@ -150,8 +150,8 @@ export default function FilesPage() {
       <AnimatePresence>
         {showUploadModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowUploadModal(false)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-3 mb-5"><div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Upload size={18} className="text-gold" /></div><div><h3 className="text-base font-bold text-foreground">رفع ملف</h3><p className="text-xs text-muted-foreground">رفع ملف جديد للنظام</p></div></div>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5"><div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Upload size={18} className="text-gold" /></div><div><h3 className="text-base font-bold text-foreground">رفع ملف</h3><p className="text-xs text-muted-foreground">رفع ملف جديد للنظام</p></div></div>
               <div className="border-2 border-dashed border-border/50 rounded-xl p-8 text-center hover:border-gold/30 transition-colors cursor-pointer" onClick={() => toast.info('اختيار ملف — قريباً')}>
                 <Upload size={32} className="mx-auto text-muted-foreground/50 mb-3" />
                 <p className="text-sm text-muted-foreground">اسحب الملف هنا أو اضغط للاختيار</p>
@@ -167,7 +167,7 @@ export default function FilesPage() {
       <AnimatePresence>
         {deleteConfirm !== null && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDeleteConfirm(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-6 text-center" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-4 sm:p-6 text-center" onClick={(e) => e.stopPropagation()}>
               <div className="w-14 h-14 rounded-2xl bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={24} className="text-danger" /></div>
               <h3 className="text-base font-bold text-foreground mb-2">حذف الملف</h3>
               <p className="text-sm text-muted-foreground mb-5">هل أنت متأكد من حذف <span className="text-foreground font-medium">{files.find(f => f.id === deleteConfirm)?.name}</span>؟</p>

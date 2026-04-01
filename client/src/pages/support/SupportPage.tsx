@@ -109,7 +109,7 @@ export default function SupportPage() {
         }
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="التذاكر المفتوحة" value={String(stats.open)} icon={MessageSquare} delay={0} />
         <StatsCard title="قيد المعالجة" value={String(stats.inProgress)} icon={Clock} delay={0.05} />
         <StatsCard title="تم الحل" value={String(stats.resolved)} icon={CheckCircle} delay={0.1} />
@@ -117,7 +117,7 @@ export default function SupportPage() {
       </div>
 
       {/* تبويبات */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-3 sm:mb-4">
         {[{ key: 'tickets', label: 'التذاكر', icon: Headphones }, { key: 'knowledge', label: 'قاعدة المعرفة', icon: BookOpen }].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key)}
             className={cn('h-9 px-4 rounded-xl text-sm font-medium transition-all flex items-center gap-2', activeTab === t.key ? 'bg-gold/10 text-gold border border-gold/20' : 'bg-surface2/50 text-muted-foreground hover:text-foreground border border-transparent')}>
@@ -181,7 +181,7 @@ export default function SupportPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {knowledgeBase.map((article, i) => (
             <motion.div key={article.title} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-              className="glass-card p-5 hover:border-gold/20 transition-all cursor-pointer group" onClick={() => toast.info(`عرض المقال: ${article.title}`)}>
+              className="glass-card p-3 sm:p-4 lg:p-5 hover:border-gold/20 transition-all cursor-pointer group" onClick={() => toast.info(`عرض المقال: ${article.title}`)}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center group-hover:scale-105 transition-transform"><BookOpen size={18} className="text-gold" /></div>
                 <div className="flex-1 min-w-0"><h3 className="text-sm font-bold text-foreground truncate">{article.title}</h3><p className="text-[10px] text-muted-foreground">{article.category}</p></div>
@@ -199,12 +199,12 @@ export default function SupportPage() {
       <AnimatePresence>
         {detailTicket && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDetailTicket(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-5">
                 <div><span className="text-xs font-mono text-muted-foreground">{detailTicket.id}</span><h2 className="text-base font-bold text-foreground mt-1">{detailTicket.subject}</h2></div>
                 <button onClick={() => setDetailTicket(null)} className="p-2 rounded-lg hover:bg-surface2 text-muted-foreground"><X size={18} /></button>
               </div>
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 sm:mb-4">
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">العميل</p><p className="text-xs text-foreground">{detailTicket.customer}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">المسؤول</p><p className="text-xs text-foreground">{detailTicket.assignee}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">القناة</p><p className="text-xs text-foreground">{detailTicket.channel === 'email' ? 'بريد إلكتروني' : detailTicket.channel === 'phone' ? 'هاتف' : 'محادثة'}</p></div>
@@ -227,15 +227,15 @@ export default function SupportPage() {
       <AnimatePresence>
         {showAddModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowAddModal(false)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-3 mb-5">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
                 <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Headphones size={18} className="text-gold" /></div>
                 <div><h3 className="text-base font-bold text-foreground">تذكرة جديدة</h3><p className="text-xs text-muted-foreground">إنشاء تذكرة دعم فني</p></div>
               </div>
               <div className="space-y-3">
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الموضوع <span className="text-danger">*</span></label><input type="text" value={newTicket.subject} onChange={(e) => setNewTicket(p => ({ ...p, subject: e.target.value }))} placeholder="موضوع التذكرة" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">العميل <span className="text-danger">*</span></label><input type="text" value={newTicket.customer} onChange={(e) => setNewTicket(p => ({ ...p, customer: e.target.value }))} placeholder="اسم العميل/الشركة" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الأولوية</label><select value={newTicket.priority} onChange={(e) => setNewTicket(p => ({ ...p, priority: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option value="high">عالية</option><option value="medium">متوسطة</option><option value="low">منخفضة</option></select></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">القناة</label><select value={newTicket.channel} onChange={(e) => setNewTicket(p => ({ ...p, channel: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option value="email">بريد</option><option value="phone">هاتف</option><option value="chat">محادثة</option></select></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">التصنيف</label><select value={newTicket.category} onChange={(e) => setNewTicket(p => ({ ...p, category: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option>استفسارات</option><option>حجوزات</option><option>مالية</option><option>تقنية</option><option>شكاوى</option></select></div>
@@ -255,7 +255,7 @@ export default function SupportPage() {
       <AnimatePresence>
         {deleteConfirm !== null && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDeleteConfirm(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-6 text-center" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-4 sm:p-6 text-center" onClick={(e) => e.stopPropagation()}>
               <div className="w-14 h-14 rounded-2xl bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={24} className="text-danger" /></div>
               <h3 className="text-base font-bold text-foreground mb-2">حذف التذكرة</h3>
               <p className="text-sm text-muted-foreground mb-5">هل أنت متأكد من حذف التذكرة <span className="text-foreground font-medium font-mono">{deleteConfirm}</span>؟</p>

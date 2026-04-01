@@ -90,7 +90,7 @@ export default function ProjectsPage() {
       <PageHeader title="إدارة المشاريع" subtitle={`${stats.total} مشروع — ${stats.active} نشط — الميزانية: ${formatCurrency(stats.totalBudget)}`}
         actions={<button onClick={() => setShowAddModal(true)} className="h-9 px-4 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all flex items-center gap-2"><Plus size={16} /> مشروع جديد</button>} />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="المشاريع النشطة" value={String(stats.active)} icon={FolderKanban} delay={0} />
         <StatsCard title="إجمالي الميزانية" value={formatCurrency(stats.totalBudget)} icon={DollarSign} delay={0.05} />
         <StatsCard title="المصروف" value={formatCurrency(stats.totalSpent)} icon={BarChart3} delay={0.1} />
@@ -105,7 +105,7 @@ export default function ProjectsPage() {
           const doneCount = project.milestones.filter(m => m.done).length
           return (
             <motion.div key={project.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-              className="glass-card p-5 hover:border-gold/20 transition-all">
+              className="glass-card p-3 sm:p-4 lg:p-5 hover:border-gold/20 transition-all">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><FolderKanban size={18} className="text-gold" /></div>
@@ -118,7 +118,7 @@ export default function ProjectsPage() {
                 <div className="flex items-center justify-between text-[10px] mb-1"><span className="text-muted-foreground">التقدم</span><span className="text-foreground font-mono">{project.progress}%</span></div>
                 <div className="w-full h-2 rounded-full bg-surface3"><div className={cn('h-full rounded-full transition-all', project.progress >= 80 ? 'bg-success' : project.progress >= 50 ? 'bg-gold' : 'bg-warning')} style={{ width: `${project.progress}%` }} /></div>
               </div>
-              <div className="grid grid-cols-3 gap-2 mb-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-3">
                 <div className="p-2 rounded-lg bg-surface2/50 text-center"><p className="text-[8px] text-muted-foreground">الميزانية</p><p className="text-[10px] font-bold font-mono text-foreground">{formatCurrency(project.budget)}</p></div>
                 <div className="p-2 rounded-lg bg-surface2/50 text-center"><p className="text-[8px] text-muted-foreground">المصروف</p><p className={cn('text-[10px] font-bold font-mono', budgetUsed > 90 ? 'text-danger' : 'text-foreground')}>{budgetUsed}%</p></div>
                 <div className="p-2 rounded-lg bg-surface2/50 text-center"><p className="text-[8px] text-muted-foreground">المراحل</p><p className="text-[10px] font-bold font-mono text-foreground">{doneCount}/{project.milestones.length}</p></div>
@@ -139,14 +139,14 @@ export default function ProjectsPage() {
       <AnimatePresence>
         {detailProject && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDetailProject(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-4 sm:p-6 max-h-[85vh] sm:max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-5">
                 <div><h2 className="text-base font-bold text-foreground">{detailProject.name}</h2><p className="text-xs text-muted-foreground">{detailProject.category} — {detailProject.location}</p></div>
                 <button onClick={() => setDetailProject(null)} className="p-2 rounded-lg hover:bg-surface2 text-muted-foreground"><X size={18} /></button>
               </div>
               <p className="text-sm text-muted-foreground mb-4">{detailProject.description}</p>
               <div className="mb-4"><div className="flex items-center justify-between text-xs mb-1"><span className="text-muted-foreground">التقدم الكلي</span><span className="text-gold font-bold font-mono">{detailProject.progress}%</span></div><div className="w-full h-3 rounded-full bg-surface3"><div className="h-full rounded-full bg-gradient-to-l from-gold to-gold-light transition-all" style={{ width: `${detailProject.progress}%` }} /></div></div>
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 sm:mb-4">
                 <div className="p-3 rounded-xl bg-gold/5 border border-gold/20"><p className="text-[10px] text-muted-foreground">الميزانية</p><p className="text-sm font-bold font-mono text-gold">{formatCurrency(detailProject.budget)}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">المصروف</p><p className="text-sm font-bold font-mono text-foreground">{formatCurrency(detailProject.spent)}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">البداية</p><p className="text-xs text-foreground">{detailProject.startDate}</p></div>
@@ -176,16 +176,16 @@ export default function ProjectsPage() {
       <AnimatePresence>
         {showAddModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowAddModal(false)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-3 mb-5"><div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><FolderKanban size={18} className="text-gold" /></div><div><h3 className="text-base font-bold text-foreground">مشروع جديد</h3><p className="text-xs text-muted-foreground">إنشاء مشروع</p></div></div>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5"><div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><FolderKanban size={18} className="text-gold" /></div><div><h3 className="text-base font-bold text-foreground">مشروع جديد</h3><p className="text-xs text-muted-foreground">إنشاء مشروع</p></div></div>
               <div className="space-y-3">
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">اسم المشروع <span className="text-danger">*</span></label><input type="text" value={newProject.name} onChange={(e) => setNewProject(p => ({ ...p, name: e.target.value }))} placeholder="اسم المشروع" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الوصف</label><textarea value={newProject.description} onChange={(e) => setNewProject(p => ({ ...p, description: e.target.value }))} placeholder="وصف المشروع..." rows={2} className="w-full p-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 resize-none transition-all" /></div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">التصنيف</label><select value={newProject.category} onChange={(e) => setNewProject(p => ({ ...p, category: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option>معارض</option><option>تشغيل</option><option>تقنية</option><option>رياضة</option><option>اجتماعي</option></select></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الميزانية (ر.س)</label><input type="number" value={newProject.budget} onChange={(e) => setNewProject(p => ({ ...p, budget: e.target.value }))} placeholder="0" dir="ltr" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">المدير</label><input type="text" value={newProject.manager} onChange={(e) => setNewProject(p => ({ ...p, manager: e.target.value }))} placeholder="مدير المشروع" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الموقع</label><input type="text" value={newProject.location} onChange={(e) => setNewProject(p => ({ ...p, location: e.target.value }))} placeholder="الموقع" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 </div>
@@ -203,7 +203,7 @@ export default function ProjectsPage() {
       <AnimatePresence>
         {deleteConfirm !== null && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDeleteConfirm(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-6 text-center" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-4 sm:p-6 text-center" onClick={(e) => e.stopPropagation()}>
               <div className="w-14 h-14 rounded-2xl bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={24} className="text-danger" /></div>
               <h3 className="text-base font-bold text-foreground mb-2">حذف المشروع</h3>
               <p className="text-sm text-muted-foreground mb-5">هل أنت متأكد من حذف <span className="text-foreground font-medium">{projects.find(p => p.id === deleteConfirm)?.name}</span>؟</p>

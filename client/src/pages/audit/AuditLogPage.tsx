@@ -61,7 +61,7 @@ export default function AuditLogPage() {
       <PageHeader title="سجل المراجعة" subtitle={`${demoLogs.length} حدث مسجل — آخر 48 ساعة`}
         actions={<button onClick={() => toast.info('تصدير السجل — قريباً')} className="h-9 px-4 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all flex items-center gap-2"><Download size={16} /> تصدير</button>} />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="إجمالي الأحداث" value={String(demoLogs.length)} icon={ScrollText} delay={0} />
         <StatsCard title="تعديلات" value={String(demoLogs.filter(l => l.action === 'تعديل' || l.action === 'تعديل صلاحيات').length)} icon={Edit3} delay={0.05} />
         <StatsCard title="تنبيهات" value={String(demoLogs.filter(l => l.severity === 'warning').length)} icon={AlertTriangle} delay={0.1} />

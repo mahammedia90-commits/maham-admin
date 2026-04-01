@@ -111,7 +111,7 @@ export default function MarketingPage() {
       />
 
       {/* إحصائيات */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="إجمالي الميزانية" value={formatCurrency(stats.totalBudget)} icon={DollarSign} delay={0} />
         <StatsCard title="الإنفاق الفعلي" value={formatCurrency(stats.totalSpent)} icon={TrendingUp} trend={12} trendLabel="هذا الشهر" delay={0.05} />
         <StatsCard title="التحويلات" value={formatNumber(stats.totalConversions)} icon={Target} trend={28} trendLabel="هذا الشهر" delay={0.1} />
@@ -119,7 +119,7 @@ export default function MarketingPage() {
       </div>
 
       {/* تبويبات */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-3 sm:mb-4">
         {[
           { key: 'campaigns', label: 'الحملات', icon: Megaphone },
           { key: 'performance', label: 'الأداء', icon: BarChart3 },
@@ -140,7 +140,7 @@ export default function MarketingPage() {
             const spentPct = camp.budget > 0 ? Math.round((camp.spent / camp.budget) * 100) : 0
             return (
               <motion.div key={camp.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-                className="glass-card p-5 hover:border-gold/20 transition-all group">
+                className="glass-card p-3 sm:p-4 lg:p-5 hover:border-gold/20 transition-all group">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><CIcon size={18} className="text-gold" /></div>
@@ -152,7 +152,7 @@ export default function MarketingPage() {
                   <StatusBadge status={camp.status} />
                 </div>
 
-                <div className="grid grid-cols-3 gap-3 mb-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
                   <div><p className="text-[10px] text-muted-foreground">الظهور</p><p className="text-sm font-bold font-mono text-foreground">{camp.impressions}</p></div>
                   <div><p className="text-[10px] text-muted-foreground">النقرات</p><p className="text-sm font-bold font-mono text-foreground">{camp.clicks}</p></div>
                   <div><p className="text-[10px] text-muted-foreground">ROI</p><p className={cn('text-sm font-bold font-mono', camp.roi.startsWith('+') ? 'text-success' : 'text-muted-foreground')}>{camp.roi}</p></div>
@@ -188,9 +188,9 @@ export default function MarketingPage() {
 
       {/* الأداء */}
       {activeTab === 'performance' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-5">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-3 sm:p-4 lg:p-5">
           <h3 className="text-sm font-bold text-foreground mb-4">أداء الحملات — آخر 4 أسابيع</h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={performanceData}>
               <defs>
                 <linearGradient id="impGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#C9A84C" stopOpacity={0.3} /><stop offset="95%" stopColor="#C9A84C" stopOpacity={0} /></linearGradient>
@@ -211,7 +211,7 @@ export default function MarketingPage() {
       {activeTab === 'channels' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card overflow-hidden">
           <div className="p-4 border-b border-border/50"><h3 className="text-sm font-bold text-foreground">أداء القنوات التسويقية</h3></div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full">
               <thead><tr className="border-b border-border/50">
                 <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">القناة</th>
@@ -246,12 +246,12 @@ export default function MarketingPage() {
       <AnimatePresence>
         {detailCampaign && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDetailCampaign(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-5">
                 <div><h2 className="text-lg font-bold text-foreground">{detailCampaign.name}</h2><p className="text-xs text-muted-foreground">{detailCampaign.channel}</p></div>
                 <button onClick={() => setDetailCampaign(null)} className="p-2 rounded-lg hover:bg-surface2 text-muted-foreground"><X size={18} /></button>
               </div>
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 sm:mb-4">
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">الميزانية</p><p className="text-sm font-bold font-mono text-foreground">{formatCurrency(detailCampaign.budget)}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">الإنفاق</p><p className="text-sm font-bold font-mono text-foreground">{formatCurrency(detailCampaign.spent)}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">الظهور</p><p className="text-sm font-bold font-mono text-foreground">{detailCampaign.impressions}</p></div>
@@ -272,18 +272,18 @@ export default function MarketingPage() {
       <AnimatePresence>
         {showAddModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowAddModal(false)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-3 mb-5">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
                 <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Megaphone size={18} className="text-gold" /></div>
                 <div><h3 className="text-base font-bold text-foreground">حملة تسويقية جديدة</h3><p className="text-xs text-muted-foreground">إنشاء حملة تسويقية جديدة</p></div>
               </div>
               <div className="space-y-3">
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">اسم الحملة <span className="text-danger">*</span></label><input type="text" value={newCamp.name} onChange={(e) => setNewCamp(p => ({ ...p, name: e.target.value }))} placeholder="اسم الحملة" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">القناة</label><select value={newCamp.channel} onChange={(e) => setNewCamp(p => ({ ...p, channel: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option>Google Ads</option><option>Instagram</option><option>Facebook</option><option>Email</option><option>LinkedIn</option><option>Twitter/X</option></select></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الميزانية (ر.س) <span className="text-danger">*</span></label><input type="number" value={newCamp.budget} onChange={(e) => setNewCamp(p => ({ ...p, budget: e.target.value }))} placeholder="0" dir="ltr" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">تاريخ البدء</label><input type="date" value={newCamp.startDate} onChange={(e) => setNewCamp(p => ({ ...p, startDate: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">تاريخ الانتهاء</label><input type="date" value={newCamp.endDate} onChange={(e) => setNewCamp(p => ({ ...p, endDate: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 </div>
@@ -301,7 +301,7 @@ export default function MarketingPage() {
       <AnimatePresence>
         {deleteConfirm !== null && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDeleteConfirm(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-6 text-center" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-4 sm:p-6 text-center" onClick={(e) => e.stopPropagation()}>
               <div className="w-14 h-14 rounded-2xl bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={24} className="text-danger" /></div>
               <h3 className="text-base font-bold text-foreground mb-2">حذف الحملة</h3>
               <p className="text-sm text-muted-foreground mb-5">هل أنت متأكد من حذف <span className="text-foreground font-medium">{campaigns.find(c => c.id === deleteConfirm)?.name}</span>؟</p>

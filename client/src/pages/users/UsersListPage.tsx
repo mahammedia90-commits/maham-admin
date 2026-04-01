@@ -216,7 +216,7 @@ export default function UsersListPage() {
       />
 
       {/* ── إحصائيات ──────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="إجمالي المستخدمين" value={formatNumber(stats.total)} icon={Users} delay={0} />
         <StatsCard title="مستخدمون نشطون" value={formatNumber(stats.active)} icon={UserCheck} trend={8} trendLabel="هذا الشهر" delay={0.05} />
         <StatsCard title="مدراء الأقسام" value={formatNumber(stats.managers)} icon={Shield} delay={0.1} />
@@ -224,7 +224,7 @@ export default function UsersListPage() {
       </div>
 
       {/* ── فلاتر الأدوار ──────────────────────────────── */}
-      <div className="flex items-center gap-2 mb-4 flex-wrap">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-3 sm:mb-4 flex-wrap">
         {[
           { key: 'all', label: 'الكل', count: stats.total },
           { key: 'super_admin', label: 'مدير عام', count: stats.admins },
@@ -269,7 +269,7 @@ export default function UsersListPage() {
             exit={{ opacity: 0, height: 0 }}
             className="glass-card p-4 mb-4 overflow-hidden"
           >
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">الحالة</label>
                 <select
@@ -309,7 +309,7 @@ export default function UsersListPage() {
       {/* ── جدول المستخدمين ──────────────────────────── */}
       <div className="glass-card overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b border-border/50">
-          <div className="relative w-72">
+          <div className="relative w-full sm:w-56 md:w-64 lg:w-72">
             <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
@@ -322,7 +322,7 @@ export default function UsersListPage() {
           <span className="text-xs text-muted-foreground">{filtered.length} مستخدم</span>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-hide">
           <table className="w-full">
             <thead>
               <tr className="border-b border-border/50">
@@ -505,7 +505,7 @@ export default function UsersListPage() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-5">
                   <InfoItem icon={Mail} label="البريد" value={detailUser.email} />
                   <InfoItem icon={Phone} label="الجوال" value={detailUser.phone} dir="ltr" />
                   <InfoItem icon={Building2} label="القسم" value={detailUser.department} />
@@ -542,10 +542,10 @@ export default function UsersListPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="glass-card w-full max-w-md p-6"
+              className="glass-card w-full max-w-md p-4 sm:p-6"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center gap-3 mb-5">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
                 <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center">
                   {editUser ? <Edit size={18} className="text-gold" /> : <Plus size={18} className="text-gold" />}
                 </div>
@@ -560,7 +560,7 @@ export default function UsersListPage() {
                 <FormField label="البريد الإلكتروني" value={formData.email} onChange={(v) => setFormData(p => ({ ...p, email: v }))} placeholder="example@mahamexpo.sa" type="email" required />
                 <FormField label="رقم الجوال" value={formData.phone} onChange={(v) => setFormData(p => ({ ...p, phone: v }))} placeholder="+966500000000" dir="ltr" required />
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="text-xs font-medium text-muted-foreground mb-1.5 block">الدور</label>
                     <select
@@ -634,7 +634,7 @@ export default function UsersListPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="glass-card w-full max-w-sm p-6 text-center"
+              className="glass-card w-full max-w-sm p-4 sm:p-6 text-center"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="w-14 h-14 rounded-2xl bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-4">

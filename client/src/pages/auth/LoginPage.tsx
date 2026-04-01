@@ -208,7 +208,7 @@ export default function LoginPage() {
         </div>
 
         {/* Steps Progress */}
-        <div className="px-5 md:px-6 mb-6">
+        <div className="px-5 md:px-6 mb-3 sm:mb-4 lg:mb-6">
           <div className="flex items-center justify-center gap-1">
             {STEPS.map((s, i) => (
               <div key={s.id} className="flex items-center">
@@ -257,7 +257,7 @@ export default function LoginPage() {
                   exit="exit"
                   transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
                 >
-                  <div className="text-center mb-6">
+                  <div className="text-center mb-3 sm:mb-4 lg:mb-6">
                     <h1 className="text-xl md:text-2xl font-bold mb-2" style={{ color: '#E8E4DC', fontFamily: 'Cairo, sans-serif' }}>
                       مرحباً بك في المنصة
                     </h1>
@@ -346,7 +346,7 @@ export default function LoginPage() {
                   </button>
 
                   {/* Selected Role Badge */}
-                  <div className="flex items-center gap-3 px-4 py-3 rounded-xl mb-6" style={{ background: 'rgba(201, 168, 76, 0.06)', border: '1px solid rgba(201, 168, 76, 0.15)' }}>
+                  <div className="flex items-center gap-3 px-4 py-3 rounded-xl mb-3 sm:mb-4 lg:mb-6" style={{ background: 'rgba(201, 168, 76, 0.06)', border: '1px solid rgba(201, 168, 76, 0.15)' }}>
                     <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: 'rgba(201, 168, 76, 0.12)' }}>
                       <selectedRole.icon className="w-4.5 h-4.5" style={{ color: '#C9A84C' }} />
                     </div>
@@ -356,7 +356,7 @@ export default function LoginPage() {
                     </div>
                   </div>
 
-                  <div className="text-center mb-6">
+                  <div className="text-center mb-3 sm:mb-4 lg:mb-6">
                     <motion.div
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
@@ -470,7 +470,7 @@ export default function LoginPage() {
                     رجوع
                   </button>
 
-                  <div className="text-center mb-6">
+                  <div className="text-center mb-3 sm:mb-4 lg:mb-6">
                     <motion.div
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}

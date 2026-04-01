@@ -47,7 +47,7 @@ export default function EventCreatePage() {
       <PageHeader title="إنشاء فعالية جديدة" subtitle="أضف فعالية أو معرض جديد" showBack />
 
       {/* Steps */}
-      <div className="glass-card p-4 mb-6">
+      <div className="glass-card p-4 mb-3 sm:mb-4 lg:mb-6">
         <div className="flex items-center justify-between">
           {steps.map((step, i) => (
             <div key={step.id} className="flex items-center flex-1">
@@ -83,7 +83,7 @@ export default function EventCreatePage() {
         key={currentStep}
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
-        className="glass-card p-6"
+        className="glass-card p-3 sm:p-4 lg:p-6"
       >
         {currentStep === 1 && (
           <div className="space-y-5 max-w-2xl">
@@ -109,7 +109,7 @@ export default function EventCreatePage() {
 
         {currentStep === 2 && (
           <div className="space-y-5 max-w-2xl">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">المدينة</label>
                 <select value={form.city} onChange={(e) => updateForm('city', e.target.value)} className={inputClass}>
@@ -126,7 +126,7 @@ export default function EventCreatePage() {
                 <input value={form.location} onChange={(e) => updateForm('location', e.target.value)} placeholder="مركز المعارض..." className={inputClass} />
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">تاريخ البدء</label>
                 <input type="date" value={form.start_date} onChange={(e) => updateForm('start_date', e.target.value)} className={inputClass} />
@@ -145,7 +145,7 @@ export default function EventCreatePage() {
               <label className="text-sm font-medium text-foreground">السعة القصوى</label>
               <input type="number" value={form.capacity} onChange={(e) => updateForm('capacity', e.target.value)} placeholder="عدد الحضور المتوقع" className={inputClass} />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">السعر (ر.س)</label>
                 <input type="number" value={form.price} onChange={(e) => updateForm('price', e.target.value)} placeholder="0.00" className={inputClass} />
@@ -184,7 +184,7 @@ export default function EventCreatePage() {
           <button
             onClick={() => setCurrentStep(s => Math.max(1, s - 1))}
             disabled={currentStep === 1}
-            className="h-10 px-5 rounded-xl border border-border/50 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-gold/30 disabled:opacity-30 transition-all flex items-center gap-2"
+            className="h-9 sm:h-10 px-3 sm:px-5 rounded-xl border border-border/50 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground hover:border-gold/30 disabled:opacity-30 transition-all flex items-center gap-2"
           >
             <ChevronRight size={16} />
             السابق
@@ -192,7 +192,7 @@ export default function EventCreatePage() {
           {currentStep < 4 ? (
             <button
               onClick={() => setCurrentStep(s => Math.min(4, s + 1))}
-              className="h-10 px-5 rounded-xl bg-gold/10 border border-gold/20 text-sm font-medium text-gold hover:bg-gold/20 transition-all flex items-center gap-2"
+              className="h-9 sm:h-10 px-3 sm:px-5 rounded-xl bg-gold/10 border border-gold/20 text-xs sm:text-sm font-medium text-gold hover:bg-gold/20 transition-all flex items-center gap-2"
             >
               التالي
               <ChevronLeft size={16} />
@@ -201,7 +201,7 @@ export default function EventCreatePage() {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="h-10 px-6 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 disabled:opacity-50 transition-all flex items-center gap-2"
+              className="h-9 sm:h-10 px-4 sm:px-6 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-xs sm:text-sm hover:shadow-lg hover:shadow-gold/25 disabled:opacity-50 transition-all flex items-center gap-2"
             >
               {loading ? <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> : <Check size={16} />}
               نشر الفعالية

@@ -87,7 +87,7 @@ export default function SponsorPortalPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-3 sm:space-y-4 lg:space-y-6">
         <PageHeader
           title="بوابة الراعي"
           subtitle="إدارة الرعاة وحزم الرعاية والعقود وتحليل العائد على الاستثمار"
@@ -100,7 +100,7 @@ export default function SponsorPortalPage() {
         />
 
         {/* Tabs */}
-        <div className="flex items-center gap-1 p-1 rounded-xl overflow-x-auto" style={{ background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.08)' }}>
+        <div className="flex items-center gap-1 p-1 rounded-xl overflow-x-auto scrollbar-hide" style={{ background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.08)' }}>
           {tabs.map((tab) => (
             <button key={tab} onClick={() => setActiveTab(tab)} className={cn(
               'px-4 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-300',
@@ -114,19 +114,19 @@ export default function SponsorPortalPage() {
 
             {/* ═══ نظرة عامة ═══ */}
             {activeTab === 'نظرة عامة' && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-3 sm:space-y-4 lg:space-y-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
                   <StatsCard title="إجمالي الرعاة" value="28" icon={Crown} trend={12} trendLabel="جديد" delay={0} />
                   <StatsCard title="قيمة الرعايات" value={formatCurrency(49700000)} icon={DollarSign} trend={45} trendLabel="نمو" delay={0.1} />
                   <StatsCard title="متوسط ROI" value="310%" icon={TrendingUp} trend={28} trendLabel="تحسن" delay={0.2} />
                   <StatsCard title="معدل التجديد" value="87%" icon={Handshake} trend={5} trendLabel="أعلى" delay={0.3} />
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
                   {/* Sponsorship Trend */}
-                  <div className="lg:col-span-2 glass-card p-6">
+                  <div className="lg:col-span-2 glass-card p-3 sm:p-4 lg:p-6">
                     <h3 className="text-sm font-bold text-foreground mb-4">اتجاه عقود الرعاية</h3>
-                    <ResponsiveContainer width="100%" height={280}>
+                    <ResponsiveContainer width="100%" height={220}>
                       <AreaChart data={sponsorshipTrend}>
                         <defs>
                           <linearGradient id="goldGradSp" x1="0" y1="0" x2="0" y2="1">
@@ -144,7 +144,7 @@ export default function SponsorPortalPage() {
                   </div>
 
                   {/* Tier Distribution */}
-                  <div className="glass-card p-6">
+                  <div className="glass-card p-3 sm:p-4 lg:p-6">
                     <h3 className="text-sm font-bold text-foreground mb-4">توزيع المستويات</h3>
                     <ResponsiveContainer width="100%" height={200}>
                       <RechartsPie>
@@ -166,8 +166,8 @@ export default function SponsorPortalPage() {
                 </div>
 
                 {/* Top Sponsors + AI */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="glass-card p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+                  <div className="glass-card p-3 sm:p-4 lg:p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-sm font-bold text-foreground flex items-center gap-2"><Crown size={16} className="text-[#C9A84C]" /> أبرز الرعاة</h3>
                       <button onClick={() => setActiveTab('الرعاة')} className="text-xs text-[#C9A84C] hover:opacity-80 flex items-center gap-1">عرض الكل <ChevronLeft size={12} /></button>
@@ -188,7 +188,7 @@ export default function SponsorPortalPage() {
                     </div>
                   </div>
 
-                  <div className="glass-card p-6">
+                  <div className="glass-card p-3 sm:p-4 lg:p-6">
                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><Zap size={16} className="text-[#C9A84C]" /> رؤى الذكاء الاصطناعي</h3>
                     <div className="space-y-3">
                       {[
@@ -219,13 +219,13 @@ export default function SponsorPortalPage() {
                 <div className="flex items-center gap-3">
                   <div className="relative flex-1">
                     <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="بحث عن راعي..." className="w-full h-10 pr-9 pl-4 rounded-xl text-sm bg-card border border-border focus:border-[rgba(201,168,76,0.3)] outline-none transition-all" />
+                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="بحث عن راعي..." className="w-full h-9 sm:h-9 sm:h-10 pr-9 pl-4 rounded-xl text-xs sm:text-sm bg-card border border-border focus:border-[rgba(201,168,76,0.3)] outline-none transition-all" />
                   </div>
                   <button onClick={() => toast.info('تصفية — قريباً')} className="nour-btn-outline text-xs flex items-center gap-1.5"><Filter size={14} /> تصفية</button>
                 </div>
                 <div className="glass-card overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
+                  <div className="overflow-x-auto scrollbar-hide">
+                    <table className="w-full text-sm min-w-[800px]">
                       <thead><tr className="border-b border-border/50">
                         {['الراعي', 'المستوى', 'الفعاليات', 'إجمالي القيمة', 'ROI', 'الحالة', 'منذ', ''].map(h => <th key={h} className="text-right p-4 text-xs font-medium text-muted-foreground">{h}</th>)}
                       </tr></thead>
@@ -251,9 +251,9 @@ export default function SponsorPortalPage() {
 
             {/* ═══ حزم الرعاية ═══ */}
             {activeTab === 'حزم الرعاية' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
                 {packages.map((pkg, i) => (
-                  <motion.div key={pkg.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="glass-card p-6 hover:border-[rgba(201,168,76,0.2)] transition-all duration-300" style={{ borderTop: `3px solid ${pkg.color}` }}>
+                  <motion.div key={pkg.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="glass-card p-3 sm:p-4 lg:p-6 hover:border-[rgba(201,168,76,0.2)] transition-all duration-300" style={{ borderTop: `3px solid ${pkg.color}` }}>
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h3 className="text-base font-bold text-foreground">{pkg.name}</h3>
@@ -287,14 +287,14 @@ export default function SponsorPortalPage() {
             {/* ═══ العقود ═══ */}
             {activeTab === 'العقود' && (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
                   <StatsCard title="العقود النشطة" value="4" icon={FileCheck} delay={0} />
                   <StatsCard title="القيمة الإجمالية" value={formatCurrency(9800000)} icon={DollarSign} delay={0.1} />
                   <StatsCard title="نسبة التحصيل" value="72%" icon={Percent} trend={12} trendLabel="تحسن" delay={0.2} />
                 </div>
                 <div className="glass-card overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
+                  <div className="overflow-x-auto scrollbar-hide">
+                    <table className="w-full text-sm min-w-[800px]">
                       <thead><tr className="border-b border-border/50">
                         {['رقم العقد', 'الراعي', 'الفعالية', 'الحزمة', 'القيمة', 'الفترة', 'الحالة', 'الدفع'].map(h => <th key={h} className="text-right p-4 text-xs font-medium text-muted-foreground">{h}</th>)}
                       </tr></thead>
@@ -320,15 +320,15 @@ export default function SponsorPortalPage() {
 
             {/* ═══ ROI والأداء ═══ */}
             {activeTab === 'ROI والأداء' && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-3 sm:space-y-4 lg:space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
                   <StatsCard title="متوسط ROI" value="310%" icon={TrendingUp} trend={28} trendLabel="تحسن" delay={0} />
                   <StatsCard title="إجمالي الوصول" value="12.5M" icon={Globe} trend={45} trendLabel="نمو" delay={0.1} />
                   <StatsCard title="رضا الرعاة" value="95%" icon={Star} trend={5} trendLabel="أعلى" delay={0.2} />
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="glass-card p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+                  <div className="glass-card p-3 sm:p-4 lg:p-6">
                     <h3 className="text-sm font-bold text-foreground mb-4">مؤشرات الأداء الرئيسية</h3>
                     <ResponsiveContainer width="100%" height={300}>
                       <RadarChart data={roiMetrics}>
@@ -339,7 +339,7 @@ export default function SponsorPortalPage() {
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="glass-card p-6">
+                  <div className="glass-card p-3 sm:p-4 lg:p-6">
                     <h3 className="text-sm font-bold text-foreground mb-4">ROI حسب المستوى</h3>
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={[
@@ -362,7 +362,7 @@ export default function SponsorPortalPage() {
 
             {/* ═══ التقارير ═══ */}
             {activeTab === 'التقارير' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {[
                   { title: 'تقرير الرعاة', desc: 'ملخص شامل لجميع الرعاة ومستوياتهم', icon: Crown, date: '2026-03-28' },
                   { title: 'تقرير ROI', desc: 'تحليل العائد على الاستثمار لكل راعي', icon: TrendingUp, date: '2026-03-25' },
@@ -371,7 +371,7 @@ export default function SponsorPortalPage() {
                   { title: 'تقرير التجديد', desc: 'توقعات تجديد العقود والفرص', icon: Handshake, date: '2026-03-10' },
                   { title: 'تقرير AI التنبؤي', desc: 'توقعات الذكاء الاصطناعي لسوق الرعاية', icon: Zap, date: '2026-03-05' },
                 ].map((report, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="glass-card p-5 hover:border-[rgba(201,168,76,0.2)] transition-all duration-300 cursor-pointer group">
+                  <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="glass-card p-3 sm:p-4 lg:p-5 hover:border-[rgba(201,168,76,0.2)] transition-all duration-300 cursor-pointer group">
                     <div className="flex items-start gap-3 mb-3">
                       <div className="w-10 h-10 rounded-lg bg-[rgba(201,168,76,0.08)] border border-[rgba(201,168,76,0.15)] flex items-center justify-center group-hover:bg-[rgba(201,168,76,0.15)] transition-all"><report.icon size={18} className="text-[#C9A84C]" /></div>
                       <div className="flex-1"><h4 className="text-sm font-bold text-foreground">{report.title}</h4><p className="text-[10px] text-muted-foreground mt-0.5">{report.desc}</p></div>

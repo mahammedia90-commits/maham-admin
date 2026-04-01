@@ -84,7 +84,7 @@ export default function SettingsPage() {
     <AdminLayout>
       <PageHeader title="الإعدادات" subtitle="إعدادات النظام والتكوين" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* القائمة الجانبية */}
         <div className="lg:col-span-1 space-y-1">
           {tabs.map(t => (
@@ -102,20 +102,20 @@ export default function SettingsPage() {
         <div className="lg:col-span-3">
           {/* عام */}
           {activeTab === 'general' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-3 sm:p-4 lg:p-6">
               <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><Building2 size={16} className="text-gold" />معلومات الشركة</h3>
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">اسم الشركة (English)</label><input type="text" value={settings.companyName} onChange={(e) => updateSetting('companyName', e.target.value)} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">اسم الشركة (عربي)</label><input type="text" value={settings.companyNameAr} onChange={(e) => updateSetting('companyNameAr', e.target.value)} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">البريد الإلكتروني</label><input type="email" value={settings.email} onChange={(e) => updateSetting('email', e.target.value)} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">رقم الهاتف</label><input type="text" value={settings.phone} onChange={(e) => updateSetting('phone', e.target.value)} dir="ltr" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 </div>
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">العنوان</label><input type="text" value={settings.address} onChange={(e) => updateSetting('address', e.target.value)} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الموقع الإلكتروني</label><input type="url" value={settings.website} onChange={(e) => updateSetting('website', e.target.value)} dir="ltr" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">المنطقة الزمنية</label><select value={settings.timezone} onChange={(e) => updateSetting('timezone', e.target.value)} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option value="Asia/Riyadh">الرياض (GMT+3)</option></select></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">اللغة</label><select value={settings.language} onChange={(e) => updateSetting('language', e.target.value)} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option value="ar">العربية</option><option value="en">English</option></select></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">العملة</label><select value={settings.currency} onChange={(e) => updateSetting('currency', e.target.value)} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option value="SAR">ريال سعودي (SAR)</option><option value="USD">دولار (USD)</option></select></div>
@@ -127,7 +127,7 @@ export default function SettingsPage() {
 
           {/* الأمان */}
           {activeTab === 'security' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-3 sm:p-4 lg:p-6">
               <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><Shield size={16} className="text-gold" />إعدادات الأمان</h3>
               <div className="divide-y divide-border/30">
                 <Toggle label="المصادقة الثنائية (2FA)" desc="تفعيل التحقق بخطوتين لجميع المستخدمين" value={settings.twoFactor} onChange={() => updateSetting('twoFactor', !settings.twoFactor)} />
@@ -144,7 +144,7 @@ export default function SettingsPage() {
           {/* الإشعارات */}
           {activeTab === 'notifications' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-              <div className="glass-card p-6">
+              <div className="glass-card p-3 sm:p-4 lg:p-6">
                 <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><Bell size={16} className="text-gold" />قنوات الإشعارات</h3>
                 <div className="divide-y divide-border/30">
                   <Toggle label="البريد الإلكتروني" desc="إرسال الإشعارات عبر البريد" value={settings.emailNotify} onChange={() => updateSetting('emailNotify', !settings.emailNotify)} />
@@ -152,7 +152,7 @@ export default function SettingsPage() {
                   <Toggle label="إشعارات الدفع" desc="إشعارات المتصفح والتطبيق" value={settings.pushNotify} onChange={() => updateSetting('pushNotify', !settings.pushNotify)} />
                 </div>
               </div>
-              <div className="glass-card p-6">
+              <div className="glass-card p-3 sm:p-4 lg:p-6">
                 <h3 className="text-sm font-bold text-foreground mb-4">أحداث الإشعارات</h3>
                 <div className="divide-y divide-border/30">
                   <Toggle label="حجز جديد" desc="إشعار عند استلام طلب حجز" value={settings.newBooking} onChange={() => updateSetting('newBooking', !settings.newBooking)} />
@@ -193,7 +193,7 @@ export default function SettingsPage() {
 
           {/* المظهر */}
           {activeTab === 'appearance' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-3 sm:p-4 lg:p-6">
               <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><Palette size={16} className="text-gold" />إعدادات المظهر</h3>
               <div className="divide-y divide-border/30">
                 <Toggle label="الوضع الداكن" desc="تفعيل الوضع الداكن للواجهة" value={settings.darkMode} onChange={() => updateSetting('darkMode', !settings.darkMode)} />
@@ -214,7 +214,7 @@ export default function SettingsPage() {
           {/* النظام */}
           {activeTab === 'system' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-              <div className="glass-card p-6">
+              <div className="glass-card p-3 sm:p-4 lg:p-6">
                 <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><Database size={16} className="text-gold" />النسخ الاحتياطي</h3>
                 <div className="divide-y divide-border/30">
                   <Toggle label="نسخ احتياطي تلقائي" desc="إنشاء نسخة احتياطية تلقائياً" value={settings.autoBackup} onChange={() => updateSetting('autoBackup', !settings.autoBackup)} />
@@ -226,7 +226,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
-              <div className="glass-card p-6">
+              <div className="glass-card p-3 sm:p-4 lg:p-6">
                 <h3 className="text-sm font-bold text-foreground mb-4">معلومات النظام</h3>
                 <div className="space-y-2 text-xs">
                   {[
@@ -244,7 +244,7 @@ export default function SettingsPage() {
                   ))}
                 </div>
               </div>
-              <div className="glass-card p-6 border-warning/30">
+              <div className="glass-card p-3 sm:p-4 lg:p-6 border-warning/30">
                 <Toggle label="وضع الصيانة" desc="تفعيل وضع الصيانة — يمنع وصول المستخدمين العاديين" value={settings.maintenanceMode} onChange={() => updateSetting('maintenanceMode', !settings.maintenanceMode)} />
               </div>
             </motion.div>

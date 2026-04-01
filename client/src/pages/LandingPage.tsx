@@ -353,7 +353,7 @@ export default function LandingPage() {
       <Section id="portals" className="py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-3 sm:mb-4 lg:mb-6" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
               <Zap className="w-4 h-4" style={{ color: '#C9A84C' }} />
               <span className="text-sm font-medium" style={{ color: '#C9A84C' }}>بوابات الدخول السريع</span>
             </div>
@@ -361,7 +361,7 @@ export default function LandingPage() {
             <p className="text-lg" style={{ color: '#A09A8E' }}>6 بوابات مخصصة حسب دورك في منظومة المعارض والمؤتمرات</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
             {PORTALS.map((portal, i) => (
               <motion.button
                 key={portal.code}
@@ -419,7 +419,7 @@ export default function LandingPage() {
         </div>
         <div className="relative z-10 max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-3 sm:mb-4 lg:mb-6" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
               <Layers className="w-4 h-4" style={{ color: '#C9A84C' }} />
               <span className="text-sm font-medium" style={{ color: '#C9A84C' }}>الأنظمة الرئيسية</span>
             </div>
@@ -431,7 +431,7 @@ export default function LandingPage() {
             <p className="text-lg" style={{ color: '#A09A8E' }}>كل نظام مصمم بدقة ليخدم دوراً محدداً في منظومة المعارض والمؤتمرات</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
             {SYSTEMS.map((sys, i) => (
               <motion.div
                 key={i}
@@ -473,7 +473,7 @@ export default function LandingPage() {
       <Section id="units" className="py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-3 sm:mb-4 lg:mb-6" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
               <Cpu className="w-4 h-4" style={{ color: '#C9A84C' }} />
               <span className="text-sm font-medium" style={{ color: '#C9A84C' }}>21 وحدة تشغيلية</span>
             </div>
@@ -510,7 +510,7 @@ export default function LandingPage() {
       <Section id="stats" className="py-20 md:py-28 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-3 sm:mb-4 lg:mb-6" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
               <BarChart3 className="w-4 h-4" style={{ color: '#C9A84C' }} />
               <span className="text-sm font-medium" style={{ color: '#C9A84C' }}>أرقام حية</span>
             </div>
@@ -548,7 +548,7 @@ export default function LandingPage() {
       <Section id="services" className="py-20 md:py-28 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-3 sm:mb-4 lg:mb-6" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
               <Star className="w-4 h-4" style={{ color: '#C9A84C' }} />
               <span className="text-sm font-medium" style={{ color: '#C9A84C' }}>الخدمات</span>
             </div>
@@ -559,7 +559,7 @@ export default function LandingPage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
             {SERVICES.map((svc, i) => (
               <motion.div
                 key={i}
@@ -584,7 +584,7 @@ export default function LandingPage() {
 
           {/* Compliance Badges */}
           <div className="mt-16 text-center">
-            <p className="text-sm mb-6" style={{ color: '#6B6560' }}>متوافق مع المعايير السعودية والعالمية</p>
+            <p className="text-sm mb-3 sm:mb-4 lg:mb-6" style={{ color: '#6B6560' }}>متوافق مع المعايير السعودية والعالمية</p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               {COMPLIANCE.map((badge) => (
                 <div key={badge} className="px-5 py-2.5 rounded-lg text-sm font-bold" style={{ background: 'rgba(201, 168, 76, 0.06)', border: '1px solid rgba(201, 168, 76, 0.15)', color: '#C9A84C' }}>
@@ -601,7 +601,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-3 sm:mb-4 lg:mb-6" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
                 <Globe className="w-4 h-4" style={{ color: '#C9A84C' }} />
                 <span className="text-sm font-medium" style={{ color: '#C9A84C' }}>عن مهام إكسبو</span>
               </div>
@@ -655,7 +655,7 @@ export default function LandingPage() {
             <p className="text-lg" style={{ color: '#A09A8E' }}>فريقنا جاهز لمساعدتك في تنظيم معرضك القادم</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
             <div className="p-6 rounded-2xl text-center" style={{ background: 'rgba(24, 23, 21, 0.5)', border: '1px solid rgba(201, 168, 76, 0.08)' }}>
               <Phone className="w-8 h-8 mx-auto mb-4" style={{ color: '#C9A84C' }} />
               <h3 className="font-bold mb-3" style={{ color: '#E8E4DC' }}>اتصل بنا</h3>
@@ -738,7 +738,7 @@ export default function LandingPage() {
           <GoldDivider />
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-4">
             <p className="text-xs" style={{ color: '#4A4540' }}>© {new Date().getFullYear()} مهام للخدمات وتقنية المعلومات. جميع الحقوق محفوظة.</p>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-3 sm:gap-4 lg:gap-6">
               <button className="text-xs hover:underline" style={{ color: '#6B6560' }}>سياسة الخصوصية</button>
               <button className="text-xs hover:underline" style={{ color: '#6B6560' }}>الشروط والأحكام</button>
               <button className="text-xs hover:underline" style={{ color: '#6B6560' }}>الدعم الفني</button>

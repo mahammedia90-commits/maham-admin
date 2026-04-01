@@ -8,37 +8,38 @@ import {
 import { cn } from '@/lib/utils'
 
 export default function TopBar() {
-  const { theme, toggleTheme, sidebarCollapsed, toggleCollapse } = useUIStore()
+  const { theme, toggleTheme, sidebarOpen, setSidebarOpen } = useUIStore()
   const { user } = useAuthStore()
   const [searchOpen, setSearchOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-30 h-16 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-      <div className="flex items-center justify-between h-full px-6">
+    <header className="sticky top-0 z-30 h-14 sm:h-16 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <div className="flex items-center justify-between h-full px-3 sm:px-4 md:px-6">
         {/* Right Side */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Mobile menu button */}
           <button
-            onClick={toggleCollapse}
+            onClick={() => setSidebarOpen(!sidebarOpen)}
             className="lg:hidden p-2 rounded-lg hover:bg-surface2 text-muted-foreground transition-colors"
           >
             <Menu size={20} />
           </button>
 
-          {/* Breadcrumb / Page Title Area */}
+          {/* Breadcrumb */}
           <div className="hidden sm:flex items-center gap-2 text-sm">
             <span className="text-muted-foreground">لوحة الإدارة</span>
           </div>
         </div>
 
         {/* Left Side */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           {/* Search */}
           <AnimatePresence>
             {searchOpen ? (
               <motion.div
                 initial={{ width: 0, opacity: 0 }}
-                animate={{ width: 280, opacity: 1 }}
+                animate={{ width: 'auto', opacity: 1 }}
                 exit={{ width: 0, opacity: 0 }}
                 className="relative"
               >
@@ -46,8 +47,8 @@ export default function TopBar() {
                 <input
                   autoFocus
                   type="text"
-                  placeholder="بحث سريع... (Ctrl+K)"
-                  className="w-full h-9 pr-10 pl-10 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/20"
+                  placeholder="بحث سريع..."
+                  className="w-[180px] sm:w-[240px] md:w-[280px] h-9 pr-10 pl-10 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/20"
                   onBlur={() => setSearchOpen(false)}
                 />
                 <button
@@ -60,11 +61,11 @@ export default function TopBar() {
             ) : (
               <button
                 onClick={() => setSearchOpen(true)}
-                className="flex items-center gap-2 h-9 px-3 rounded-lg bg-surface2/50 border border-border/50 text-sm text-muted-foreground hover:border-gold/30 hover:text-foreground transition-all"
+                className="flex items-center gap-2 h-9 px-2 sm:px-3 rounded-lg bg-surface2/50 border border-border/50 text-sm text-muted-foreground hover:border-gold/30 hover:text-foreground transition-all"
               >
                 <Search size={16} />
                 <span className="hidden md:inline">بحث...</span>
-                <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-surface3 text-[10px] font-mono text-muted-foreground border border-border/50">
+                <kbd className="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-surface3 text-[10px] font-mono text-muted-foreground border border-border/50">
                   <Command size={10} /> K
                 </kbd>
               </button>
@@ -98,7 +99,7 @@ export default function TopBar() {
                     initial={{ opacity: 0, y: 5, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                    className="absolute left-0 top-12 w-80 glass-card z-50 overflow-hidden"
+                    className="absolute left-0 sm:left-0 top-12 w-72 sm:w-80 glass-card z-50 overflow-hidden"
                   >
                     <div className="p-4 border-b border-border/50">
                       <h3 className="text-sm font-bold text-foreground">الإشعارات</h3>
@@ -112,8 +113,8 @@ export default function TopBar() {
             </AnimatePresence>
           </div>
 
-          {/* User Avatar */}
-          <div className="w-9 h-9 rounded-full bg-gold/15 border border-gold/25 flex items-center justify-center text-gold font-bold text-sm mr-1">
+          {/* User Avatar - hidden on very small screens */}
+          <div className="hidden sm:flex w-9 h-9 rounded-full bg-gold/15 border border-gold/25 items-center justify-center text-gold font-bold text-sm mr-1">
             {user?.name?.charAt(0) || 'م'}
           </div>
         </div>

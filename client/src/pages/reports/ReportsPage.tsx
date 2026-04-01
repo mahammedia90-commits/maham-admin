@@ -93,7 +93,7 @@ export default function ReportsPage() {
         }
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="إجمالي الإيرادات" value={formatCurrency(2365000)} icon={DollarSign} trend={18} trendLabel="هذا الربع" delay={0} />
         <StatsCard title="صافي الربح" value={formatCurrency(905000)} icon={TrendingUp} trend={25} trendLabel="هذا الربع" delay={0.05} />
         <StatsCard title="العملاء الجدد" value="1,070" icon={Users} trend={32} trendLabel="هذا الربع" delay={0.1} />
@@ -101,7 +101,7 @@ export default function ReportsPage() {
       </div>
 
       {/* تبويبات */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-3 sm:mb-4">
         {[
           { key: 'overview', label: 'نظرة عامة', icon: BarChart3 },
           { key: 'financial', label: 'مالي', icon: DollarSign },
@@ -117,7 +117,7 @@ export default function ReportsPage() {
       {/* نظرة عامة */}
       {activeTab === 'overview' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-5">
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-3 sm:p-4 lg:p-5">
             <h3 className="text-sm font-bold text-foreground mb-4">الإيرادات والمصروفات</h3>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={revenueData}>
@@ -131,7 +131,7 @@ export default function ReportsPage() {
             </ResponsiveContainer>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-5">
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-3 sm:p-4 lg:p-5">
             <h3 className="text-sm font-bold text-foreground mb-4">صافي الربح</h3>
             <ResponsiveContainer width="100%" height={250}>
               <AreaChart data={revenueData}>
@@ -145,7 +145,7 @@ export default function ReportsPage() {
             </ResponsiveContainer>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-5 lg:col-span-2">
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-3 sm:p-4 lg:p-5 lg:col-span-2">
             <h3 className="text-sm font-bold text-foreground mb-4">مؤشرات الأداء الرئيسية (KPIs)</h3>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={kpiData}>
@@ -166,7 +166,7 @@ export default function ReportsPage() {
       {activeTab === 'financial' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card overflow-hidden">
           <div className="p-4 border-b border-border/50"><h3 className="text-sm font-bold text-foreground">الملخص المالي — آخر 6 أشهر</h3></div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full">
               <thead><tr className="border-b border-border/50">
                 <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">الشهر</th>

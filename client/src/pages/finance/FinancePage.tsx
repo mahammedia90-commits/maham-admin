@@ -160,7 +160,7 @@ export default function FinancePage() {
       />
 
       {/* ── إحصائيات ──────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="إجمالي الإيرادات" value={formatCurrency(stats.totalRevenue)} icon={DollarSign} trend={18} trendLabel="هذا الربع" delay={0} />
         <StatsCard title="المبالغ المعلقة" value={formatCurrency(stats.totalPending)} icon={Wallet} delay={0.05} />
         <StatsCard title="متأخرة السداد" value={formatCurrency(stats.totalOverdue)} icon={TrendingUp} trend={-8} trendLabel="عن الشهر الماضي" delay={0.1} />
@@ -169,7 +169,7 @@ export default function FinancePage() {
 
       {/* ── الرسوم البيانية ──────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
-        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-5 lg:col-span-2">
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-3 sm:p-4 lg:p-5 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-bold text-foreground">التدفق النقدي</h3>
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -193,7 +193,7 @@ export default function FinancePage() {
           </ResponsiveContainer>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="glass-card p-5">
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="glass-card p-3 sm:p-4 lg:p-5">
           <h3 className="text-sm font-bold text-foreground mb-3">توزيع الإيرادات</h3>
           <ResponsiveContainer width="100%" height={180}>
             <PieChart>
@@ -215,7 +215,7 @@ export default function FinancePage() {
       </div>
 
       {/* ── تبويبات ──────────────────────────────── */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-3 sm:mb-4">
         {tabs.map((t) => (
           <button key={t.key} onClick={() => { setTab(t.key); setPage(1); setSearch(''); setStatusFilter('all') }}
             className={cn('h-9 px-4 rounded-xl text-sm font-medium transition-all flex items-center gap-2', tab === t.key ? 'bg-gold/10 text-gold border border-gold/20' : 'bg-surface2/50 text-muted-foreground hover:text-foreground border border-transparent')}>
@@ -244,7 +244,7 @@ export default function FinancePage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border/50">
@@ -306,7 +306,7 @@ export default function FinancePage() {
           <div className="p-4 border-b border-border/50">
             <h3 className="text-sm font-bold text-foreground">سجل المدفوعات</h3>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border/50">
@@ -343,7 +343,7 @@ export default function FinancePage() {
           <div className="p-4 border-b border-border/50">
             <h3 className="text-sm font-bold text-foreground">طلبات الاسترداد</h3>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border/50">
@@ -441,8 +441,8 @@ export default function FinancePage() {
       <AnimatePresence>
         {showInvoiceModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowInvoiceModal(false)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="glass-card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-3 mb-5">
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
                 <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Receipt size={18} className="text-gold" /></div>
                 <div><h3 className="text-base font-bold text-foreground">فاتورة جديدة</h3><p className="text-xs text-muted-foreground">إنشاء فاتورة جديدة — سيتم احتساب الضريبة تلقائياً</p></div>
               </div>
@@ -451,7 +451,7 @@ export default function FinancePage() {
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">اسم العميل <span className="text-danger">*</span></label>
                   <input type="text" value={newInv.client} onChange={(e) => setNewInv(p => ({ ...p, client: e.target.value }))} placeholder="أدخل اسم العميل" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="text-xs font-medium text-muted-foreground mb-1.5 block">المبلغ (ر.س) <span className="text-danger">*</span></label>
                     <input type="number" value={newInv.amount} onChange={(e) => setNewInv(p => ({ ...p, amount: e.target.value }))} placeholder="0.00" dir="ltr" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" />

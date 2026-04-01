@@ -89,7 +89,7 @@ export default function SponsorsPage() {
       <PageHeader title="إدارة الرعاة" subtitle={`${stats.total} راعٍ — ${stats.active} نشط — القيمة: ${formatCurrency(stats.totalValue)}`}
         actions={<button onClick={() => setShowAddModal(true)} className="h-9 px-4 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all flex items-center gap-2"><Plus size={16} /> راعٍ جديد</button>} />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="الرعاة النشطون" value={String(stats.active)} icon={Award} delay={0} />
         <StatsCard title="قيمة الرعايات" value={formatCurrency(stats.totalValue)} icon={DollarSign} delay={0.05} />
         <StatsCard title="قيد التفاوض" value={String(stats.pending)} icon={TrendingUp} delay={0.1} />
@@ -110,7 +110,7 @@ export default function SponsorsPage() {
           const TIcon = tierIcons[sponsor.tier] || Award
           return (
             <motion.div key={sponsor.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-              className={cn('glass-card p-5 hover:border-gold/20 transition-all', sponsor.tier === 'platinum' ? 'border-chrome/20' : '')}>
+              className={cn('glass-card p-3 sm:p-4 lg:p-5 hover:border-gold/20 transition-all', sponsor.tier === 'platinum' ? 'border-chrome/20' : '')}>
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg border', tierColors[sponsor.tier])}>{sponsor.logo}</div>
@@ -121,7 +121,7 @@ export default function SponsorsPage() {
                   <span className={cn('text-[10px] px-2 py-0.5 rounded-full', statusColors[sponsor.status])}>{statusLabels[sponsor.status]}</span>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2 sm:mb-3">
                 <div className="p-2 rounded-lg bg-gold/5 border border-gold/15 text-center"><p className="text-[8px] text-muted-foreground">قيمة الرعاية</p><p className="text-xs font-bold font-mono text-gold">{formatCurrency(sponsor.value)}</p></div>
                 <div className="p-2 rounded-lg bg-surface2/50 text-center"><p className="text-[8px] text-muted-foreground">الفترة</p><p className="text-[10px] text-foreground">{sponsor.startDate} → {sponsor.endDate}</p></div>
               </div>
@@ -146,7 +146,7 @@ export default function SponsorsPage() {
       <AnimatePresence>
         {detailSponsor && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDetailSponsor(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-3">
                   <div className={cn('w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-xl border', tierColors[detailSponsor.tier])}>{detailSponsor.logo}</div>
@@ -154,7 +154,7 @@ export default function SponsorsPage() {
                 </div>
                 <button onClick={() => setDetailSponsor(null)} className="p-2 rounded-lg hover:bg-surface2 text-muted-foreground"><X size={18} /></button>
               </div>
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 sm:mb-4">
                 <div className="p-3 rounded-xl bg-gold/5 border border-gold/20"><p className="text-[10px] text-muted-foreground">قيمة الرعاية</p><p className="text-lg font-bold font-mono text-gold">{formatCurrency(detailSponsor.value)}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">جهة الاتصال</p><p className="text-xs text-foreground">{detailSponsor.contact}</p><p className="text-[10px] text-muted-foreground">{detailSponsor.email}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">البداية</p><p className="text-xs text-foreground">{detailSponsor.startDate}</p></div>
@@ -172,15 +172,15 @@ export default function SponsorsPage() {
       <AnimatePresence>
         {showAddModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowAddModal(false)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-3 mb-5"><div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Award size={18} className="text-gold" /></div><div><h3 className="text-base font-bold text-foreground">راعٍ جديد</h3><p className="text-xs text-muted-foreground">إضافة راعٍ للمعرض</p></div></div>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5"><div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Award size={18} className="text-gold" /></div><div><h3 className="text-base font-bold text-foreground">راعٍ جديد</h3><p className="text-xs text-muted-foreground">إضافة راعٍ للمعرض</p></div></div>
               <div className="space-y-3">
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">اسم الراعي <span className="text-danger">*</span></label><input type="text" value={newSponsor.name} onChange={(e) => setNewSponsor(p => ({ ...p, name: e.target.value }))} placeholder="اسم الشركة" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الباقة</label><select value={newSponsor.tier} onChange={(e) => setNewSponsor(p => ({ ...p, tier: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option value="platinum">بلاتيني</option><option value="gold">ذهبي</option><option value="silver">فضي</option><option value="bronze">برونزي</option></select></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">القيمة (ر.س)</label><input type="number" value={newSponsor.value} onChange={(e) => setNewSponsor(p => ({ ...p, value: e.target.value }))} placeholder="0" dir="ltr" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">جهة الاتصال</label><input type="text" value={newSponsor.contact} onChange={(e) => setNewSponsor(p => ({ ...p, contact: e.target.value }))} placeholder="الاسم" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">القطاع</label><input type="text" value={newSponsor.industry} onChange={(e) => setNewSponsor(p => ({ ...p, industry: e.target.value }))} placeholder="القطاع" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 </div>
@@ -198,7 +198,7 @@ export default function SponsorsPage() {
       <AnimatePresence>
         {deleteConfirm !== null && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDeleteConfirm(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-6 text-center" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-4 sm:p-6 text-center" onClick={(e) => e.stopPropagation()}>
               <div className="w-14 h-14 rounded-2xl bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={24} className="text-danger" /></div>
               <h3 className="text-base font-bold text-foreground mb-2">حذف الراعي</h3>
               <p className="text-sm text-muted-foreground mb-5">هل أنت متأكد من حذف <span className="text-foreground font-medium">{sponsors.find(s => s.id === deleteConfirm)?.name}</span>؟</p>

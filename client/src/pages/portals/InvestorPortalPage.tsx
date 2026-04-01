@@ -83,20 +83,20 @@ export default function InvestorPortalPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-3 sm:space-y-4 lg:space-y-6">
         <PageHeader
           title="بوابة المستثمر"
           subtitle="مركز التحكم الشامل لإدارة الاستثمارات والمستثمرين والفرص الاستثمارية"
           actions={
-            <div className="flex items-center gap-2">
-              <button className="nour-btn-outline text-xs flex items-center gap-1.5"><Download size={14} /> تصدير التقرير</button>
-              <button className="nour-btn-gold text-xs flex items-center gap-1.5"><Target size={14} /> فرصة استثمارية جديدة</button>
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+              <button className="nour-btn-outline text-[10px] sm:text-xs flex items-center gap-1.5"><Download size={14} /> <span className="hidden sm:inline">تصدير التقرير</span></button>
+              <button className="nour-btn-gold text-[10px] sm:text-xs flex items-center gap-1.5"><Target size={14} /> <span className="hidden sm:inline">فرصة استثمارية جديدة</span></button>
             </div>
           }
         />
 
         {/* Tabs */}
-        <div className="flex items-center gap-1 p-1 rounded-xl overflow-x-auto" style={{ background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.08)' }}>
+        <div className="flex items-center gap-1 p-1 rounded-xl overflow-x-auto scrollbar-hide" style={{ background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.08)' }}>
           {tabs.map((tab) => (
             <button key={tab} onClick={() => setActiveTab(tab)} className={cn(
               'px-4 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-300',
@@ -110,16 +110,16 @@ export default function InvestorPortalPage() {
 
             {/* ═══ نظرة عامة ═══ */}
             {activeTab === 'نظرة عامة' && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-3 sm:space-y-4 lg:space-y-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
                   <StatsCard title="إجمالي الاستثمارات" value={formatCurrency(totalInvested)} icon={DollarSign} trend={23.5} trendLabel="نمو سنوي" delay={0} />
                   <StatsCard title="المستثمرون النشطون" value={topInvestors.filter(i => i.status === 'active').length.toString()} icon={Users} trend={12} trendLabel="جديد" delay={0.1} />
                   <StatsCard title="متوسط العائد ROI" value={`${avgROI}%`} icon={TrendingUp} trend={3.2} trendLabel="تحسن" delay={0.2} />
                   <StatsCard title="الصفقات النشطة" value={totalDeals.toString()} icon={Briefcase} trend={8} trendLabel="جديدة" delay={0.3} />
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <div className="lg:col-span-2 glass-card p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+                  <div className="lg:col-span-2 glass-card p-3 sm:p-4 lg:p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-sm font-bold text-foreground">اتجاه الاستثمارات والعوائد</h3>
                       <div className="flex items-center gap-3 text-[10px]">
@@ -127,7 +127,7 @@ export default function InvestorPortalPage() {
                         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: '#22c55e' }} /> عوائد</span>
                       </div>
                     </div>
-                    <ResponsiveContainer width="100%" height={280}>
+                    <ResponsiveContainer width="100%" height={220}>
                       <AreaChart data={investmentTrend}>
                         <defs>
                           <linearGradient id="investGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#C9A84C" stopOpacity={0.3} /><stop offset="95%" stopColor="#C9A84C" stopOpacity={0} /></linearGradient>
@@ -143,9 +143,9 @@ export default function InvestorPortalPage() {
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="glass-card p-6">
+                  <div className="glass-card p-3 sm:p-4 lg:p-6">
                     <h3 className="text-sm font-bold text-foreground mb-4">توزيع القطاعات</h3>
-                    <ResponsiveContainer width="100%" height={200}>
+                    <ResponsiveContainer width="100%" height={180}>
                       <RechartsPie>
                         <Pie data={sectorDistribution} cx="50%" cy="50%" innerRadius={55} outerRadius={80} paddingAngle={3} dataKey="value">
                           {sectorDistribution.map((entry, i) => <Cell key={i} fill={entry.color} />)}
@@ -164,8 +164,8 @@ export default function InvestorPortalPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="glass-card p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+                  <div className="glass-card p-3 sm:p-4 lg:p-6">
                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><Shield size={16} className="text-gold" /> مصفوفة المخاطر</h3>
                     <div className="space-y-3">
                       {riskMatrix.map((r) => (
@@ -182,7 +182,7 @@ export default function InvestorPortalPage() {
                     </div>
                   </div>
 
-                  <div className="glass-card p-6 border-gold/15">
+                  <div className="glass-card p-3 sm:p-4 lg:p-6 border-gold/15">
                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><Zap size={16} className="text-gold" /> رؤى الذكاء الاصطناعي</h3>
                     <div className="space-y-3">
                       {[
@@ -205,7 +205,7 @@ export default function InvestorPortalPage() {
                   </div>
                 </div>
 
-                <div className="glass-card p-6">
+                <div className="glass-card p-3 sm:p-4 lg:p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-sm font-bold text-foreground flex items-center gap-2"><Award size={16} className="text-gold" /> أبرز المستثمرين</h3>
                     <button onClick={() => setActiveTab('المستثمرون')} className="text-xs text-gold hover:text-gold/80 flex items-center gap-1">عرض الكل <ChevronLeft size={12} /></button>
@@ -232,17 +232,17 @@ export default function InvestorPortalPage() {
 
             {/* ═══ المحفظة الاستثمارية ═══ */}
             {activeTab === 'المحفظة الاستثمارية' && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-3 sm:space-y-4 lg:space-y-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
                   <StatsCard title="القيمة الإجمالية" value={formatCurrency(68200000)} icon={Wallet} trend={15.3} trendLabel="نمو" delay={0} />
                   <StatsCard title="العوائد المحققة" value={formatCurrency(8900000)} icon={TrendingUp} trend={22.1} trendLabel="هذا الربع" delay={0.1} />
                   <StatsCard title="الصفقات المفتوحة" value="24" icon={Briefcase} delay={0.2} />
                   <StatsCard title="معدل النجاح" value="94.2%" icon={CheckCircle2} trend={2.1} trendLabel="تحسن" delay={0.3} />
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="glass-card p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+                  <div className="glass-card p-3 sm:p-4 lg:p-6">
                     <h3 className="text-sm font-bold text-foreground mb-4">أداء المحفظة الشهري</h3>
-                    <ResponsiveContainer width="100%" height={280}>
+                    <ResponsiveContainer width="100%" height={220}>
                       <BarChart data={investmentTrend}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(201,168,76,0.06)" />
                         <XAxis dataKey="month" tick={{ fill: '#6B6560', fontSize: 11 }} axisLine={false} tickLine={false} />
@@ -253,7 +253,7 @@ export default function InvestorPortalPage() {
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="glass-card p-6">
+                  <div className="glass-card p-3 sm:p-4 lg:p-6">
                     <h3 className="text-sm font-bold text-foreground mb-4">تصنيف الاستثمارات حسب الحالة</h3>
                     <div className="space-y-4">
                       {[
@@ -280,17 +280,17 @@ export default function InvestorPortalPage() {
 
             {/* ═══ المستثمرون ═══ */}
             {activeTab === 'المستثمرون' && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                   <div className="relative flex-1">
                     <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="بحث عن مستثمر..." className="w-full h-10 pr-9 pl-4 rounded-xl text-sm bg-card border border-border focus:border-gold/30 outline-none transition-all" />
+                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="بحث عن مستثمر..." className="w-full h-9 sm:h-9 sm:h-10 pr-9 pl-4 rounded-xl text-xs sm:text-sm bg-card border border-border focus:border-gold/30 outline-none transition-all" />
                   </div>
-                  <button className="nour-btn-outline text-xs flex items-center gap-1.5"><Filter size={14} /> تصفية</button>
+                  <button className="nour-btn-outline text-xs flex items-center gap-1.5 justify-center"><Filter size={14} /> تصفية</button>
                 </div>
                 <div className="glass-card overflow-hidden">
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
+                    <table className="w-full text-sm min-w-[800px]">
                       <thead><tr className="border-b border-border/50">
                         {['المستثمر', 'التصنيف', 'إجمالي الاستثمار', 'الصفقات', 'العائد ROI', 'القطاع', 'الحالة', ''].map(h => <th key={h} className="text-right p-4 text-xs font-medium text-muted-foreground">{h}</th>)}
                       </tr></thead>
@@ -317,9 +317,9 @@ export default function InvestorPortalPage() {
             {/* ═══ الفرص ═══ */}
             {activeTab === 'الفرص' && (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                   {opportunities.map((opp, i) => (
-                    <motion.div key={opp.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="glass-card p-5 hover:border-gold/20 transition-all duration-300">
+                    <motion.div key={opp.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="glass-card p-3 sm:p-4 lg:p-5 hover:border-gold/20 transition-all duration-300">
                       <div className="flex items-start justify-between mb-3">
                         <div><h4 className="text-sm font-bold text-foreground mb-1">{opp.title}</h4><span className="text-[10px] px-2 py-0.5 rounded-full bg-gold/8 text-gold/70 border border-gold/15">{opp.type}</span></div>
                         <span className={cn('text-[10px] px-2 py-0.5 rounded-full font-medium', opp.risk === 'منخفض' && 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/15', opp.risk === 'متوسط' && 'bg-amber-500/10 text-amber-400 border border-amber-500/15', opp.risk === 'مرتفع' && 'bg-red-500/10 text-red-400 border border-red-500/15')}>مخاطر {opp.risk}ة</span>
@@ -329,7 +329,7 @@ export default function InvestorPortalPage() {
                         <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)' }}><motion.div initial={{ width: 0 }} animate={{ width: `${(opp.raised / opp.targetRaise) * 100}%` }} transition={{ duration: 1 }} className="h-full rounded-full bg-gradient-to-l from-gold to-gold/60" /></div>
                         <div className="flex items-center justify-between text-[10px] mt-1"><span className="text-muted-foreground">{formatCurrency(opp.raised)}</span><span className="text-muted-foreground">{formatCurrency(opp.targetRaise)}</span></div>
                       </div>
-                      <div className="grid grid-cols-3 gap-2 text-[10px] mb-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[10px] mb-3">
                         <div className="p-2 rounded-lg text-center" style={{ background: 'rgba(201,168,76,0.04)' }}><span className="text-muted-foreground block">الحد الأدنى</span><span className="font-bold text-foreground">{formatCurrency(opp.minInvestment)}</span></div>
                         <div className="p-2 rounded-lg text-center" style={{ background: 'rgba(34,197,94,0.04)' }}><span className="text-muted-foreground block">العائد المتوقع</span><span className="font-bold text-emerald-400">{opp.expectedROI}%</span></div>
                         <div className="p-2 rounded-lg text-center" style={{ background: 'rgba(255,255,255,0.02)' }}><span className="text-muted-foreground block">الموعد النهائي</span><span className="font-bold text-foreground">{formatDate(opp.deadline)}</span></div>
@@ -344,14 +344,14 @@ export default function InvestorPortalPage() {
             {/* ═══ العقود ═══ */}
             {activeTab === 'العقود' && (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
                   <StatsCard title="العقود النشطة" value="3" icon={FileText} delay={0} />
                   <StatsCard title="القيمة الإجمالية" value={formatCurrency(12500000)} icon={DollarSign} delay={0.1} />
                   <StatsCard title="نسبة التحصيل" value="78%" icon={CheckCircle2} trend={5} trendLabel="تحسن" delay={0.2} />
                 </div>
                 <div className="glass-card overflow-hidden">
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
+                    <table className="w-full text-sm min-w-[800px]">
                       <thead><tr className="border-b border-border/50">
                         {['رقم العقد', 'المستثمر', 'الفعالية', 'القيمة', 'الفترة', 'حالة العقد', 'حالة الدفع'].map(h => <th key={h} className="text-right p-4 text-xs font-medium text-muted-foreground">{h}</th>)}
                       </tr></thead>
@@ -376,7 +376,7 @@ export default function InvestorPortalPage() {
 
             {/* ═══ التقارير ═══ */}
             {activeTab === 'التقارير' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {[
                   { title: 'تقرير الأداء الاستثماري', desc: 'تحليل شامل لأداء المحفظة والعوائد', icon: LineChart, date: '2026-03-28' },
                   { title: 'تقرير المخاطر', desc: 'تقييم المخاطر لجميع الصفقات النشطة', icon: Shield, date: '2026-03-25' },
@@ -385,7 +385,7 @@ export default function InvestorPortalPage() {
                   { title: 'تقرير العقود', desc: 'حالة العقود والتحصيل المالي', icon: FileText, date: '2026-03-10' },
                   { title: 'تقرير AI التنبؤي', desc: 'توقعات الذكاء الاصطناعي للربع القادم', icon: Zap, date: '2026-03-05' },
                 ].map((report, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="glass-card p-5 hover:border-gold/20 transition-all duration-300 cursor-pointer group">
+                  <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="glass-card p-3 sm:p-4 lg:p-5 hover:border-gold/20 transition-all duration-300 cursor-pointer group">
                     <div className="flex items-start gap-3 mb-3">
                       <div className="w-10 h-10 rounded-lg bg-gold/8 border border-gold/15 flex items-center justify-center group-hover:bg-gold/15 transition-all"><report.icon size={18} className="text-gold" /></div>
                       <div className="flex-1"><h4 className="text-sm font-bold text-foreground">{report.title}</h4><p className="text-[10px] text-muted-foreground mt-0.5">{report.desc}</p></div>

@@ -122,7 +122,7 @@ export default function SalesPage() {
       />
 
       {/* إحصائيات */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="قيمة الأنبوب" value={formatCurrency(stats.totalPipeline)} icon={DollarSign} trend={22} trendLabel="هذا الربع" delay={0} />
         <StatsCard title="القيمة المرجحة" value={formatCurrency(stats.weightedPipeline)} icon={Target} delay={0.05} />
         <StatsCard title="متوسط الصفقة" value={formatCurrency(stats.avgDealSize)} icon={BarChart3} delay={0.1} />
@@ -130,7 +130,7 @@ export default function SalesPage() {
       </div>
 
       {/* تبويبات */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-3 sm:mb-4">
         {[
           { key: 'deals', label: 'الصفقات', icon: Briefcase },
           { key: 'reps', label: 'المندوبون', icon: Users },
@@ -146,7 +146,7 @@ export default function SalesPage() {
       {/* الصفقات */}
       {activeTab === 'deals' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full">
               <thead><tr className="border-b border-border/50">
                 <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">الصفقة</th>
@@ -194,7 +194,7 @@ export default function SalesPage() {
           {salesReps.map((rep, i) => {
             const targetPct = Math.round((rep.closedValue / rep.target) * 100)
             return (
-              <motion.div key={rep.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-card p-5">
+              <motion.div key={rep.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-card p-3 sm:p-4 lg:p-5">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center text-gold font-bold text-lg">{rep.avatar}</div>
                   <div className="flex-1">
@@ -225,9 +225,9 @@ export default function SalesPage() {
 
       {/* التحليلات */}
       {activeTab === 'analytics' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-5">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-3 sm:p-4 lg:p-5">
           <h3 className="text-sm font-bold text-foreground mb-4">المبيعات حسب الفئة — آخر 6 أشهر</h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={220}>
             <BarChart data={salesData}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#888' }} />
@@ -246,12 +246,12 @@ export default function SalesPage() {
       <AnimatePresence>
         {detailDeal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDetailDeal(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-5">
                 <div><h2 className="text-lg font-bold text-foreground">{detailDeal.name}</h2><p className="text-xs text-muted-foreground">{detailDeal.client}</p></div>
                 <button onClick={() => setDetailDeal(null)} className="p-2 rounded-lg hover:bg-surface2 text-muted-foreground"><X size={18} /></button>
               </div>
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 sm:mb-4">
                 <div className="p-3 rounded-xl bg-gold/5 border border-gold/20"><p className="text-[10px] text-muted-foreground">القيمة</p><p className="text-lg font-bold font-mono text-gold">{formatCurrency(detailDeal.value)}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">الاحتمالية</p><p className="text-lg font-bold font-mono text-foreground">{detailDeal.probability}%</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">المرحلة</p><p className={cn('text-sm font-bold', stageColors[detailDeal.stage]?.split(' ')[1])}>{detailDeal.stage}</p></div>
@@ -276,15 +276,15 @@ export default function SalesPage() {
       <AnimatePresence>
         {showAddModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowAddModal(false)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-3 mb-5">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
                 <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Briefcase size={18} className="text-gold" /></div>
                 <div><h3 className="text-base font-bold text-foreground">صفقة جديدة</h3><p className="text-xs text-muted-foreground">إنشاء صفقة مبيعات جديدة</p></div>
               </div>
               <div className="space-y-3">
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">اسم الصفقة <span className="text-danger">*</span></label><input type="text" value={newDeal.name} onChange={(e) => setNewDeal(p => ({ ...p, name: e.target.value }))} placeholder="اسم الصفقة" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">العميل <span className="text-danger">*</span></label><input type="text" value={newDeal.client} onChange={(e) => setNewDeal(p => ({ ...p, client: e.target.value }))} placeholder="اسم العميل/الشركة" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">القيمة (ر.س) <span className="text-danger">*</span></label><input type="number" value={newDeal.value} onChange={(e) => setNewDeal(p => ({ ...p, value: e.target.value }))} placeholder="0" dir="ltr" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">المرحلة</label><select value={newDeal.stage} onChange={(e) => setNewDeal(p => ({ ...p, stage: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option>تواصل</option><option>عرض سعر</option><option>تفاوض</option><option>إغلاق</option></select></div>
                 </div>
@@ -304,7 +304,7 @@ export default function SalesPage() {
       <AnimatePresence>
         {deleteConfirm !== null && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDeleteConfirm(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-6 text-center" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-4 sm:p-6 text-center" onClick={(e) => e.stopPropagation()}>
               <div className="w-14 h-14 rounded-2xl bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={24} className="text-danger" /></div>
               <h3 className="text-base font-bold text-foreground mb-2">حذف الصفقة</h3>
               <p className="text-sm text-muted-foreground mb-5">هل أنت متأكد من حذف <span className="text-foreground font-medium">{deals.find(d => d.id === deleteConfirm)?.name}</span>؟</p>

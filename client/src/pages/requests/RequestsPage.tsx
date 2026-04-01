@@ -225,39 +225,39 @@ export default function RequestsPage() {
         title="إدارة الطلبات"
         subtitle={`${stats.total} طلب — ${stats.pending} معلق — ${stats.criticalCount} حرج`}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
             <button
               onClick={() => toast.info('جاري تصدير الطلبات...')}
-              className="h-9 px-3 rounded-xl border border-border/50 text-sm text-muted-foreground hover:text-foreground hover:border-gold/30 transition-all flex items-center gap-2"
+              className="h-8 sm:h-9 px-2 sm:px-3 rounded-lg sm:rounded-xl border border-border/50 text-xs sm:text-sm text-muted-foreground hover:text-foreground hover:border-gold/30 transition-all flex items-center gap-1.5"
             >
               <Download size={14} />
-              تصدير
+              <span className="hidden sm:inline">تصدير</span>
             </button>
             {selectedIds.length > 0 && (
               <button
                 onClick={handleBulkApprove}
-                className="h-9 px-4 rounded-xl bg-success/10 border border-success/20 text-sm font-medium text-success hover:bg-success/20 transition-all flex items-center gap-2"
+                className="h-8 sm:h-9 px-2 sm:px-4 rounded-lg sm:rounded-xl bg-success/10 border border-success/20 text-xs sm:text-sm font-medium text-success hover:bg-success/20 transition-all flex items-center gap-1.5"
               >
-                <CheckCheck size={16} />
-                موافقة جماعية ({selectedIds.length})
+                <CheckCheck size={14} />
+                <span className="hidden sm:inline">موافقة جماعية</span> ({selectedIds.length})
               </button>
             )}
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={cn(
-                'h-9 px-3 rounded-xl border text-sm transition-all flex items-center gap-2',
+                'h-8 sm:h-9 px-2 sm:px-3 rounded-lg sm:rounded-xl border text-xs sm:text-sm transition-all flex items-center gap-1.5',
                 showFilters ? 'border-gold/30 bg-gold/10 text-gold' : 'border-border/50 text-muted-foreground hover:text-foreground'
               )}
             >
               <Filter size={14} />
-              فلاتر
+              <span className="hidden sm:inline">فلاتر</span>
             </button>
           </div>
         }
       />
 
       {/* ── إحصائيات ──────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="إجمالي الطلبات" value={formatNumber(stats.total)} icon={Inbox} delay={0} />
         <StatsCard title="طلبات معلقة" value={formatNumber(stats.pending)} icon={Clock} trend={stats.criticalCount > 0 ? -stats.criticalCount : undefined} trendLabel="حرج" delay={0.05} />
         <StatsCard title="تمت الموافقة" value={formatNumber(stats.approved)} icon={Check} trend={25} trendLabel="هذا الشهر" delay={0.1} />
@@ -265,7 +265,7 @@ export default function RequestsPage() {
       </div>
 
       {/* ── فلاتر الحالة ──────────────────────────────── */}
-      <div className="flex items-center gap-2 mb-4 flex-wrap">
+      <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4 flex-wrap overflow-x-auto pb-1">
         {statusFilters.map((f) => (
           <button
             key={f.key}
@@ -295,7 +295,7 @@ export default function RequestsPage() {
             exit={{ opacity: 0, height: 0 }}
             className="glass-card p-4 mb-4 overflow-hidden"
           >
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">نوع الطلب</label>
                 <select
@@ -348,25 +348,25 @@ export default function RequestsPage() {
       {/* ── جدول الطلبات ──────────────────────────────── */}
       <div className="glass-card overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border/50">
-          <div className="relative w-72">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 sm:p-4 border-b border-border/50">
+          <div className="relative w-full sm:w-56 md:w-64 lg:w-72">
             <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1) }}
               placeholder="بحث بالمرجع أو الاسم أو الشركة..."
-              className="w-full h-10 pr-10 pl-4 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/20 transition-all"
+              className="w-full h-9 sm:h-10 pr-10 pl-4 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/20 transition-all"
             />
           </div>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-[11px] sm:text-xs text-muted-foreground">
             عرض {paged.length} من {filtered.length} طلب
           </span>
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        <div className="overflow-x-auto scrollbar-hide">
+          <table className="w-full min-w-[900px]">
             <thead>
               <tr className="border-b border-border/50">
                 <th className="px-3 py-3 text-center w-10">
@@ -517,7 +517,7 @@ export default function RequestsPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between p-4 border-t border-border/50">
+          <div className="flex items-center justify-between p-3 sm:p-4 border-t border-border/50">
             <span className="text-xs text-muted-foreground">صفحة {page} من {totalPages}</span>
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
@@ -551,11 +551,11 @@ export default function RequestsPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="glass-card w-full max-w-2xl max-h-[85vh] overflow-y-auto"
+              className="glass-card w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] sm:max-h-[85vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-5 border-b border-border/50">
+              <div className="flex items-center justify-between p-4 sm:p-5 border-b border-border/50">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center">
                     <FileText size={22} className="text-gold" />
@@ -574,7 +574,7 @@ export default function RequestsPage() {
               </div>
 
               {/* Content */}
-              <div className="p-5 space-y-5">
+              <div className="p-4 sm:p-5 space-y-4 sm:space-y-3 sm:space-y-4 lg:space-y-5">
                 {/* Status + Priority */}
                 <div className="flex items-center gap-3 flex-wrap">
                   <StatusBadge status={detailRequest.status} />
@@ -588,7 +588,7 @@ export default function RequestsPage() {
                 </div>
 
                 {/* Info Grid */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-3">
                     <div>
                       <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">مقدم الطلب</p>
@@ -639,7 +639,7 @@ export default function RequestsPage() {
                 </div>
 
                 {/* Meta */}
-                <div className="flex items-center justify-between text-[11px] text-muted-foreground pt-2 border-t border-border/30">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 text-[10px] sm:text-[11px] text-muted-foreground pt-2 border-t border-border/30">
                   <span>تاريخ الإنشاء: {formatDate(detailRequest.created_at)}</span>
                   <span>آخر تحديث: {formatDate(detailRequest.updated_at)}</span>
                   <span>{detailRequest.attachments} مرفق</span>
@@ -684,7 +684,7 @@ export default function RequestsPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="glass-card w-full max-w-md p-6"
+              className="glass-card w-full max-w-md p-4 sm:p-6"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-3 mb-4">

@@ -109,7 +109,7 @@ export default function LegalPage() {
         }
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
         <StatsCard title="العقود الفعالة" value={String(stats.activeContracts)} icon={FileText} delay={0} />
         <StatsCard title="قيمة العقود" value={formatCurrency(stats.totalValue)} icon={Scale} delay={0.05} />
         <StatsCard title="نسبة الامتثال" value={`${stats.complianceRate}%`} icon={Shield} trend={5} trendLabel="تحسن" delay={0.1} />
@@ -117,7 +117,7 @@ export default function LegalPage() {
       </div>
 
       {/* تبويبات */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-3 sm:mb-4">
         {[{ key: 'contracts', label: 'العقود', icon: FileText }, { key: 'compliance', label: 'الامتثال', icon: Shield }, { key: 'licenses', label: 'التراخيص', icon: BookOpen }].map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key)}
             className={cn('h-9 px-4 rounded-xl text-sm font-medium transition-all flex items-center gap-2', activeTab === t.key ? 'bg-gold/10 text-gold border border-gold/20' : 'bg-surface2/50 text-muted-foreground hover:text-foreground border border-transparent')}>
@@ -136,7 +136,7 @@ export default function LegalPage() {
                 className="w-full h-9 pr-10 pl-4 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" />
             </div>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full">
               <thead><tr className="border-b border-border/50">
                 <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">العقد</th>
@@ -176,7 +176,7 @@ export default function LegalPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {compliance.map((item, i) => (
             <motion.div key={item.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-              className={cn('glass-card p-5', item.status === 'non_compliant' ? 'border-danger/30' : '')}>
+              className={cn('glass-card p-3 sm:p-4 lg:p-5', item.status === 'non_compliant' ? 'border-danger/30' : '')}>
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', item.status === 'compliant' ? 'bg-success/10' : item.status === 'non_compliant' ? 'bg-danger/10' : 'bg-gold/10')}>
@@ -207,7 +207,7 @@ export default function LegalPage() {
             { name: 'رخصة الاتصالات', number: 'CITC-XXXX', expiry: '2026-11-30', status: 'active', issuer: 'هيئة الاتصالات' },
           ].map((lic, i) => (
             <motion.div key={lic.name} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-              className={cn('glass-card p-5', lic.status === 'expiring' ? 'border-warning/30' : '')}>
+              className={cn('glass-card p-3 sm:p-4 lg:p-5', lic.status === 'expiring' ? 'border-warning/30' : '')}>
               <div className="flex items-center gap-3 mb-3">
                 <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', lic.status === 'active' ? 'bg-success/10' : 'bg-warning/10')}>
                   <BookOpen size={18} className={lic.status === 'active' ? 'text-success' : 'text-warning'} />
@@ -228,12 +228,12 @@ export default function LegalPage() {
       <AnimatePresence>
         {detailContract && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDetailContract(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-5">
                 <div><h2 className="text-base font-bold text-foreground">{detailContract.title}</h2><p className="text-xs text-muted-foreground">{detailContract.party}</p></div>
                 <button onClick={() => setDetailContract(null)} className="p-2 rounded-lg hover:bg-surface2 text-muted-foreground"><X size={18} /></button>
               </div>
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 sm:mb-4">
                 <div className="p-3 rounded-xl bg-gold/5 border border-gold/20"><p className="text-[10px] text-muted-foreground">القيمة</p><p className="text-lg font-bold font-mono text-gold">{formatCurrency(detailContract.value)}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">النوع</p><p className="text-sm text-foreground">{typeLabels[detailContract.type]}</p></div>
                 <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">البداية</p><p className="text-sm text-foreground">{detailContract.startDate}</p></div>
@@ -253,19 +253,19 @@ export default function LegalPage() {
       <AnimatePresence>
         {showAddModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowAddModal(false)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-3 mb-5">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
                 <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Scale size={18} className="text-gold" /></div>
                 <div><h3 className="text-base font-bold text-foreground">عقد جديد</h3><p className="text-xs text-muted-foreground">إنشاء عقد قانوني</p></div>
               </div>
               <div className="space-y-3">
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">عنوان العقد <span className="text-danger">*</span></label><input type="text" value={newContract.title} onChange={(e) => setNewContract(p => ({ ...p, title: e.target.value }))} placeholder="عنوان العقد" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الطرف الآخر <span className="text-danger">*</span></label><input type="text" value={newContract.party} onChange={(e) => setNewContract(p => ({ ...p, party: e.target.value }))} placeholder="اسم الشركة/الجهة" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">النوع</label><select value={newContract.type} onChange={(e) => setNewContract(p => ({ ...p, type: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50">{Object.entries(typeLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">القيمة (ر.س)</label><input type="number" value={newContract.value} onChange={(e) => setNewContract(p => ({ ...p, value: e.target.value }))} placeholder="0" dir="ltr" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">تاريخ البدء</label><input type="date" value={newContract.startDate} onChange={(e) => setNewContract(p => ({ ...p, startDate: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                   <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">تاريخ الانتهاء</label><input type="date" value={newContract.endDate} onChange={(e) => setNewContract(p => ({ ...p, endDate: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
                 </div>
@@ -284,7 +284,7 @@ export default function LegalPage() {
       <AnimatePresence>
         {deleteConfirm !== null && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDeleteConfirm(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-6 text-center" onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-4 sm:p-6 text-center" onClick={(e) => e.stopPropagation()}>
               <div className="w-14 h-14 rounded-2xl bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={24} className="text-danger" /></div>
               <h3 className="text-base font-bold text-foreground mb-2">حذف العقد</h3>
               <p className="text-sm text-muted-foreground mb-5">هل أنت متأكد من حذف <span className="text-foreground font-medium">{contracts.find(c => c.id === deleteConfirm)?.title}</span>؟</p>
