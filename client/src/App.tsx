@@ -80,6 +80,39 @@ import WorkflowsPage from "./pages/workflows/WorkflowsPage";
 // Files
 import FilesPage from "./pages/files/FilesPage";
 
+// Documents Vault
+import DocumentsPage from "./pages/documents/DocumentsPage";
+
+// Messages
+import MessagesPage from "./pages/messages/MessagesPage";
+
+// Notifications
+import NotificationsPage from "./pages/notifications/NotificationsPage";
+
+// Badges
+import BadgesPage from "./pages/badges/BadgesPage";
+
+// Waitlist
+import WaitlistPage from "./pages/waitlist/WaitlistPage";
+
+// Sponsor Assets
+import SponsorAssetsPage from "./pages/sponsor-assets/SponsorAssetsPage";
+
+// Packages & Sectors
+import PackagesPage from "./pages/packages/PackagesPage";
+
+// Exhibition Map
+import ExhibitionMapPage from "./pages/exhibition-map/ExhibitionMapPage";
+
+// Exhibitor Services
+import ExhibitorServicesPage from "./pages/exhibitor-services/ExhibitorServicesPage";
+
+// Teams
+import TeamsPage from "./pages/teams/TeamsPage";
+
+// Opportunities
+import OpportunitiesPage from "./pages/opportunities/OpportunitiesPage";
+
 function Router() {
   return (
     <Switch>
@@ -157,6 +190,39 @@ function Router() {
 
       {/* Files */}
       <Route path="/files" component={FilesPage} />
+
+      {/* Documents Vault */}
+      <Route path="/documents" component={DocumentsPage} />
+
+      {/* Messages */}
+      <Route path="/messages" component={MessagesPage} />
+
+      {/* Notifications */}
+      <Route path="/notifications" component={NotificationsPage} />
+
+      {/* Badges */}
+      <Route path="/badges" component={BadgesPage} />
+
+      {/* Waitlist */}
+      <Route path="/waitlist" component={WaitlistPage} />
+
+      {/* Sponsor Assets */}
+      <Route path="/sponsor-assets" component={SponsorAssetsPage} />
+
+      {/* Packages & Sectors */}
+      <Route path="/packages" component={PackagesPage} />
+
+      {/* Exhibition Map */}
+      <Route path="/exhibition-map" component={ExhibitionMapPage} />
+
+      {/* Exhibitor Services */}
+      <Route path="/exhibitor-services" component={ExhibitorServicesPage} />
+
+      {/* Teams */}
+      <Route path="/teams" component={TeamsPage} />
+
+      {/* Opportunities */}
+      <Route path="/opportunities" component={OpportunitiesPage} />
 
       {/* 404 */}
       <Route path="/404" component={NotFound} />

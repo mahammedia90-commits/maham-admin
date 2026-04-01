@@ -10,7 +10,9 @@ import {
   TrendingUp, Settings, BarChart3, Brain, UserCheck, Briefcase,
   Scale, Cog, HeadphonesIcon, FolderKanban, Handshake, Building2,
   Monitor, FileArchive, Shield, ChevronDown, LogOut, PanelRightClose,
-  PanelRightOpen, Workflow, Globe, ClipboardList, UsersRound
+  PanelRightOpen, Workflow, Globe, ClipboardList, UsersRound,
+  FolderOpen, MessageSquare, Bell, Award, Clock, Image, Package,
+  Map, Wrench, UsersIcon, Lightbulb
 } from 'lucide-react'
 
 interface NavItem {
@@ -71,10 +73,31 @@ const navSections: { title: string; items: NavItem[] }[] = [
     ],
   },
   {
+    title: 'المستندات والتواصل',
+    items: [
+      { label: 'المستندات', icon: FolderOpen, path: '/documents' },
+      { label: 'الرسائل', icon: MessageSquare, path: '/messages', badge: 'جديد' },
+      { label: 'الإشعارات', icon: Bell, path: '/notifications' },
+      { label: 'الشارات', icon: Award, path: '/badges' },
+      { label: 'قائمة الانتظار', icon: Clock, path: '/waitlist' },
+    ],
+  },
+  {
+    title: 'الرعاية والحزم',
+    items: [
+      { label: 'أصول الرعاة', icon: Image, path: '/sponsor-assets' },
+      { label: 'الحزم والقطاعات', icon: Package, path: '/packages' },
+    ],
+  },
+  {
     title: 'التشغيل',
     items: [
       { label: 'العمليات', icon: Cog, path: '/operations' },
       { label: 'سير العمل', icon: Workflow, path: '/workflows' },
+      { label: 'خريطة المعرض', icon: Map, path: '/exhibition-map' },
+      { label: 'خدمات العارضين', icon: Wrench, path: '/exhibitor-services' },
+      { label: 'إدارة الفرق', icon: UsersIcon, path: '/teams' },
+      { label: 'فرص الاستثمار', icon: Lightbulb, path: '/opportunities' },
     ],
   },
   {
