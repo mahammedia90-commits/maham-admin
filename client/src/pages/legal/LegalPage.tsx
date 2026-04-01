@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Scale, LayoutDashboard, FileText, Receipt, CreditCard, Shield, Brain, Copy, Plus, Download } from 'lucide-react';
+import AdminLayout from '@/components/layout/AdminLayout';
 import PageHeader from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -92,6 +93,7 @@ export default function LegalPage() {
   const cPay = selectedContract ? payments.filter(p => p.contractId === selectedContract.id) : [];
 
   return (
+    <AdminLayout>
     <div className="space-y-4 sm:space-y-6">
       <PageHeader
         title="الشؤون القانونية والعقود"
@@ -231,5 +233,6 @@ export default function LegalPage() {
         </DialogContent>
       </Dialog>
     </div>
+    </AdminLayout>
   );
 }
