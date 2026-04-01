@@ -5,6 +5,9 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
+// Landing
+import LandingPage from "./pages/LandingPage";
+
 // Auth
 import LoginPage from "./pages/auth/LoginPage";
 
@@ -79,8 +82,10 @@ import FilesPage from "./pages/files/FilesPage";
 function Router() {
   return (
     <Switch>
+      {/* Landing */}
+      <Route path="/" component={LandingPage} />
+
       {/* Auth */}
-      <Route path="/" component={LoginPage} />
       <Route path="/login" component={LoginPage} />
 
       {/* Dashboard */}

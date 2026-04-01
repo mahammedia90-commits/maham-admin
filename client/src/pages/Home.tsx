@@ -1,5 +1,5 @@
-import LoginPage from './auth/LoginPage'
+import { Redirect } from 'wouter';
 
 export default function Home() {
-  return <LoginPage />
+  return <Redirect to="/" />;
 }
