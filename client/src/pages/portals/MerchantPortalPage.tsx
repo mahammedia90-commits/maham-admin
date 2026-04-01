@@ -67,7 +67,7 @@ export default function MerchantPortalPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-3 sm:space-y-4 lg:space-y-6">
+      <div className="space-y-6">
         <PageHeader
           title="بوابة التاجر"
           subtitle="إدارة التجار والأكشاك والحجوزات والعقود التجارية"
@@ -80,7 +80,7 @@ export default function MerchantPortalPage() {
         />
 
         {/* Tabs */}
-        <div className="flex items-center gap-1 p-1 rounded-xl overflow-x-auto scrollbar-hide" style={{ background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.08)' }}>
+        <div className="flex items-center gap-1 p-1 rounded-xl overflow-x-auto" style={{ background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.08)' }}>
           {tabs.map((tab) => (
             <button key={tab} onClick={() => setActiveTab(tab)} className={cn(
               'px-4 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-300',
@@ -94,17 +94,17 @@ export default function MerchantPortalPage() {
 
             {/* ═══ نظرة عامة ═══ */}
             {activeTab === 'نظرة عامة' && (
-              <div className="space-y-3 sm:space-y-4 lg:space-y-6">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <StatsCard title="إجمالي التجار" value="156" icon={Store} trend={18} trendLabel="جديد" delay={0} />
                   <StatsCard title="الأكشاك المحجوزة" value="342 / 400" icon={MapPin} trend={85} trendLabel="نسبة الإشغال" delay={0.1} />
                   <StatsCard title="إيرادات الحجوزات" value={formatCurrency(12800000)} icon={DollarSign} trend={32} trendLabel="نمو" delay={0.2} />
                   <StatsCard title="طلبات معلقة" value="12" icon={Clock} trend={-3} trendLabel="أقل" delay={0.3} />
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Booking Trend Chart */}
-                  <div className="lg:col-span-2 glass-card p-3 sm:p-4 lg:p-6">
+                  <div className="lg:col-span-2 glass-card p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-sm font-bold text-foreground">اتجاه الحجوزات والإيرادات</h3>
                       <div className="flex items-center gap-3 text-[10px]">
@@ -112,7 +112,7 @@ export default function MerchantPortalPage() {
                         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: '#22c55e' }} /> إيرادات</span>
                       </div>
                     </div>
-                    <ResponsiveContainer width="100%" height={220}>
+                    <ResponsiveContainer width="100%" height={280}>
                       <BarChart data={bookingTrend}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(201,168,76,0.06)" />
                         <XAxis dataKey="month" tick={{ fill: '#6B6560', fontSize: 11 }} axisLine={false} tickLine={false} />
@@ -126,7 +126,7 @@ export default function MerchantPortalPage() {
                   </div>
 
                   {/* Booth Types Pie */}
-                  <div className="glass-card p-3 sm:p-4 lg:p-6">
+                  <div className="glass-card p-6">
                     <h3 className="text-sm font-bold text-foreground mb-4">أنواع الأكشاك</h3>
                     <ResponsiveContainer width="100%" height={200}>
                       <RechartsPie>
@@ -148,8 +148,8 @@ export default function MerchantPortalPage() {
                 </div>
 
                 {/* Top Merchants + AI Insights */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
-                  <div className="glass-card p-3 sm:p-4 lg:p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="glass-card p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-sm font-bold text-foreground flex items-center gap-2"><Star size={16} className="text-[#C9A84C]" /> أبرز التجار</h3>
                       <button onClick={() => setActiveTab('التجار')} className="text-xs text-[#C9A84C] hover:opacity-80 flex items-center gap-1">عرض الكل <ChevronLeft size={12} /></button>
@@ -170,7 +170,7 @@ export default function MerchantPortalPage() {
                     </div>
                   </div>
 
-                  <div className="glass-card p-3 sm:p-4 lg:p-6">
+                  <div className="glass-card p-6">
                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><Zap size={16} className="text-[#C9A84C]" /> رؤى الذكاء الاصطناعي</h3>
                     <div className="space-y-3">
                       {[
@@ -197,14 +197,14 @@ export default function MerchantPortalPage() {
 
             {/* ═══ الأكشاك والمواقع ═══ */}
             {activeTab === 'الأكشاك والمواقع' && (
-              <div className="space-y-3 sm:space-y-4 lg:space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4">
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <StatsCard title="إجمالي الأكشاك" value="400" icon={MapPin} delay={0} />
                   <StatsCard title="محجوزة" value="342" icon={CheckCircle2} trend={85} trendLabel="إشغال" delay={0.1} />
                   <StatsCard title="متاحة" value="58" icon={Package} delay={0.2} />
                   <StatsCard title="قيد الصيانة" value="5" icon={AlertTriangle} delay={0.3} />
                 </div>
-                <div className="glass-card p-3 sm:p-4 lg:p-6">
+                <div className="glass-card p-6">
                   <h3 className="text-sm font-bold text-foreground mb-4">خريطة الأكشاك التفاعلية</h3>
                   <div className="h-64 rounded-xl flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.03)', border: '1px solid rgba(201,168,76,0.08)' }}>
                     <div className="text-center">
@@ -214,7 +214,7 @@ export default function MerchantPortalPage() {
                     </div>
                   </div>
                 </div>
-                <div className="glass-card p-3 sm:p-4 lg:p-6">
+                <div className="glass-card p-6">
                   <h3 className="text-sm font-bold text-foreground mb-4">إحصائيات الأكشاك حسب النوع</h3>
                   <ResponsiveContainer width="100%" height={250}>
                     <BarChart data={boothTypes.map(b => ({ ...b, occupied: Math.round(b.value * 3.42), total: Math.round(b.value * 4) }))}>
@@ -236,13 +236,13 @@ export default function MerchantPortalPage() {
                 <div className="flex items-center gap-3">
                   <div className="relative flex-1">
                     <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="بحث عن تاجر..." className="w-full h-9 sm:h-9 sm:h-10 pr-9 pl-4 rounded-xl text-xs sm:text-sm bg-card border border-border focus:border-[rgba(201,168,76,0.3)] outline-none transition-all" />
+                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="بحث عن تاجر..." className="w-full h-10 pr-9 pl-4 rounded-xl text-sm bg-card border border-border focus:border-[rgba(201,168,76,0.3)] outline-none transition-all" />
                   </div>
                   <button onClick={() => toast.info('تصفية — قريباً')} className="nour-btn-outline text-xs flex items-center gap-1.5"><Filter size={14} /> تصفية</button>
                 </div>
                 <div className="glass-card overflow-hidden">
-                  <div className="overflow-x-auto scrollbar-hide">
-                    <table className="w-full text-sm min-w-[800px]">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
                       <thead><tr className="border-b border-border/50">
                         {['التاجر', 'الفئة', 'الأكشاك', 'إجمالي الإنفاق', 'التقييم', 'KYC', 'الحالة', ''].map(h => <th key={h} className="text-right p-4 text-xs font-medium text-muted-foreground">{h}</th>)}
                       </tr></thead>
@@ -269,15 +269,15 @@ export default function MerchantPortalPage() {
             {/* ═══ الطلبات ═══ */}
             {activeTab === 'الطلبات' && (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <StatsCard title="إجمالي الطلبات" value="48" icon={ShoppingBag} delay={0} />
                   <StatsCard title="معتمدة" value="28" icon={CheckCircle2} delay={0.1} />
                   <StatsCard title="معلقة" value="12" icon={Clock} delay={0.2} />
                   <StatsCard title="مرفوضة" value="8" icon={AlertTriangle} delay={0.3} />
                 </div>
                 <div className="glass-card overflow-hidden">
-                  <div className="overflow-x-auto scrollbar-hide">
-                    <table className="w-full text-sm min-w-[800px]">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
                       <thead><tr className="border-b border-border/50">
                         {['رقم الطلب', 'التاجر', 'الفعالية', 'نوع الكشك', 'المساحة', 'السعر', 'الحالة', 'التاريخ'].map(h => <th key={h} className="text-right p-4 text-xs font-medium text-muted-foreground">{h}</th>)}
                       </tr></thead>
@@ -304,14 +304,14 @@ export default function MerchantPortalPage() {
             {/* ═══ العقود ═══ */}
             {activeTab === 'العقود' && (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <StatsCard title="العقود النشطة" value="3" icon={FileCheck} delay={0} />
                   <StatsCard title="القيمة الإجمالية" value={formatCurrency(4150000)} icon={DollarSign} delay={0.1} />
                   <StatsCard title="نسبة التحصيل" value="65%" icon={CreditCard} trend={8} trendLabel="تحسن" delay={0.2} />
                 </div>
                 <div className="glass-card overflow-hidden">
-                  <div className="overflow-x-auto scrollbar-hide">
-                    <table className="w-full text-sm min-w-[800px]">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
                       <thead><tr className="border-b border-border/50">
                         {['رقم العقد', 'التاجر', 'الفعالية', 'القيمة', 'الفترة', 'حالة العقد', 'حالة الدفع'].map(h => <th key={h} className="text-right p-4 text-xs font-medium text-muted-foreground">{h}</th>)}
                       </tr></thead>
@@ -336,7 +336,7 @@ export default function MerchantPortalPage() {
 
             {/* ═══ التقارير ═══ */}
             {activeTab === 'التقارير' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
                   { title: 'تقرير الحجوزات', desc: 'تحليل شامل لحجوزات الأكشاك والمواقع', icon: MapPin, date: '2026-03-28' },
                   { title: 'تقرير التجار', desc: 'ملخص نشاط وتصنيف التجار', icon: Store, date: '2026-03-25' },
@@ -345,7 +345,7 @@ export default function MerchantPortalPage() {
                   { title: 'تقرير KYC', desc: 'حالة التحقق من هوية التجار', icon: FileCheck, date: '2026-03-10' },
                   { title: 'تقرير AI التنبؤي', desc: 'توقعات الطلب والإيرادات القادمة', icon: Zap, date: '2026-03-05' },
                 ].map((report, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="glass-card p-3 sm:p-4 lg:p-5 hover:border-[rgba(201,168,76,0.2)] transition-all duration-300 cursor-pointer group">
+                  <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="glass-card p-5 hover:border-[rgba(201,168,76,0.2)] transition-all duration-300 cursor-pointer group">
                     <div className="flex items-start gap-3 mb-3">
                       <div className="w-10 h-10 rounded-lg bg-[rgba(201,168,76,0.08)] border border-[rgba(201,168,76,0.15)] flex items-center justify-center group-hover:bg-[rgba(201,168,76,0.15)] transition-all"><report.icon size={18} className="text-[#C9A84C]" /></div>
                       <div className="flex-1"><h4 className="text-sm font-bold text-foreground">{report.title}</h4><p className="text-[10px] text-muted-foreground mt-0.5">{report.desc}</p></div>

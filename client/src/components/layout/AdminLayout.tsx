@@ -12,42 +12,24 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const { isAuthenticated, isLoading } = useAuthStore()
-  const { sidebarCollapsed, sidebarOpen, setSidebarOpen, theme } = useUIStore()
-  const [location] = useLocation()
+  const { sidebarCollapsed, theme } = useUIStore()
+  const [, navigate] = useLocation()
 
   useEffect(() => {
     document.documentElement.classList.toggle('light', theme === 'light')
   }, [theme])
 
-  // Close mobile drawer on route change
-  useEffect(() => {
-    setSidebarOpen(false)
-  }, [location, setSidebarOpen])
-
   return (
     <div className="min-h-screen bg-background" dir="rtl">
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
       <Sidebar />
-
       <div
         className={cn(
-          'transition-all duration-300 min-h-screen',
-          // Desktop: margin for fixed sidebar
-          'lg:mr-[260px]',
-          sidebarCollapsed && 'lg:mr-[72px]',
-          // Mobile: no margin (sidebar is overlay)
-          'mr-0'
+          'transition-all duration-300',
+          sidebarCollapsed ? 'mr-[72px]' : 'mr-[260px]'
         )}
       >
         <TopBar />
-        <main className="p-3 sm:p-4 md:p-5 lg:p-6 min-h-[calc(100vh-4rem)]">
+        <main className="p-6 min-h-[calc(100vh-4rem)]">
           {children}
         </main>
       </div>

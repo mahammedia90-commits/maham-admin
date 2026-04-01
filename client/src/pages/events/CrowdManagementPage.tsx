@@ -55,7 +55,7 @@ export default function CrowdManagementPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-4 sm:space-y-5 lg:space-y-6 pb-6 sm:pb-8">
+      <div className="space-y-6 pb-8">
         <PageHeader
           title="إدارة الحشود"
           subtitle="مراقبة وإدارة تدفق الزوار في الفعاليات والمعارض — بيانات حية"
@@ -70,18 +70,18 @@ export default function CrowdManagementPage() {
         />
 
         {/* KPI Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatsCard title="إجمالي الزوار الآن" value={totalCurrent.toLocaleString()} icon={Users} trend={12} trendLabel="عن أمس" />
           <StatsCard title="معدل الإشغال" value={`${overallRate}%`} icon={Activity} trend={overallRate > 85 ? -3 : 5} trendLabel="تغيير" delay={0.05} />
           <StatsCard title="الكاميرات النشطة" value={totalCameras.toString()} icon={Camera} delay={0.1} />
           <StatsCard title="أجهزة الاستشعار" value={totalSensors.toString()} icon={Wifi} delay={0.15} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Zones Grid - 2 cols */}
           <div className="lg:col-span-2 space-y-4">
             <h3 className="text-sm font-bold text-foreground">خريطة المناطق</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {zones.map((zone) => {
                 const rate = Math.round((zone.current / zone.capacity) * 100)
                 return (
@@ -91,7 +91,7 @@ export default function CrowdManagementPage() {
                     animate={{ opacity: 1, y: 0 }}
                     onClick={() => setSelectedZone(selectedZone === zone.id ? null : zone.id)}
                     className={cn(
-                      'glass-card p-3 sm:p-4 lg:p-5 rounded-xl border cursor-pointer transition-all',
+                      'glass-card p-5 rounded-xl border cursor-pointer transition-all',
                       selectedZone === zone.id ? 'border-gold/30 shadow-[0_0_15px_rgba(201,168,76,0.1)]' : 'border-gold/10 hover:border-gold/20',
                       zone.status === 'critical' && 'border-red-500/30 bg-red-500/5'
                     )}
@@ -188,7 +188,7 @@ export default function CrowdManagementPage() {
             </div>
 
             {/* Hourly Flow */}
-            <div className="glass-card rounded-2xl p-3 sm:p-4 lg:p-6 border border-gold/10">
+            <div className="glass-card rounded-2xl p-6 border border-gold/10">
               <h3 className="text-sm font-bold text-foreground mb-4">تدفق الزوار بالساعة</h3>
               <div className="space-y-2">
                 {hourlyFlow.map((h) => (
@@ -217,8 +217,8 @@ export default function CrowdManagementPage() {
           </div>
 
           {/* Alerts Column */}
-          <div className="space-y-3 sm:space-y-4 lg:space-y-6">
-            <div className="glass-card rounded-2xl p-3 sm:p-4 lg:p-6 border border-gold/10">
+          <div className="space-y-6">
+            <div className="glass-card rounded-2xl p-6 border border-gold/10">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                   <Bell size={14} className="text-gold" />
@@ -262,7 +262,7 @@ export default function CrowdManagementPage() {
             </div>
 
             {/* Emergency Actions */}
-            <div className="glass-card rounded-2xl p-3 sm:p-4 lg:p-6 border border-red-500/15">
+            <div className="glass-card rounded-2xl p-6 border border-red-500/15">
               <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                 <Shield size={14} className="text-red-400" />
                 إجراءات الطوارئ
@@ -282,7 +282,7 @@ export default function CrowdManagementPage() {
             </div>
 
             {/* AI Prediction */}
-            <div className="glass-card rounded-2xl p-3 sm:p-4 lg:p-6 border border-gold/10">
+            <div className="glass-card rounded-2xl p-6 border border-gold/10">
               <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
                 <TrendingUp size={14} className="text-gold" />
                 توقعات AI

@@ -1,8 +1,8 @@
 import { create } from 'zustand'
 
 interface UIState {
-  sidebarOpen: boolean       // mobile drawer open/close
-  sidebarCollapsed: boolean  // desktop collapsed/expanded
+  sidebarOpen: boolean
+  sidebarCollapsed: boolean
   theme: 'dark' | 'light'
   toggleSidebar: () => void
   setSidebarOpen: (open: boolean) => void
@@ -12,7 +12,7 @@ interface UIState {
 }
 
 export const useUIStore = create<UIState>((set, get) => ({
-  sidebarOpen: false,
+  sidebarOpen: true,
   sidebarCollapsed: false,
   theme: (typeof window !== 'undefined' && localStorage.getItem('maham-theme') as 'dark' | 'light') || 'dark',
   toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),

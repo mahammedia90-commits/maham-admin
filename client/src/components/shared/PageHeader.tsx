@@ -17,29 +17,25 @@ export default function PageHeader({ title, subtitle, actions, showBack }: PageH
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-6"
+      className="flex items-center justify-between mb-6"
     >
-      <div className="flex items-center gap-3 min-w-0">
+      <div className="flex items-center gap-3">
         {showBack && (
           <button
             onClick={() => window.history.back()}
-            className="btn-back flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex-shrink-0"
+            className="btn-back flex items-center justify-center w-10 h-10 rounded-xl"
           >
             <ArrowRight size={18} />
           </button>
         )}
-        <div className="min-w-0">
-          <h1 className="text-lg sm:text-xl font-bold text-foreground truncate">{title}</h1>
+        <div>
+          <h1 className="text-xl font-bold text-foreground">{title}</h1>
           {subtitle && (
-            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 truncate">{subtitle}</p>
+            <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>
           )}
         </div>
       </div>
-      {actions && (
-        <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
-          {actions}
-        </div>
-      )}
+      {actions && <div className="flex items-center gap-2">{actions}</div>}
     </motion.div>
   )
 }

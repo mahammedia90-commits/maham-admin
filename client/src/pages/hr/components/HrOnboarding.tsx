@@ -1,188 +1,145 @@
-/**
- * ═══════════════════════════════════════════════════════════════════════════
- * MAHAM EXPO — HR Onboarding System
- * ═══════════════════════════════════════════════════════════════════════════
- * Employee onboarding: task tracking, document collection, system access,
- * orientation scheduling, buddy assignment, progress monitoring
- * ═══════════════════════════════════════════════════════════════════════════
- */
-import { useState, useMemo } from 'react'
-import { motion } from 'framer-motion'
-import {
-  UserPlus, Search, CheckCircle2, Circle, Clock, ArrowRight,
-  FileText, Key, Users, BookOpen, Shield, Laptop, Building2,
-  Sparkles, Zap
-} from 'lucide-react'
-import { cn, formatDate } from '@/lib/utils'
-import { EmployeeAvatar, MiniProgress, MetricBox, SectionCard } from './HrShared'
-import type { OnboardingTask, Employee } from '../hrTypes'
+import { useState } from 'react';
+import { UserPlus, CheckCircle, Clock, ArrowRight, Users, FileText, Shield, Laptop, Eye } from 'lucide-react';
+import type { OnboardingTask, Employee } from '../hrTypes';
+import { SectionCard, MiniStat, Badge, ProgressBar, HrModal } from './HrShared';
 
-interface HrOnboardingProps {
-  tasks: OnboardingTask[]
-  employees: Employee[]
-}
+interface Props { tasks: OnboardingTask[]; employees: Employee[]; }
 
-export default function HrOnboarding({ tasks, employees }: HrOnboardingProps) {
-  const [search, setSearch] = useState('')
+export default function HrOnboarding({ tasks, employees }: Props) {
+  const [selectedTask, setSelectedTask] = useState<OnboardingTask | null>(null);
+  const [filterStatus, setFilterStatus] = useState('');
 
-  // Group by employee
-  const grouped = useMemo(() => {
-    const map = new Map<string, OnboardingTask[]>()
-    tasks.forEach(t => {
-      const list = map.get(t.employee_id) || []
-      list.push(t)
-      map.set(t.employee_id, list)
-    })
-    return map
-  }, [tasks])
+  const newEmployees = employees.filter(e => e.status === 'probation');
+  const completedTasks = tasks.filter(t => t.status === 'completed').length;
+  const inProgressTasks = tasks.filter(t => t.status === 'in_progress').length;
+  const pendingTasks = tasks.filter(t => t.status === 'pending').length;
+  const overdueTasks = 0; // placeholder
+  const completionRate = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
 
-  const completedCount = tasks.filter(t => t.completed).length
-  const totalCount = tasks.length
-  const overallProgress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
+  const filtered = filterStatus ? tasks.filter(t => t.status === filterStatus) : tasks;
 
-  const stepIcons: Record<string, any> = {
-    account: Key, documents: FileText, policies: Shield, role_assignment: Users,
-    system_access: Laptop, orientation: BookOpen
-  }
+  const phases = [
+    { name: 'ما قبل الانضمام', icon: <FileText className="w-5 h-5" />, desc: 'إعداد العقود والمستندات', color: 'text-info', items: ['إعداد العقد', 'فتح ملف GOSI', 'تسجيل في قوى', 'إعداد البريد'] },
+    { name: 'اليوم الأول', icon: <UserPlus className="w-5 h-5" />, desc: 'الاستقبال والتعريف', color: 'text-gold', items: ['جولة في المكتب', 'تسليم الأجهزة', 'تعريف بالفريق', 'شرح السياسات'] },
+    { name: 'الأسبوع الأول', icon: <Laptop className="w-5 h-5" />, desc: 'التدريب الأساسي', color: 'text-warning', items: ['تدريب الأنظمة', 'تدريب الأمان', 'تدريب PDPL', 'اجتماع المدير'] },
+    { name: 'الشهر الأول', icon: <Shield className="w-5 h-5" />, desc: 'التقييم والمتابعة', color: 'text-success', items: ['تقييم أولي', 'خطة التطوير', 'تغذية راجعة', 'تأكيد التجربة'] },
+  ];
 
-  // Onboarding workflow steps
-  const workflowSteps = [
-    { step: 'account', label: 'إنشاء الحسابات', desc: 'بريد إلكتروني، أنظمة داخلية، Active Directory' },
-    { step: 'documents', label: 'جمع المستندات', desc: 'هوية، سيرة ذاتية، شهادات، فحص طبي' },
-    { step: 'policies', label: 'توقيع السياسات', desc: 'NDA، لائحة العمل، سياسة الخصوصية PDPL' },
-    { step: 'role_assignment', label: 'تعيين الدور', desc: 'الهيكل التنظيمي، الصلاحيات، RBAC' },
-    { step: 'system_access', label: 'الوصول للأنظمة', desc: 'ERP، CRM، أدوات التعاون، VPN' },
-    { step: 'orientation', label: 'التوجيه والتعريف', desc: 'جولة المكتب، تعريف الفريق، ثقافة الشركة' },
-  ]
+  const statusBadge = (s: string) => {
+    if (s === 'completed') return <Badge variant="success">مكتمل</Badge>;
+    if (s === 'in_progress') return <Badge variant="warning">قيد التنفيذ</Badge>;
+    if (s === 'overdue') return <Badge variant="danger">متأخر</Badge>;
+    return <Badge variant="info">معلق</Badge>;
+  };
 
   return (
-    <div className="space-y-4">
-      {/* ─── KPI Stats ─────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-        <div className="glass-card p-3">
-          <div className="flex items-center gap-2 mb-1">
-            <UserPlus size={14} className="text-gold" />
-            <span className="text-[10px] text-muted-foreground">موظفون جدد</span>
-          </div>
-          <p className="text-lg font-bold font-mono text-foreground">{grouped.size}</p>
-        </div>
-        <div className="glass-card p-3">
-          <div className="flex items-center gap-2 mb-1">
-            <CheckCircle2 size={14} className="text-success" />
-            <span className="text-[10px] text-muted-foreground">مهام مكتملة</span>
-          </div>
-          <p className="text-lg font-bold font-mono text-foreground">{completedCount}/{totalCount}</p>
-        </div>
-        <div className="glass-card p-3">
-          <div className="flex items-center gap-2 mb-1">
-            <Clock size={14} className="text-warning" />
-            <span className="text-[10px] text-muted-foreground">مهام متبقية</span>
-          </div>
-          <p className="text-lg font-bold font-mono text-foreground">{totalCount - completedCount}</p>
-        </div>
-        <div className="glass-card p-3">
-          <div className="flex items-center gap-2 mb-1">
-            <Zap size={14} className="text-info" />
-            <span className="text-[10px] text-muted-foreground">نسبة الإنجاز</span>
-          </div>
-          <p className="text-lg font-bold font-mono text-foreground">{overallProgress}%</p>
-        </div>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
+        <MiniStat label="موظفون جدد" value={newEmployees.length} color="text-gold" />
+        <MiniStat label="مكتملة" value={completedTasks} color="text-success" />
+        <MiniStat label="قيد التنفيذ" value={inProgressTasks} color="text-warning" />
+        <MiniStat label="معلقة" value={pendingTasks} color="text-info" />
+        <MiniStat label="متأخرة" value={overdueTasks} color="text-destructive" />
       </div>
 
-      {/* ─── Onboarding Workflow ───────────────────────────────────────── */}
-      <SectionCard title="سير عمل التأهيل — Onboarding Workflow" icon={ArrowRight}>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-          {workflowSteps.map((ws, i) => {
-            const Icon = stepIcons[ws.step] || Circle
-            return (
-              <div key={ws.step} className="p-3 rounded-xl bg-surface2/30 border border-border/20 text-center relative">
-                <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center mx-auto mb-2">
-                  <Icon size={16} className="text-gold" />
-                </div>
-                <h5 className="text-[10px] font-bold text-foreground mb-0.5">{ws.label}</h5>
-                <p className="text-[8px] text-muted-foreground">{ws.desc}</p>
-                <div className="absolute -left-1 top-1/2 -translate-y-1/2 hidden lg:block">
-                  {i < workflowSteps.length - 1 && <ArrowRight size={12} className="text-gold/30" />}
-                </div>
-              </div>
-            )
-          })}
+      <SectionCard title="تقدم التأهيل" icon={<UserPlus className="w-5 h-5" />}>
+        <div className="flex items-center gap-4 mb-4">
+          <div className="relative w-20 h-20">
+            <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="8" className="text-muted" />
+              <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="8" className="text-gold" strokeDasharray={`${completionRate * 2.51} 251`} strokeLinecap="round" />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center"><span className="text-lg font-bold text-gold">{completionRate}%</span></div>
+          </div>
+          <div className="flex-1"><p className="text-sm font-bold text-foreground mb-2">نسبة الإنجاز</p><ProgressBar value={completedTasks} max={tasks.length || 1} /><p className="text-xs text-chrome mt-1">{completedTasks} من {tasks.length} مهمة</p></div>
         </div>
       </SectionCard>
 
-      {/* ─── Employee Onboarding Cards ─────────────────────────────────── */}
-      {Array.from(grouped.entries()).map(([empId, empTasks]) => {
-        const emp = employees.find(e => e.id === empId)
-        const completed = empTasks.filter(t => t.completed).length
-        const total = empTasks.length
-        const progress = Math.round((completed / total) * 100)
-        const sorted = [...empTasks].sort((a, b) => a.order - b.order)
-
-        return (
-          <motion.div key={empId} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-            className="glass-card p-3 sm:p-4">
-            <div className="flex items-center gap-3 mb-4">
-              <EmployeeAvatar name={empTasks[0].employee_name} size="md" />
-              <div className="flex-1 min-w-0">
-                <h4 className="text-xs font-bold text-foreground">{empTasks[0].employee_name}</h4>
-                <p className="text-[10px] text-muted-foreground">{emp?.job_title_ar || ''} • {emp?.department_name || ''}</p>
+      <SectionCard title="مراحل التأهيل" icon={<ArrowRight className="w-5 h-5" />}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {phases.map((phase, idx) => (
+            <div key={phase.name} className="glass-card p-4 rounded-lg border border-border/50 hover:border-gold/20 transition-all">
+              <div className="flex items-center gap-2 mb-3"><div className={`p-2 rounded-lg bg-card/50 ${phase.color}`}>{phase.icon}</div><div><p className="text-xs font-bold text-foreground">{phase.name}</p><p className="text-[10px] text-chrome">{phase.desc}</p></div></div>
+              <div className="space-y-2">
+                {phase.items.map((item, i) => (
+                  <div key={i} className="flex items-center gap-2 text-xs"><CheckCircle className={`w-3.5 h-3.5 shrink-0 ${i < 2 ? 'text-success' : 'text-muted'}`} /><span className={i < 2 ? 'text-foreground line-through' : 'text-chrome'}>{item}</span></div>
+                ))}
               </div>
-              <div className="text-left shrink-0">
-                <p className="text-sm font-bold font-mono text-gold">{progress}%</p>
-                <p className="text-[9px] text-muted-foreground">{completed}/{total} مهام</p>
-              </div>
-            </div>
-
-            <MiniProgress value={progress} color={progress === 100 ? 'success' : progress >= 50 ? 'gold' : 'warning'} size="sm" />
-
-            <div className="mt-3 space-y-2">
-              {sorted.map(task => {
-                const Icon = stepIcons[task.step] || Circle
-                return (
-                  <div key={task.id} className={cn('flex items-start gap-3 p-2 rounded-lg transition-all',
-                    task.completed ? 'bg-success/5' : 'bg-surface2/20')}>
-                    <div className={cn('w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5',
-                      task.completed ? 'bg-success/20' : 'bg-surface2/50')}>
-                      {task.completed ? <CheckCircle2 size={14} className="text-success" /> : <Circle size={14} className="text-muted-foreground" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className={cn('text-[11px] font-medium', task.completed ? 'text-muted-foreground line-through' : 'text-foreground')}>
-                          {task.title}
-                        </span>
-                        <Icon size={10} className="text-gold" />
-                      </div>
-                      <p className="text-[9px] text-muted-foreground mt-0.5">{task.description}</p>
-                      <div className="flex items-center gap-3 mt-1 flex-wrap">
-                        <span className="text-[8px] text-muted-foreground">المسؤول: {task.assigned_to}</span>
-                        <span className="text-[8px] text-muted-foreground">الموعد: {formatDate(task.due_date)}</span>
-                        {task.completed_at && <span className="text-[8px] text-success">اكتمل: {formatDate(task.completed_at)}</span>}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </motion.div>
-        )
-      })}
-
-      {/* ─── AI Onboarding Suggestions ─────────────────────────────────── */}
-      <SectionCard title="اقتراحات الذكاء الاصطناعي للتأهيل" icon={Sparkles}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {[
-            { title: 'تخصيص مسار التأهيل', desc: 'تعديل خطوات التأهيل تلقائياً بناءً على الدور الوظيفي والقسم والخبرة السابقة' },
-            { title: 'تعيين Buddy تلقائي', desc: 'اقتراح زميل مرشد من نفس القسم بناءً على التوافق الشخصي والمهني' },
-            { title: 'جدولة ذكية', desc: 'ترتيب جلسات التعريف والتدريب تلقائياً بناءً على توفر الفريق والأولويات' },
-            { title: 'تنبيهات استباقية', desc: 'إشعار المدير والموظف الجديد بالمهام المتأخرة مع اقتراح حلول بديلة' },
-          ].map(item => (
-            <div key={item.title} className="p-3 rounded-xl bg-gold/5 border border-gold/10">
-              <h5 className="text-[10px] font-bold text-foreground mb-0.5">{item.title}</h5>
-              <p className="text-[9px] text-muted-foreground">{item.desc}</p>
             </div>
           ))}
         </div>
       </SectionCard>
+
+      <SectionCard title="الموظفون الجدد" icon={<Users className="w-5 h-5" />}>
+        {newEmployees.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {newEmployees.map(emp => {
+              const empTasks = tasks.filter(t => t.employee_id === emp.id);
+              const empDone = empTasks.filter(t => t.status === 'completed').length;
+              const empPct = empTasks.length > 0 ? Math.round((empDone / empTasks.length) * 100) : 0;
+              return (
+                <div key={emp.id} className="glass-card p-3 rounded-lg border border-border/50">
+                  <div className="flex items-center gap-3 mb-3"><div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center text-gold font-bold text-sm">{emp.name_ar.charAt(0)}</div><div><p className="text-xs font-bold text-foreground">{emp.name_ar}</p><p className="text-[10px] text-chrome">{emp.position}</p></div></div>
+                  <ProgressBar value={empDone} max={empTasks.length || 1} /><p className="text-[10px] text-chrome mt-1">{empPct}% — {empDone}/{empTasks.length}</p>
+                  <div className="flex justify-between text-[10px] mt-2"><span className="text-chrome">الانضمام</span><span className="text-foreground">{emp.join_date}</span></div>
+                </div>
+              );
+            })}
+          </div>
+        ) : <p className="text-sm text-chrome text-center py-6">لا يوجد موظفون في فترة التجربة</p>}
+      </SectionCard>
+
+      <SectionCard title="مهام التأهيل" icon={<CheckCircle className="w-5 h-5" />}>
+        <div className="flex gap-1 flex-wrap mb-4">
+          {[{ v: '', l: 'الكل' }, { v: 'completed', l: 'مكتمل' }, { v: 'in_progress', l: 'قيد التنفيذ' }, { v: 'pending', l: 'معلق' }, ].map(s => (
+            <button key={s.v} onClick={() => setFilterStatus(s.v)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${filterStatus === s.v ? 'bg-gold/10 text-gold border border-gold/30' : 'text-chrome hover:bg-muted'}`}>{s.l}</button>
+          ))}
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead><tr className="border-b border-border">
+              <th className="text-right py-2 px-2 text-chrome font-medium">المهمة</th>
+              <th className="text-right py-2 px-2 text-chrome font-medium hidden sm:table-cell">الموظف</th>
+              <th className="text-right py-2 px-2 text-chrome font-medium hidden md:table-cell">المسؤول</th>
+              <th className="text-right py-2 px-2 text-chrome font-medium">الحالة</th>
+              <th className="text-right py-2 px-2 text-chrome font-medium hidden lg:table-cell">الاستحقاق</th>
+              <th className="text-center py-2 px-2 text-chrome font-medium">عرض</th>
+            </tr></thead>
+            <tbody>
+              {filtered.map(task => (
+                <tr key={task.id} className="border-b border-border/50 hover:bg-card/30">
+                  <td className="py-2 px-2"><p className="font-medium text-foreground">{task.task}</p><p className="text-[10px] text-chrome">{task.step}</p></td>
+                  <td className="py-2 px-2 text-chrome hidden sm:table-cell">{task.employee_name}</td>
+                  <td className="py-2 px-2 text-chrome hidden md:table-cell">{task.assigned_to}</td>
+                  <td className="py-2 px-2">{statusBadge(task.status)}</td>
+                  <td className="py-2 px-2 text-chrome hidden lg:table-cell">{task.due_date}</td>
+                  <td className="py-2 px-2 text-center"><button onClick={() => setSelectedTask(task)} className="p-1 rounded hover:bg-gold/10 text-gold"><Eye className="w-4 h-4" /></button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </SectionCard>
+
+      <HrModal open={!!selectedTask} onClose={() => setSelectedTask(null)} title="تفاصيل مهمة التأهيل" size="md">
+        {selectedTask && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div><p className="text-xs text-chrome mb-1">المهمة</p><p className="text-sm font-bold text-foreground">{selectedTask.task}</p></div>
+              <div><p className="text-xs text-chrome mb-1">الحالة</p>{statusBadge(selectedTask.status)}</div>
+              <div><p className="text-xs text-chrome mb-1">الموظف</p><p className="text-sm text-foreground">{selectedTask.employee_name}</p></div>
+              <div><p className="text-xs text-chrome mb-1">المسؤول</p><p className="text-sm text-foreground">{selectedTask.assigned_to}</p></div>
+              <div><p className="text-xs text-chrome mb-1">المرحلة</p><p className="text-sm text-foreground">{selectedTask.step}</p></div>
+              <div><p className="text-xs text-chrome mb-1">الاستحقاق</p><p className="text-sm text-foreground">{selectedTask.due_date}</p></div>
+            </div>
+            {selectedTask.description && <div><p className="text-xs text-chrome mb-1">الوصف</p><p className="text-sm text-foreground">{selectedTask.description}</p></div>}
+            <div className="flex gap-2">
+              {selectedTask.status !== 'completed' && <button className="px-4 py-2 bg-success/10 text-success rounded-lg text-xs font-medium hover:bg-success/20">تحديد كمكتمل</button>}
+              <button className="px-4 py-2 bg-muted text-foreground rounded-lg text-xs font-medium hover:bg-muted/80">إعادة تعيين</button>
+            </div>
+          </div>
+        )}
+      </HrModal>
     </div>
-  )
+  );
 }
