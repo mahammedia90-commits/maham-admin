@@ -113,6 +113,17 @@ import TeamsPage from "./pages/teams/TeamsPage";
 // Opportunities
 import OpportunitiesPage from "./pages/opportunities/OpportunitiesPage";
 
+// Laravel Dashboard Pages
+import CategoriesPage from "./pages/categories/CategoriesPage";
+import CitiesPage from "./pages/cities/CitiesPage";
+import BannersPage from "./pages/banners/BannersPage";
+import CmsPagesPage from "./pages/cms-pages/CmsPagesPage";
+import FaqsPage from "./pages/faqs/FaqsPage";
+import RatingsPage from "./pages/ratings/RatingsPage";
+import KycPage from "./pages/kyc/KycPage";
+import BusinessProfilesPage from "./pages/business-profiles/BusinessProfilesPage";
+import SponsorBenefitsPage from "./pages/sponsor-benefits/SponsorBenefitsPage";
+
 function Router() {
   return (
     <Switch>
@@ -223,6 +234,17 @@ function Router() {
 
       {/* Opportunities */}
       <Route path="/opportunities" component={OpportunitiesPage} />
+
+      {/* Laravel Dashboard Pages */}
+      <Route path="/categories" component={CategoriesPage} />
+      <Route path="/cities" component={CitiesPage} />
+      <Route path="/banners" component={BannersPage} />
+      <Route path="/cms-pages" component={CmsPagesPage} />
+      <Route path="/faqs" component={FaqsPage} />
+      <Route path="/ratings" component={RatingsPage} />
+      <Route path="/kyc" component={KycPage} />
+      <Route path="/business-profiles" component={BusinessProfilesPage} />
+      <Route path="/sponsor-benefits" component={SponsorBenefitsPage} />
 
       {/* 404 */}
       <Route path="/404" component={NotFound} />

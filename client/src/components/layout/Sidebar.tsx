@@ -12,7 +12,8 @@ import {
   Monitor, FileArchive, Shield, ChevronDown, LogOut, PanelRightClose,
   PanelRightOpen, Workflow, Globe, ClipboardList, UsersRound,
   FolderOpen, MessageSquare, Bell, Award, Clock, Image, Package,
-  Map, Wrench, UsersIcon, Lightbulb
+  Map, Wrench, UsersIcon, Lightbulb, Tags, MapPin, ImageIcon,
+  FileCode, HelpCircle, Star, ShieldCheck, Building, Gift
 } from 'lucide-react'
 
 interface NavItem {
@@ -87,6 +88,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
     items: [
       { label: 'أصول الرعاة', icon: Image, path: '/sponsor-assets' },
       { label: 'الحزم والقطاعات', icon: Package, path: '/packages' },
+      { label: 'مزايا الرعاية', icon: Gift, path: '/sponsor-benefits' },
     ],
   },
   {
@@ -108,6 +110,24 @@ const navSections: { title: string; items: NavItem[] }[] = [
       { label: 'خدمة العملاء 360', icon: HeadphonesIcon, path: '/support' },
       { label: 'إدارة المشاريع', icon: FolderKanban, path: '/projects' },
       { label: 'الرعاة والشركاء', icon: Handshake, path: '/sponsors' },
+    ],
+  },
+  {
+    title: 'إدارة المحتوى',
+    items: [
+      { label: 'الفئات', icon: Tags, path: '/categories' },
+      { label: 'المدن', icon: MapPin, path: '/cities' },
+      { label: 'البانرات', icon: ImageIcon, path: '/banners' },
+      { label: 'صفحات المحتوى', icon: FileCode, path: '/cms-pages' },
+      { label: 'الأسئلة الشائعة', icon: HelpCircle, path: '/faqs' },
+      { label: 'التقييمات', icon: Star, path: '/ratings' },
+    ],
+  },
+  {
+    title: 'التحقق والملفات التجارية',
+    items: [
+      { label: 'التحقق KYC', icon: ShieldCheck, path: '/kyc', badge: 'مهم' },
+      { label: 'الملفات التجارية', icon: Building, path: '/business-profiles' },
     ],
   },
   {
