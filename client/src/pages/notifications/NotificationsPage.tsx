@@ -1,291 +1,378 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Bell, BellOff, CheckCheck, Trash2, Filter, Settings,
-  AlertTriangle, Info, CheckCircle, XCircle, Calendar,
-  DollarSign, FileText, Users, Shield, Brain, Clock,
-  ChevronDown, Search, MailOpen, Mail
-} from 'lucide-react'
-import { toast } from 'sonner'
-import AdminLayout from '@/components/layout/AdminLayout'
-import PageHeader from '@/components/shared/PageHeader'
-import StatsCard from '@/components/shared/StatsCard'
-import { cn, formatDateTime } from '@/lib/utils'
+import React, { useState } from 'react';
+import AdminLayout from '@/components/layout/AdminLayout';
+import PageHeader from '@/components/shared/PageHeader';
+import StatsCard from '@/components/shared/StatsCard';
+import StatusBadge from '@/components/shared/StatusBadge';
+import { cn, formatCurrency, formatDate } from '@/lib/utils';
+import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Bell, 
+  Search, 
+  Filter, 
+  CheckCircle2, 
+  AlertCircle, 
+  Info, 
+  Clock, 
+  FileText, 
+  CreditCard, 
+  UserCheck, 
+  Calendar,
+  MoreVertical,
+  Check,
+  Trash2
+} from 'lucide-react';
 
-type NotifType = 'info' | 'warning' | 'success' | 'error' | 'system'
-type NotifCategory = 'events' | 'finance' | 'legal' | 'users' | 'security' | 'ai' | 'operations'
+// Types
+type NotificationType = 'system' | 'finance' | 'orders';
+type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
 
 interface Notification {
-  id: number
-  title: string
-  message: string
-  type: NotifType
-  category: NotifCategory
-  read: boolean
-  time: string
-  actionUrl?: string
-  actionLabel?: string
+  id: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  date: string;
+  read: boolean;
+  priority: NotificationPriority;
+  source: string;
 }
 
-const MOCK_NOTIFICATIONS: Notification[] = [
-  { id: 1, title: 'طلب حجز بوث جديد', message: 'قدّم التاجر أحمد المالكي طلب حجز بوث في المنطقة A - الفعالية: معرض التقنية 2026', type: 'info', category: 'events', read: false, time: '2026-03-31T14:30:00', actionUrl: '/requests', actionLabel: 'مراجعة الطلب' },
-  { id: 2, title: 'تنبيه: عقد ينتهي خلال 7 أيام', message: 'عقد الراعي الذهبي مع شركة التقنية المتقدمة ينتهي في 7 أبريل 2026', type: 'warning', category: 'legal', read: false, time: '2026-03-31T13:00:00', actionUrl: '/legal', actionLabel: 'عرض العقد' },
-  { id: 3, title: 'دفعة مالية مستلمة', message: 'تم استلام دفعة بقيمة 150,000 ر.س من المستثمر خالد الدوسري عبر SADAD', type: 'success', category: 'finance', read: false, time: '2026-03-31T11:45:00', actionUrl: '/finance', actionLabel: 'عرض التفاصيل' },
-  { id: 4, title: 'فشل في إرسال فاتورة ZATCA', message: 'فشل إرسال الفاتورة #INV-2026-0089 إلى منصة فاتورة — خطأ في التوقيع الرقمي', type: 'error', category: 'finance', read: false, time: '2026-03-31T10:30:00', actionUrl: '/finance', actionLabel: 'إعادة المحاولة' },
-  { id: 5, title: 'مستخدم جديد مسجل', message: 'تسجيل مستثمر جديد: ريم الزهراني — بانتظار التحقق KYC', type: 'info', category: 'users', read: true, time: '2026-03-31T09:15:00', actionUrl: '/users', actionLabel: 'مراجعة الحساب' },
-  { id: 6, title: 'تنبيه أمني: محاولة دخول مشبوهة', message: 'تم رصد 5 محاولات دخول فاشلة من IP: 185.xxx.xxx.12 خلال 10 دقائق', type: 'error', category: 'security', read: true, time: '2026-03-30T22:00:00', actionUrl: '/audit', actionLabel: 'عرض السجل' },
-  { id: 7, title: 'توصية AI: تحسين التسعير', message: 'يقترح العقل التنفيذي زيادة أسعار البوثات في المنطقة B بنسبة 12% بناءً على تحليل الطلب', type: 'info', category: 'ai', read: true, time: '2026-03-30T16:00:00', actionUrl: '/ai', actionLabel: 'عرض التحليل' },
-  { id: 8, title: 'فعالية جديدة منشورة', message: 'تم نشر فعالية "معرض الابتكار 2026" بنجاح — تاريخ البدء: 20 مايو 2026', type: 'success', category: 'events', read: true, time: '2026-03-30T14:00:00', actionUrl: '/events', actionLabel: 'عرض الفعالية' },
-  { id: 9, title: 'تحديث سياسة الامتثال', message: 'تم تحديث متطلبات NCA للأمن السيبراني — يرجى مراجعة الإعدادات', type: 'warning', category: 'security', read: true, time: '2026-03-30T10:00:00', actionUrl: '/legal', actionLabel: 'مراجعة' },
-  { id: 10, title: 'اكتمال مهمة العمليات', message: 'تم إكمال تجهيز القاعة الرئيسية لمعرض التقنية — جاهز للتفتيش', type: 'success', category: 'operations', read: true, time: '2026-03-29T17:00:00', actionUrl: '/operations', actionLabel: 'عرض التفاصيل' },
-  { id: 11, title: 'طلب KYC معلق', message: 'مستندات KYC للتاجر سارة العتيبي بحاجة لمراجعة — مرفق: سجل تجاري + هوية', type: 'warning', category: 'users', read: true, time: '2026-03-29T12:00:00', actionUrl: '/documents', actionLabel: 'مراجعة المستندات' },
-  { id: 12, title: 'تقرير أسبوعي جاهز', message: 'التقرير الأسبوعي للأداء المالي والتشغيلي جاهز للتحميل', type: 'info', category: 'finance', read: true, time: '2026-03-29T08:00:00', actionUrl: '/reports', actionLabel: 'تحميل التقرير' },
-]
+// Mock Data
+const mockNotifications: Notification[] = [
+  {
+    id: 'NOT-001',
+    title: 'طلب جديد',
+    message: 'تم استلام طلب حجز جناح جديد لمعرض التقنية 2024.',
+    type: 'orders',
+    date: '2024-05-20T10:30:00Z',
+    read: false,
+    priority: 'high',
+    source: 'نظام الحجوزات'
+  },
+  {
+    id: 'NOT-002',
+    title: 'دفعة مستلمة',
+    message: 'تم تأكيد استلام الدفعة الأولى من شركة الأفق بقيمة 50,000 ريال.',
+    type: 'finance',
+    date: '2024-05-20T09:15:00Z',
+    read: false,
+    priority: 'medium',
+    source: 'النظام المالي'
+  },
+  {
+    id: 'NOT-003',
+    title: 'عقد بحاجة لتوقيع',
+    message: 'عقد الرعاية البلاتينية لشركة التقدم جاهز للتوقيع النهائي.',
+    type: 'system',
+    date: '2024-05-19T14:45:00Z',
+    read: true,
+    priority: 'urgent',
+    source: 'إدارة العقود'
+  },
+  {
+    id: 'NOT-004',
+    title: 'KYC مكتمل',
+    message: 'تم التحقق بنجاح من مستندات شركة النور التجارية.',
+    type: 'system',
+    date: '2024-05-19T11:20:00Z',
+    read: true,
+    priority: 'low',
+    source: 'نظام الامتثال'
+  },
+  {
+    id: 'NOT-005',
+    title: 'فعالية قادمة',
+    message: 'تذكير: معرض الابتكار يبدأ بعد 3 أيام. يرجى مراجعة التجهيزات النهائية.',
+    type: 'system',
+    date: '2024-05-18T08:00:00Z',
+    read: true,
+    priority: 'high',
+    source: 'إدارة الفعاليات'
+  },
+  {
+    id: 'NOT-006',
+    title: 'تأخير في السداد',
+    message: 'يوجد تأخير في سداد الدفعة الثانية لشركة القمة.',
+    type: 'finance',
+    date: '2024-05-17T15:30:00Z',
+    read: false,
+    priority: 'urgent',
+    source: 'النظام المالي'
+  },
+  {
+    id: 'NOT-007',
+    title: 'طلب دعم فني',
+    message: 'تم فتح تذكرة دعم فني جديدة بخصوص مشكلة في منصة العارضين.',
+    type: 'system',
+    date: '2024-05-17T10:00:00Z',
+    read: true,
+    priority: 'medium',
+    source: 'خدمة العملاء'
+  }
+];
+
+const tabs = [
+  { id: 'all', label: 'الكل' },
+  { id: 'system', label: 'النظام' },
+  { id: 'finance', label: 'المالية' },
+  { id: 'orders', label: 'الطلبات' }
+];
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS)
-  const [filterType, setFilterType] = useState<string>('')
-  const [filterCategory, setFilterCategory] = useState<string>('')
-  const [filterRead, setFilterRead] = useState<string>('')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [activeTab, setActiveTab] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
 
-  const unreadCount = notifications.filter(n => !n.read).length
-  const warningCount = notifications.filter(n => n.type === 'warning').length
-  const errorCount = notifications.filter(n => n.type === 'error').length
+  const handleMarkAsRead = (id: string) => {
+    setNotifications(prev => 
+      prev.map(notif => notif.id === id ? { ...notif, read: true } : notif)
+    );
+    toast.success('تم تحديد الإشعار كمقروء');
+  };
 
-  const filtered = notifications.filter(n => {
-    if (filterType && n.type !== filterType) return false
-    if (filterCategory && n.category !== filterCategory) return false
-    if (filterRead === 'unread' && n.read) return false
-    if (filterRead === 'read' && !n.read) return false
-    if (searchQuery && !n.title.includes(searchQuery) && !n.message.includes(searchQuery)) return false
-    return true
-  })
+  const handleMarkAllAsRead = () => {
+    setNotifications(prev => prev.map(notif => ({ ...notif, read: true })));
+    toast.success('تم تحديد جميع الإشعارات كمقروءة');
+  };
 
-  const markRead = (id: number) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
-  }
+  const handleDelete = (id: string) => {
+    setNotifications(prev => prev.filter(notif => notif.id !== id));
+    toast.success('تم حذف الإشعار');
+  };
 
-  const markAllRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
-    toast.success('تم تعليم جميع الإشعارات كمقروءة')
-  }
+  const filteredNotifications = notifications.filter(notif => {
+    const matchesTab = activeTab === 'all' || notif.type === activeTab;
+    const matchesSearch = notif.title.includes(searchQuery) || notif.message.includes(searchQuery);
+    return matchesTab && matchesSearch;
+  });
 
-  const deleteNotification = (id: number) => {
-    setNotifications(prev => prev.filter(n => n.id !== id))
-    toast.success('تم حذف الإشعار')
-  }
+  const stats = {
+    total: notifications.length,
+    unread: notifications.filter(n => !n.read).length,
+    urgent: notifications.filter(n => n.priority === 'urgent').length,
+    today: notifications.filter(n => new Date(n.date).toDateString() === new Date().toDateString()).length
+  };
 
-  const getTypeIcon = (type: NotifType) => {
+  const getIconForType = (type: string) => {
     switch (type) {
-      case 'info': return <Info size={16} className="text-info" />
-      case 'warning': return <AlertTriangle size={16} className="text-warning" />
-      case 'success': return <CheckCircle size={16} className="text-success" />
-      case 'error': return <XCircle size={16} className="text-danger" />
-      case 'system': return <Shield size={16} className="text-gold" />
+      case 'finance': return <CreditCard className="w-5 h-5 text-emerald-500" />;
+      case 'orders': return <FileText className="w-5 h-5 text-blue-500" />;
+      default: return <Info className="w-5 h-5 text-gold" />;
     }
-  }
+  };
 
-  const getCategoryIcon = (category: NotifCategory) => {
-    switch (category) {
-      case 'events': return <Calendar size={12} />
-      case 'finance': return <DollarSign size={12} />
-      case 'legal': return <FileText size={12} />
-      case 'users': return <Users size={12} />
-      case 'security': return <Shield size={12} />
-      case 'ai': return <Brain size={12} />
-      case 'operations': return <Settings size={12} />
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'urgent': return 'text-red-500 bg-red-500/10 border-red-500/20';
+      case 'high': return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
+      case 'medium': return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+      case 'low': return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
+      default: return 'text-muted-foreground bg-surface border-border';
     }
-  }
+  };
 
-  const getCategoryLabel = (category: NotifCategory) => {
-    switch (category) {
-      case 'events': return 'الفعاليات'
-      case 'finance': return 'المالية'
-      case 'legal': return 'القانونية'
-      case 'users': return 'المستخدمون'
-      case 'security': return 'الأمان'
-      case 'ai': return 'الذكاء الاصطناعي'
-      case 'operations': return 'العمليات'
+  const getPriorityLabel = (priority: string) => {
+    switch (priority) {
+      case 'urgent': return 'عاجل جداً';
+      case 'high': return 'عالي';
+      case 'medium': return 'متوسط';
+      case 'low': return 'عادي';
+      default: return priority;
     }
-  }
-
-  const getTypeBg = (type: NotifType) => {
-    switch (type) {
-      case 'info': return 'border-r-info'
-      case 'warning': return 'border-r-warning'
-      case 'success': return 'border-r-success'
-      case 'error': return 'border-r-danger'
-      case 'system': return 'border-r-gold'
-    }
-  }
-
-  // Group by date
-  const groupedByDate = filtered.reduce<Record<string, Notification[]>>((acc, n) => {
-    const date = new Date(n.time).toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' })
-    if (!acc[date]) acc[date] = []
-    acc[date].push(n)
-    return acc
-  }, {})
+  };
 
   return (
     <AdminLayout>
-      <PageHeader
-        title="مركز الإشعارات"
-        subtitle="جميع التنبيهات والإشعارات في مكان واحد"
-        actions={
-          <div className="flex items-center gap-2">
-            <button
-              onClick={markAllRead}
-              disabled={unreadCount === 0}
-              className="h-9 px-4 rounded-lg bg-surface border border-border text-sm text-muted-foreground hover:text-gold hover:border-gold/30 disabled:opacity-30 transition-all flex items-center gap-2"
-            >
-              <CheckCheck size={14} />
-              تعليم الكل كمقروء
-            </button>
-            <button
-              onClick={() => toast.info('إعدادات الإشعارات — قريباً')}
-              className="h-9 px-4 rounded-lg bg-surface border border-border text-sm text-muted-foreground hover:text-gold hover:border-gold/30 transition-all flex items-center gap-2"
-            >
-              <Settings size={14} />
-              الإعدادات
-            </button>
-          </div>
-        }
-      />
+      <div className="space-y-6">
+        <PageHeader 
+          title="مركز الإشعارات" 
+          subtitle="إدارة ومتابعة جميع تنبيهات وإشعارات النظام"
+        />
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <StatsCard title="إجمالي الإشعارات" value={notifications.length} icon={Bell} delay={0} />
-        <StatsCard title="غير مقروءة" value={unreadCount} icon={Mail} delay={0.1} />
-        <StatsCard title="تحذيرات" value={warningCount} icon={AlertTriangle} delay={0.2} />
-        <StatsCard title="أخطاء" value={errorCount} icon={XCircle} delay={0.3} />
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="بحث في الإشعارات..."
-            className="w-full h-9 pr-9 pl-3 rounded-lg bg-surface border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/40 transition-all"
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard
+            title="إجمالي الإشعارات"
+            value={stats.total.toString()}
+            icon={Bell}
+            delay={0.1}
+          />
+          <StatsCard
+            title="غير مقروءة"
+            value={stats.unread.toString()}
+            icon={AlertCircle}
+            delay={0.2}
+            trend={12}
+          />
+          <StatsCard
+            title="عاجلة"
+            value={stats.urgent.toString()}
+            icon={Clock}
+            delay={0.3}
+          />
+          <StatsCard
+            title="إشعارات اليوم"
+            value={stats.today.toString()}
+            icon={Calendar}
+            delay={0.4}
+            trend={5}
           />
         </div>
-        <select value={filterType} onChange={e => setFilterType(e.target.value)} className="h-9 px-3 rounded-lg bg-surface border border-border text-xs text-foreground cursor-pointer focus:outline-none focus:border-gold/40">
-          <option value="">كل الأنواع</option>
-          <option value="info">معلومات</option>
-          <option value="warning">تحذيرات</option>
-          <option value="success">نجاح</option>
-          <option value="error">أخطاء</option>
-        </select>
-        <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} className="h-9 px-3 rounded-lg bg-surface border border-border text-xs text-foreground cursor-pointer focus:outline-none focus:border-gold/40">
-          <option value="">كل الأقسام</option>
-          <option value="events">الفعاليات</option>
-          <option value="finance">المالية</option>
-          <option value="legal">القانونية</option>
-          <option value="users">المستخدمون</option>
-          <option value="security">الأمان</option>
-          <option value="ai">الذكاء الاصطناعي</option>
-          <option value="operations">العمليات</option>
-        </select>
-        <select value={filterRead} onChange={e => setFilterRead(e.target.value)} className="h-9 px-3 rounded-lg bg-surface border border-border text-xs text-foreground cursor-pointer focus:outline-none focus:border-gold/40">
-          <option value="">الكل</option>
-          <option value="unread">غير مقروءة</option>
-          <option value="read">مقروءة</option>
-        </select>
-      </div>
 
-      {/* Notifications List */}
-      <div className="space-y-6">
-        {Object.keys(groupedByDate).length === 0 ? (
-          <div className="glass-card py-16 flex flex-col items-center">
-            <BellOff size={40} className="text-muted-foreground/30 mb-3" />
-            <p className="text-sm text-muted-foreground">لا توجد إشعارات مطابقة</p>
+        {/* Main Content */}
+        <div className="glass-card rounded-2xl border border-border/50 overflow-hidden flex flex-col">
+          {/* Toolbar */}
+          <div className="p-4 border-b border-border/50 bg-surface2/50 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+            {/* Tabs */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto hide-scrollbar">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "px-4 py-2 rounded-xl text-sm font-medium transition-all whitespace-nowrap",
+                    activeTab === tab.id
+                      ? "bg-gold/10 text-gold border border-gold/20"
+                      : "text-muted-foreground hover:bg-surface2 hover:text-foreground"
+                  )}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <div className="relative flex-1 md:w-64">
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="بحث في الإشعارات..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-4 pr-10 py-2 bg-surface border border-border/50 rounded-xl text-sm focus:outline-none focus:border-gold/50 transition-colors text-foreground"
+                />
+              </div>
+              <button 
+                onClick={handleMarkAllAsRead}
+                className="p-2 bg-surface border border-border/50 rounded-xl text-muted-foreground hover:text-gold hover:border-gold/30 transition-colors"
+                title="تحديد الكل كمقروء"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+              </button>
+              <button className="p-2 bg-surface border border-border/50 rounded-xl text-muted-foreground hover:text-gold hover:border-gold/30 transition-colors">
+                <Filter className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-        ) : (
-          Object.entries(groupedByDate).map(([date, notifs]) => (
-            <div key={date}>
-              <h3 className="text-xs font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-                <Clock size={12} />
-                {date}
-              </h3>
-              <div className="space-y-2">
-                <AnimatePresence mode="popLayout">
-                  {notifs.map((notif, idx) => (
+
+          {/* Notifications List */}
+          <div className="p-4">
+            <div className="space-y-3">
+              <AnimatePresence mode="popLayout">
+                {filteredNotifications.length > 0 ? (
+                  filteredNotifications.map((notif, index) => (
                     <motion.div
                       key={notif.id}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 10 }}
-                      transition={{ duration: 0.2, delay: idx * 0.03 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ delay: index * 0.05 }}
                       className={cn(
-                        'glass-card p-4 border-r-3 transition-all group',
-                        getTypeBg(notif.type),
-                        !notif.read && 'bg-gold/[0.02]'
+                        "group p-4 rounded-xl border transition-all duration-300",
+                        notif.read 
+                          ? "bg-surface/50 border-border/30" 
+                          : "bg-surface2 border-gold/20 shadow-[0_0_15px_rgba(212,175,55,0.05)]"
                       )}
                     >
-                      <div className="flex items-start gap-3">
-                        <div className="shrink-0 mt-0.5">
-                          {getTypeIcon(notif.type)}
+                      <div className="flex gap-4 items-start">
+                        {/* Icon */}
+                        <div className={cn(
+                          "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+                          notif.read ? "bg-surface" : "bg-gold/10"
+                        )}>
+                          {getIconForType(notif.type)}
                         </div>
+
+                        {/* Content */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h4 className={cn('text-sm font-semibold', notif.read ? 'text-foreground/80' : 'text-foreground')}>
-                              {notif.title}
-                            </h4>
-                            {!notif.read && (
-                              <span className="w-2 h-2 rounded-full bg-gold shrink-0" />
-                            )}
+                          <div className="flex items-start justify-between gap-4 mb-1">
+                            <div>
+                              <h4 className={cn(
+                                "text-base font-medium mb-1",
+                                notif.read ? "text-foreground" : "text-gold"
+                              )}>
+                                {notif.title}
+                              </h4>
+                              <p className="text-sm text-muted-foreground leading-relaxed">
+                                {notif.message}
+                              </p>
+                            </div>
+                            
+                            {/* Actions & Time */}
+                            <div className="flex flex-col items-end gap-2 shrink-0">
+                              <span className="text-xs text-muted-foreground whitespace-nowrap">
+                                {formatDate(notif.date)}
+                              </span>
+                              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {!notif.read && (
+                                  <button
+                                    onClick={() => handleMarkAsRead(notif.id)}
+                                    className="p-1.5 hover:bg-gold/10 hover:text-gold rounded-lg text-muted-foreground transition-colors"
+                                    title="تحديد كمقروء"
+                                  >
+                                    <Check className="w-4 h-4" />
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => handleDelete(notif.id)}
+                                  className="p-1.5 hover:bg-red-500/10 hover:text-red-500 rounded-lg text-muted-foreground transition-colors"
+                                  title="حذف"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
                           </div>
-                          <p className="text-xs text-muted-foreground leading-relaxed mb-2">{notif.message}</p>
-                          <div className="flex items-center gap-3">
-                            <span className="text-[10px] text-muted-foreground/70 flex items-center gap-1">
-                              {getCategoryIcon(notif.category)}
-                              {getCategoryLabel(notif.category)}
+
+                          {/* Meta Tags */}
+                          <div className="flex items-center gap-3 mt-3">
+                            <span className={cn(
+                              "text-xs px-2.5 py-1 rounded-md border",
+                              getPriorityColor(notif.priority)
+                            )}>
+                              {getPriorityLabel(notif.priority)}
                             </span>
-                            <span className="text-[10px] text-muted-foreground/70">
-                              {new Date(notif.time).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <div className="w-1.5 h-1.5 rounded-full bg-border" />
+                              {notif.source}
                             </span>
-                            {notif.actionLabel && (
-                              <button
-                                onClick={() => { markRead(notif.id); window.location.href = notif.actionUrl || '#' }}
-                                className="text-[10px] text-gold hover:text-gold-light transition-colors font-medium"
-                              >
-                                {notif.actionLabel}
-                              </button>
-                            )}
                           </div>
-                        </div>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                          {!notif.read && (
-                            <button
-                              onClick={() => markRead(notif.id)}
-                              className="p-1.5 rounded-md hover:bg-surface2 text-muted-foreground hover:text-info transition-colors"
-                              title="تعليم كمقروء"
-                            >
-                              <MailOpen size={13} />
-                            </button>
-                          )}
-                          <button
-                            onClick={() => deleteNotification(notif.id)}
-                            className="p-1.5 rounded-md hover:bg-danger/10 text-muted-foreground hover:text-danger transition-colors"
-                            title="حذف"
-                          >
-                            <Trash2 size={13} />
-                          </button>
                         </div>
                       </div>
                     </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
+                  ))
+                ) : (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="py-12 flex flex-col items-center justify-center text-center"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-surface2 flex items-center justify-center mb-4">
+                      <Bell className="w-8 h-8 text-muted-foreground/50" />
+                    </div>
+                    <h3 className="text-lg font-medium text-foreground mb-2">لا توجد إشعارات</h3>
+                    <p className="text-sm text-muted-foreground max-w-sm">
+                      لا توجد إشعارات مطابقة لمعايير البحث أو الفلترة الحالية.
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-          ))
-        )}
+          </div>
+        </div>
       </div>
     </AdminLayout>
-  )
+  );
 }

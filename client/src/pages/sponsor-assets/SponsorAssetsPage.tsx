@@ -1,219 +1,356 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Image, CheckCircle, XCircle, Eye, Download, Clock, Search,
-  Filter, FileImage, FileVideo, FileText, Palette, X, AlertTriangle,
-  BarChart3, Upload
-} from 'lucide-react'
-import { toast } from 'sonner'
-import AdminLayout from '@/components/layout/AdminLayout'
-import PageHeader from '@/components/shared/PageHeader'
-import StatsCard from '@/components/shared/StatsCard'
-import StatusBadge from '@/components/shared/StatusBadge'
-import { cn, formatDate } from '@/lib/utils'
+import React, { useState, useMemo } from 'react';
+import AdminLayout from '@/components/layout/AdminLayout';
+import PageHeader from '@/components/shared/PageHeader';
+import StatsCard from '@/components/shared/StatsCard';
+import StatusBadge from '@/components/shared/StatusBadge';
+import { cn, formatDate } from '@/lib/utils';
+import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Image as ImageIcon, 
+  Video, 
+  FileText, 
+  HardDrive, 
+  CheckCircle, 
+  Clock, 
+  Search, 
+  Filter, 
+  Download, 
+  Eye, 
+  Trash2, 
+  UploadCloud
+} from 'lucide-react';
 
-interface SponsorAsset {
-  id: number
-  sponsor_name: string
-  sponsor_tier: 'platinum' | 'gold' | 'silver' | 'bronze'
-  event_name: string
-  asset_type: 'logo' | 'banner' | 'video' | 'brochure' | 'social_media'
-  file_name: string
-  file_size: string
-  dimensions?: string
-  status: 'pending' | 'approved' | 'rejected' | 'revision_requested'
-  placement: string
-  submitted_at: string
-  reviewed_at?: string
-  reviewer?: string
-  rejection_reason?: string
-  thumbnail?: string
+// Interfaces
+interface Asset {
+  id: string;
+  sponsor: string;
+  type: 'شعار' | 'بانر' | 'فيديو' | 'بروشور';
+  fileName: string;
+  size: string;
+  sizeInBytes: number;
+  uploadDate: string;
+  status: 'معتمد' | 'قيد المراجعة' | 'مرفوض';
+  dimensions?: string;
+  format: string;
 }
 
-const MOCK_ASSETS: SponsorAsset[] = [
-  { id: 1, sponsor_name: 'شركة التقنية المتقدمة', sponsor_tier: 'platinum', event_name: 'معرض التقنية 2026', asset_type: 'logo', file_name: 'logo-main-v3.svg', file_size: '245 KB', dimensions: '1200x400', status: 'pending', placement: 'المسرح الرئيسي + البانرات', submitted_at: '2026-03-31T10:00:00' },
-  { id: 2, sponsor_name: 'شركة التقنية المتقدمة', sponsor_tier: 'platinum', event_name: 'معرض التقنية 2026', asset_type: 'banner', file_name: 'main-banner-expo.jpg', file_size: '2.1 MB', dimensions: '1920x600', status: 'approved', placement: 'الصفحة الرئيسية', submitted_at: '2026-03-30T14:00:00', reviewed_at: '2026-03-30T16:00:00', reviewer: 'أحمد المشرف' },
-  { id: 3, sponsor_name: 'مجموعة الابتكار', sponsor_tier: 'gold', event_name: 'معرض التقنية 2026', asset_type: 'video', file_name: 'promo-30sec.mp4', file_size: '18.5 MB', status: 'pending', placement: 'شاشات العرض', submitted_at: '2026-03-31T08:00:00' },
-  { id: 4, sponsor_name: 'بنك الاستثمار الأول', sponsor_tier: 'gold', event_name: 'معرض الابتكار 2026', asset_type: 'brochure', file_name: 'investment-brochure.pdf', file_size: '5.2 MB', status: 'rejected', placement: 'منطقة الاستقبال', submitted_at: '2026-03-29T11:00:00', reviewed_at: '2026-03-29T15:00:00', reviewer: 'سارة المراجعة', rejection_reason: 'الدقة غير كافية — يرجى إرسال نسخة بدقة 300 DPI' },
-  { id: 5, sponsor_name: 'شركة الحلول الذكية', sponsor_tier: 'silver', event_name: 'معرض التقنية 2026', asset_type: 'social_media', file_name: 'social-kit.zip', file_size: '8.7 MB', status: 'approved', placement: 'وسائل التواصل', submitted_at: '2026-03-28T09:00:00', reviewed_at: '2026-03-28T12:00:00', reviewer: 'أحمد المشرف' },
-  { id: 6, sponsor_name: 'مؤسسة الريادة', sponsor_tier: 'bronze', event_name: 'معرض التقنية 2026', asset_type: 'logo', file_name: 'logo-riyada.png', file_size: '120 KB', dimensions: '800x300', status: 'revision_requested', placement: 'كتيب المعرض', submitted_at: '2026-03-27T10:00:00', reviewed_at: '2026-03-27T14:00:00', reviewer: 'سارة المراجعة', rejection_reason: 'يرجى إرسال نسخة بخلفية شفافة (PNG)' },
-]
+// Mock Data
+const MOCK_ASSETS: Asset[] = [
+  {
+    id: 'AST-001',
+    sponsor: 'شركة التقنية المتقدمة',
+    type: 'شعار',
+    fileName: 'tech_advanced_logo_dark.svg',
+    size: '150 KB',
+    sizeInBytes: 153600,
+    uploadDate: '2026-03-25T10:30:00Z',
+    status: 'معتمد',
+    dimensions: '1024x1024',
+    format: 'SVG'
+  },
+  {
+    id: 'AST-002',
+    sponsor: 'مجموعة العطاء',
+    type: 'فيديو',
+    fileName: 'alataa_promo_2026.mp4',
+    size: '45 MB',
+    sizeInBytes: 47185920,
+    uploadDate: '2026-03-28T14:15:00Z',
+    status: 'قيد المراجعة',
+    dimensions: '1920x1080',
+    format: 'MP4'
+  },
+  {
+    id: 'AST-003',
+    sponsor: 'بنك الابتكار',
+    type: 'بروشور',
+    fileName: 'innovation_bank_services.pdf',
+    size: '3.2 MB',
+    sizeInBytes: 3355443,
+    uploadDate: '2026-03-30T09:45:00Z',
+    status: 'معتمد',
+    format: 'PDF'
+  },
+  {
+    id: 'AST-004',
+    sponsor: 'شركة البناء الحديث',
+    type: 'بانر',
+    fileName: 'modern_build_expo_banner.png',
+    size: '2.1 MB',
+    sizeInBytes: 2202009,
+    uploadDate: '2026-04-01T11:20:00Z',
+    status: 'معتمد',
+    dimensions: '2000x500',
+    format: 'PNG'
+  },
+  {
+    id: 'AST-005',
+    sponsor: 'شركة التقنية المتقدمة',
+    type: 'فيديو',
+    fileName: 'tech_interview_ceo.webm',
+    size: '120 MB',
+    sizeInBytes: 125829120,
+    uploadDate: '2026-03-26T16:00:00Z',
+    status: 'مرفوض',
+    dimensions: '3840x2160',
+    format: 'WEBM'
+  },
+  {
+    id: 'AST-006',
+    sponsor: 'مؤسسة الغذاء الصحي',
+    type: 'شعار',
+    fileName: 'healthy_food_logo.png',
+    size: '450 KB',
+    sizeInBytes: 460800,
+    uploadDate: '2026-03-31T08:10:00Z',
+    status: 'قيد المراجعة',
+    dimensions: '512x512',
+    format: 'PNG'
+  }
+];
 
-const ASSET_TYPE_CONFIG: Record<string, { label: string; icon: any; color: string }> = {
-  logo: { label: 'شعار', icon: Palette, color: 'text-gold' },
-  banner: { label: 'بانر', icon: FileImage, color: 'text-info' },
-  video: { label: 'فيديو', icon: FileVideo, color: 'text-success' },
-  brochure: { label: 'كتيب', icon: FileText, color: 'text-warning' },
-  social_media: { label: 'وسائل تواصل', icon: Image, color: 'text-[#e040fb]' },
-}
-
-const TIER_CONFIG: Record<string, { label: string; color: string }> = {
-  platinum: { label: 'بلاتيني', color: 'text-[#e5e4e2]' },
-  gold: { label: 'ذهبي', color: 'text-gold' },
-  silver: { label: 'فضي', color: 'text-[#c0c0c0]' },
-  bronze: { label: 'برونزي', color: 'text-[#cd7f32]' },
-}
-
-const STATUS_MAP: Record<string, string> = {
-  pending: 'pending',
-  approved: 'approved',
-  rejected: 'rejected',
-  revision_requested: 'review',
-}
+const TABS = [
+  { id: 'overview', label: 'نظرة عامة', icon: HardDrive },
+  { id: 'logos', label: 'الشعارات', icon: ImageIcon },
+  { id: 'marketing', label: 'المواد التسويقية', icon: FileText },
+  { id: 'videos', label: 'الفيديوهات', icon: Video },
+];
 
 export default function SponsorAssetsPage() {
-  const [assets] = useState(MOCK_ASSETS)
-  const [search, setSearch] = useState('')
-  const [filterType, setFilterType] = useState<string>('')
-  const [filterStatus, setFilterStatus] = useState<string>('')
-  const [selectedAsset, setSelectedAsset] = useState<SponsorAsset | null>(null)
+  const [activeTab, setActiveTab] = useState('overview');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('الكل');
 
-  const filtered = assets.filter(a => {
-    if (search && !a.sponsor_name.includes(search) && !a.file_name.includes(search)) return false
-    if (filterType && a.asset_type !== filterType) return false
-    if (filterStatus && a.status !== filterStatus) return false
-    return true
-  })
+  // Derived State
+  const filteredAssets = useMemo(() => {
+    return MOCK_ASSETS.filter(asset => {
+      const matchesSearch = asset.sponsor.includes(searchQuery) || asset.fileName.includes(searchQuery);
+      const matchesStatus = statusFilter === 'الكل' || asset.status === statusFilter;
+      
+      let matchesTab = true;
+      if (activeTab === 'logos') matchesTab = asset.type === 'شعار';
+      if (activeTab === 'marketing') matchesTab = asset.type === 'بانر' || asset.type === 'بروشور';
+      if (activeTab === 'videos') matchesTab = asset.type === 'فيديو';
+
+      return matchesSearch && matchesStatus && matchesTab;
+    });
+  }, [searchQuery, statusFilter, activeTab]);
+
+  // Stats Calculations
+  const totalAssets = MOCK_ASSETS.length;
+  const approvedAssets = MOCK_ASSETS.filter(a => a.status === 'معتمد').length;
+  const pendingAssets = MOCK_ASSETS.filter(a => a.status === 'قيد المراجعة').length;
+  const totalSizeBytes = MOCK_ASSETS.reduce((acc, curr) => acc + curr.sizeInBytes, 0);
+  const totalSizeMB = (totalSizeBytes / (1024 * 1024)).toFixed(1);
+
+  const handleDownload = (fileName: string) => {
+    toast.success(`جاري تحميل ${fileName}`);
+  };
+
+  const handleDelete = (fileName: string) => {
+    toast.error(`تم حذف ${fileName}`);
+  };
 
   return (
     <AdminLayout>
-      <PageHeader
-        title="أصول الرعاة"
-        subtitle="مراجعة وإدارة الشعارات والبانرات والمواد الإعلانية للرعاة"
-        actions={
-          <button onClick={() => toast.info('طلب أصول جديدة — قريباً')} className="h-9 px-4 rounded-lg bg-gold/10 border border-gold/25 text-sm text-gold hover:bg-gold/20 transition-all flex items-center gap-2">
-            <Upload size={14} />
-            طلب أصول
-          </button>
-        }
-      />
+      <div className="space-y-6 p-6">
+        <PageHeader 
+          title="أصول الرعاة الرقمية" 
+          subtitle="إدارة ومراجعة الملفات والمواد التسويقية المقدمة من الرعاة"
+          actions={<button onClick={() => toast.info("قريباً")} className="h-9 px-4 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all flex items-center gap-2">إجراء</button>}
+        />
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <StatsCard title="إجمالي الأصول" value={assets.length} icon={Image} delay={0} />
-        <StatsCard title="بانتظار المراجعة" value={assets.filter(a => a.status === 'pending').length} icon={Clock} delay={0.1} />
-        <StatsCard title="مقبولة" value={assets.filter(a => a.status === 'approved').length} icon={CheckCircle} delay={0.2} />
-        <StatsCard title="مرفوضة / تعديل" value={assets.filter(a => a.status === 'rejected' || a.status === 'revision_requested').length} icon={AlertTriangle} delay={0.3} />
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث بالراعي أو اسم الملف..." className="w-full h-9 pr-9 pl-3 rounded-lg bg-surface border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/40 transition-all" />
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard 
+            title="إجمالي الأصول" 
+            value={totalAssets.toString()} 
+            icon={HardDrive} 
+            delay={0.1}
+          />
+          <StatsCard 
+            title="الأصول المعتمدة" 
+            value={approvedAssets.toString()} 
+            icon={CheckCircle} 
+            trend={12}
+            delay={0.2}
+          />
+          <StatsCard 
+            title="قيد المراجعة" 
+            value={pendingAssets.toString()} 
+            icon={Clock} 
+            delay={0.3}
+          />
+          <StatsCard 
+            title="حجم التخزين المستهلك" 
+            value={`${totalSizeMB} MB`} 
+            icon={FileText} 
+            trend={5}
+            delay={0.4}
+          />
         </div>
-        <select value={filterType} onChange={e => setFilterType(e.target.value)} className="h-9 px-3 rounded-lg bg-surface border border-border text-xs text-foreground cursor-pointer focus:outline-none focus:border-gold/40">
-          <option value="">كل الأنواع</option>
-          {Object.entries(ASSET_TYPE_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
-        </select>
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="h-9 px-3 rounded-lg bg-surface border border-border text-xs text-foreground cursor-pointer focus:outline-none focus:border-gold/40">
-          <option value="">كل الحالات</option>
-          <option value="pending">معلق</option>
-          <option value="approved">مقبول</option>
-          <option value="rejected">مرفوض</option>
-          <option value="revision_requested">تعديل مطلوب</option>
-        </select>
-      </div>
 
-      {/* Assets Table */}
-      <div className="glass-card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border/50">
-                <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">الراعي</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">النوع</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">الملف</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">الموضع</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">الحالة</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">التاريخ</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground w-[140px]">إجراءات</th>
-              </tr>
-            </thead>
-            <tbody>
-              <AnimatePresence mode="popLayout">
-                {filtered.length === 0 ? (
-                  <tr><td colSpan={7} className="py-12 text-center text-sm text-muted-foreground">لا توجد أصول مطابقة</td></tr>
-                ) : (
-                  filtered.map((asset, idx) => {
-                    const typeConf = ASSET_TYPE_CONFIG[asset.asset_type]
-                    const tierConf = TIER_CONFIG[asset.sponsor_tier]
-                    return (
-                      <motion.tr key={asset.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: idx * 0.03 }} className="border-b border-border/30 hover:bg-surface/50 transition-colors">
-                        <td className="px-4 py-3">
-                          <div>
-                            <p className="text-sm font-medium text-foreground">{asset.sponsor_name}</p>
-                            <p className={cn('text-[10px]', tierConf.color)}>{tierConf.label} — {asset.event_name}</p>
+        {/* Tabs */}
+        <div className="flex space-x-2 space-x-reverse border-b border-border/50 pb-2 overflow-x-auto">
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 relative whitespace-nowrap",
+                  isActive 
+                    ? "text-gold bg-gold/10 font-medium" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-surface2"
+                )}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{tab.label}</span>
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className="absolute bottom-[-8px] left-0 right-0 h-0.5 bg-gold"
+                    initial={false}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Filters and Search */}
+        <div className="flex flex-col md:flex-row gap-4 justify-between items-center glass-card p-4 rounded-xl">
+          <div className="relative w-full md:w-96">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input 
+              type="text"
+              placeholder="ابحث باسم الراعي أو الملف..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-surface2 border border-border/50 rounded-lg pr-10 pl-4 py-2 text-sm focus:outline-none focus:border-gold/50 transition-colors text-foreground placeholder:text-muted-foreground"
+            />
+          </div>
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <Filter className="w-4 h-4 text-gold" />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="bg-surface2 border border-border/50 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-gold/50 transition-colors text-foreground"
+            >
+              <option value="الكل">جميع الحالات</option>
+              <option value="معتمد">معتمد</option>
+              <option value="قيد المراجعة">قيد المراجعة</option>
+              <option value="مرفوض">مرفوض</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Assets List */}
+        <div className="glass-card rounded-xl overflow-hidden border border-border/50">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-right">
+              <thead className="bg-surface2/50 text-muted-foreground border-b border-border/50">
+                <tr>
+                  <th className="px-6 py-4 font-medium">الملف</th>
+                  <th className="px-6 py-4 font-medium">الراعي</th>
+                  <th className="px-6 py-4 font-medium">النوع / الصيغة</th>
+                  <th className="px-6 py-4 font-medium">الحجم / الأبعاد</th>
+                  <th className="px-6 py-4 font-medium">تاريخ الرفع</th>
+                  <th className="px-6 py-4 font-medium">الحالة</th>
+                  <th className="px-6 py-4 font-medium text-center">إجراءات</th>
+                </tr>
+              </thead>
+              <tbody>
+                <AnimatePresence>
+                  {filteredAssets.length > 0 ? (
+                    filteredAssets.map((asset, index) => (
+                      <motion.tr 
+                        key={asset.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2, delay: index * 0.05 }}
+                        className="border-b border-border/50 hover:bg-surface2/30 transition-colors"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-gold/10 flex items-center justify-center text-gold">
+                              {asset.type === 'فيديو' ? <Video className="w-5 h-5" /> : 
+                               asset.type === 'بروشور' ? <FileText className="w-5 h-5" /> : 
+                               <ImageIcon className="w-5 h-5" />}
+                            </div>
+                            <div>
+                              <p className="font-medium text-foreground max-w-[150px] truncate" title={asset.fileName}>
+                                {asset.fileName}
+                              </p>
+                              <p className="text-xs text-muted-foreground">{asset.id}</p>
+                            </div>
                           </div>
                         </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1.5">
-                            <typeConf.icon size={14} className={typeConf.color} />
-                            <span className="text-xs text-foreground">{typeConf.label}</span>
-                          </div>
+                        <td className="px-6 py-4 text-foreground">{asset.sponsor}</td>
+                        <td className="px-6 py-4">
+                          <p className="text-foreground">{asset.type}</p>
+                          <p className="text-xs text-muted-foreground">{asset.format}</p>
                         </td>
-                        <td className="px-4 py-3">
-                          <div>
-                            <p className="text-xs text-foreground font-mono">{asset.file_name}</p>
-                            <p className="text-[10px] text-muted-foreground">{asset.file_size}{asset.dimensions ? ` — ${asset.dimensions}` : ''}</p>
-                          </div>
+                        <td className="px-6 py-4">
+                          <p className="text-foreground">{asset.size}</p>
+                          {asset.dimensions && (
+                            <p className="text-xs text-muted-foreground">{asset.dimensions}</p>
+                          )}
                         </td>
-                        <td className="px-4 py-3 text-xs text-muted-foreground">{asset.placement}</td>
-                        <td className="px-4 py-3"><StatusBadge status={STATUS_MAP[asset.status] || asset.status} /></td>
-                        <td className="px-4 py-3 text-xs text-muted-foreground font-mono">{formatDate(asset.submitted_at)}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1">
-                            <button onClick={() => setSelectedAsset(asset)} className="p-1.5 rounded-md hover:bg-surface2 text-muted-foreground hover:text-info transition-colors" title="معاينة"><Eye size={13} /></button>
-                            {asset.status === 'pending' && (
-                              <>
-                                <button onClick={() => toast.success('تمت الموافقة')} className="p-1.5 rounded-md hover:bg-success/10 text-muted-foreground hover:text-success transition-colors" title="قبول"><CheckCircle size={13} /></button>
-                                <button onClick={() => toast.error('تم الرفض')} className="p-1.5 rounded-md hover:bg-danger/10 text-muted-foreground hover:text-danger transition-colors" title="رفض"><XCircle size={13} /></button>
-                              </>
-                            )}
-                            <button onClick={() => toast.info('تحميل — قريباً')} className="p-1.5 rounded-md hover:bg-surface2 text-muted-foreground hover:text-gold transition-colors" title="تحميل"><Download size={13} /></button>
+                        <td className="px-6 py-4 text-muted-foreground">
+                          {formatDate(asset.uploadDate)}
+                        </td>
+                        <td className="px-6 py-4">
+                          <StatusBadge status={asset.status} />
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-center gap-2">
+                            <button 
+                              onClick={() => toast.info(`معاينة ${asset.fileName}`)}
+                              className="p-2 text-muted-foreground hover:text-gold hover:bg-gold/10 rounded-lg transition-colors"
+                              title="معاينة"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => handleDownload(asset.fileName)}
+                              className="p-2 text-muted-foreground hover:text-gold hover:bg-gold/10 rounded-lg transition-colors"
+                              title="تحميل"
+                            >
+                              <Download className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => handleDelete(asset.fileName)}
+                              className="p-2 text-muted-foreground hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
+                              title="حذف"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           </div>
                         </td>
                       </motion.tr>
-                    )
-                  })
-                )}
-              </AnimatePresence>
-            </tbody>
-          </table>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <HardDrive className="w-8 h-8 text-muted-foreground/50" />
+                          <p>لا توجد أصول مطابقة للبحث</p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </AnimatePresence>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-
-      {/* Detail Modal */}
-      <AnimatePresence>
-        {selectedAsset && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setSelectedAsset(null)}>
-            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} className="glass-card w-full max-w-lg" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center justify-between p-4 border-b border-border/50">
-                <h3 className="text-lg font-bold text-foreground">تفاصيل الأصل</h3>
-                <button onClick={() => setSelectedAsset(null)} className="p-2 rounded-lg hover:bg-surface2 transition-colors"><X size={18} /></button>
-              </div>
-              <div className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="glass-card p-3"><p className="text-[10px] text-muted-foreground">الراعي</p><p className="text-sm font-medium text-foreground">{selectedAsset.sponsor_name}</p></div>
-                  <div className="glass-card p-3"><p className="text-[10px] text-muted-foreground">المستوى</p><p className={cn('text-sm font-medium', TIER_CONFIG[selectedAsset.sponsor_tier].color)}>{TIER_CONFIG[selectedAsset.sponsor_tier].label}</p></div>
-                  <div className="glass-card p-3"><p className="text-[10px] text-muted-foreground">نوع الأصل</p><p className="text-sm text-foreground">{ASSET_TYPE_CONFIG[selectedAsset.asset_type].label}</p></div>
-                  <div className="glass-card p-3"><p className="text-[10px] text-muted-foreground">الحجم</p><p className="text-sm text-foreground">{selectedAsset.file_size}</p></div>
-                </div>
-                <div className="glass-card p-3"><p className="text-[10px] text-muted-foreground">موضع العرض</p><p className="text-sm text-foreground">{selectedAsset.placement}</p></div>
-                {selectedAsset.rejection_reason && (
-                  <div className="glass-card p-3 border-r-2 border-r-danger">
-                    <p className="text-[10px] text-danger mb-1">سبب الرفض / التعديل</p>
-                    <p className="text-sm text-foreground">{selectedAsset.rejection_reason}</p>
-                  </div>
-                )}
-                {selectedAsset.reviewer && (
-                  <div className="glass-card p-3"><p className="text-[10px] text-muted-foreground">المراجع</p><p className="text-sm text-foreground">{selectedAsset.reviewer} — {selectedAsset.reviewed_at ? formatDate(selectedAsset.reviewed_at) : ''}</p></div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </AdminLayout>
-  )
+  );
 }

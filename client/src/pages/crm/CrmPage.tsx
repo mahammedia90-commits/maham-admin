@@ -1,353 +1,348 @@
-/*
- * CrmPage — إدارة علاقات العملاء
- * تابات: نظرة عامة | جهات الاتصال | الصفقات | Pipeline | الأنشطة | التقارير
- */
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+// Design: Nour Theme — CRM Module
+// 6 tabs: Overview, Contacts, Deals, Pipeline, Activities, Reports
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Users, UserPlus, Phone, Mail, Building2, DollarSign, TrendingUp,
-  Clock, CheckCircle, XCircle, Eye, Plus, Search,
-  ArrowUpRight, Target, Calendar, Star, MapPin, Briefcase, Activity
-} from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import AdminLayout from '@/components/layout/AdminLayout';
-import PageHeader from '@/components/shared/PageHeader';
-import DataTable, { Column } from '@/components/shared/DataTable';
-import StatsCard from '@/components/shared/StatsCard';
-import StatusBadge from '@/components/shared/StatusBadge';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { cn, formatCurrency, formatDate } from '@/lib/utils';
-import { toast } from 'sonner';
+  Users, UserPlus, Handshake, TrendingUp, Phone, Mail,
+  Calendar, Search, Eye, Edit, Target, Clock, CheckCircle,
+  MessageSquare, Star, BarChart3, PieChart, Activity, Plus,
+  DollarSign, Building2, ArrowUpRight, Filter, UserCheck
+} from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import AdminLayout from '@/components/layout/AdminLayout'
+import PageHeader from '@/components/shared/PageHeader'
+import StatsCard from '@/components/shared/StatsCard'
+import StatusBadge from '@/components/shared/StatusBadge'
+import { cn, formatCurrency, formatDate } from '@/lib/utils'
+import { toast } from 'sonner'
 
-// ========== TYPES & DATA ==========
-interface Contact {
-  id: number; name: string; company: string; email: string; phone: string;
-  type: 'investor' | 'merchant' | 'sponsor' | 'lead';
-  status: 'active' | 'inactive' | 'prospect';
-  score: number; city: string; lastContact: string; deals: number; revenue: number;
-}
+const tabs = [
+  { id: 'overview', label: 'نظرة عامة', icon: PieChart },
+  { id: 'contacts', label: 'جهات الاتصال', icon: Users },
+  { id: 'deals', label: 'الصفقات', icon: Handshake },
+  { id: 'pipeline', label: 'خط الأنابيب', icon: Target },
+  { id: 'activities', label: 'الأنشطة', icon: Activity },
+  { id: 'reports', label: 'التقارير', icon: BarChart3 },
+]
 
-const mockContacts: Contact[] = [
-  { id: 1, name: 'عبدالله الشمري', company: 'شركة الشمري للتجارة', email: 'a.shamri@co.sa', phone: '+966 55 123 4567', type: 'merchant', status: 'active', score: 92, city: 'الرياض', lastContact: '2026-03-28', deals: 3, revenue: 145000 },
-  { id: 2, name: 'فهد العتيبي', company: 'مجموعة العتيبي', email: 'f.otaibi@group.sa', phone: '+966 50 234 5678', type: 'sponsor', status: 'active', score: 88, city: 'جدة', lastContact: '2026-03-25', deals: 2, revenue: 320000 },
-  { id: 3, name: 'خالد الدوسري', company: 'استثمارات الدوسري', email: 'k.dosari@inv.sa', phone: '+966 54 345 6789', type: 'investor', status: 'active', score: 95, city: 'الرياض', lastContact: '2026-03-30', deals: 4, revenue: 580000 },
-  { id: 4, name: 'سعد المطيري', company: 'تجارة المطيري', email: 's.mutairi@trade.sa', phone: '+966 56 456 7890', type: 'merchant', status: 'prospect', score: 65, city: 'الدمام', lastContact: '2026-03-15', deals: 1, revenue: 28000 },
-  { id: 5, name: 'محمد الحربي', company: 'شركة الحربي', email: 'm.harbi@co.sa', phone: '+966 55 567 8901', type: 'merchant', status: 'active', score: 78, city: 'الرياض', lastContact: '2026-03-22', deals: 2, revenue: 95000 },
-  { id: 6, name: 'عمر الزهراني', company: 'زهراني كابيتال', email: 'o.zahrani@cap.sa', phone: '+966 50 678 9012', type: 'investor', status: 'active', score: 85, city: 'جدة', lastContact: '2026-03-20', deals: 1, revenue: 200000 },
-  { id: 7, name: 'يوسف النجم', company: 'مؤسسة النجم', email: 'y.najm@est.sa', phone: '+966 54 789 0123', type: 'merchant', status: 'inactive', score: 42, city: 'المدينة', lastContact: '2026-02-10', deals: 0, revenue: 0 },
-  { id: 8, name: 'أحمد التقنية', company: 'رؤية التقنية', email: 'a.tech@vision.sa', phone: '+966 56 890 1234', type: 'sponsor', status: 'active', score: 90, city: 'الرياض', lastContact: '2026-03-29', deals: 3, revenue: 450000 },
-];
+const contacts = [
+  { id: 1, name: 'أحمد الراشد', company: 'شركة الرياض للاستثمار', role: 'مستثمر', email: 'ahmed@riyadhinvest.sa', phone: '+966 55 123 4567', status: 'active', score: 95, lastContact: '2026-03-28', deals: 3 },
+  { id: 2, name: 'سارة المطيري', company: 'مؤسسة النخبة التجارية', role: 'تاجر', email: 'sara@elite.sa', phone: '+966 55 234 5678', status: 'active', score: 82, lastContact: '2026-03-25', deals: 2 },
+  { id: 3, name: 'خالد العتيبي', company: 'شركة STC', role: 'راعي', email: 'khalid@stc.sa', phone: '+966 55 345 6789', status: 'active', score: 98, lastContact: '2026-03-29', deals: 1 },
+  { id: 4, name: 'فهد الدوسري', company: 'مجموعة الفطيم', role: 'مستثمر', email: 'fahd@futtaim.ae', phone: '+966 55 456 7890', status: 'lead', score: 75, lastContact: '2026-03-20', deals: 0 },
+  { id: 5, name: 'نورة القحطاني', company: 'شركة نيوم', role: 'مستثمر', email: 'noura@neom.sa', phone: '+966 55 567 8901', status: 'active', score: 92, lastContact: '2026-03-27', deals: 2 },
+  { id: 6, name: 'عبدالله الشمري', company: 'شركة أرامكو', role: 'راعي', email: 'abdullah@aramco.sa', phone: '+966 55 678 9012', status: 'active', score: 99, lastContact: '2026-03-30', deals: 4 },
+  { id: 7, name: 'ريم الحربي', company: 'شركة الأغذية المتحدة', role: 'تاجر', email: 'reem@unitedfood.sa', phone: '+966 55 789 0123', status: 'active', score: 78, lastContact: '2026-03-22', deals: 1 },
+  { id: 8, name: 'محمد العنزي', company: 'شركة البناء الحديث', role: 'مستثمر', email: 'mohammed@modern.sa', phone: '+966 55 890 1234', status: 'lead', score: 65, lastContact: '2026-03-18', deals: 0 },
+]
 
-interface Deal {
-  id: number; title: string; contact: string; value: number;
-  stage: 'lead' | 'qualified' | 'proposal' | 'negotiation' | 'won' | 'lost';
-  probability: number; expectedClose: string; assignee: string;
-}
+const deals = [
+  { id: 'DEAL-001', title: 'رعاية بلاتينية — معرض الرياض التقني', contact: 'عبدالله الشمري', value: 1500000, stage: 'won', probability: 100, closeDate: '2026-03-15' },
+  { id: 'DEAL-002', title: 'استثمار 5 أجنحة — معرض الرياض التقني', contact: 'أحمد الراشد', value: 2500000, stage: 'negotiation', probability: 75, closeDate: '2026-04-10' },
+  { id: 'DEAL-003', title: 'حزمة رعاية ذهبية — معرض جدة', contact: 'خالد العتيبي', value: 500000, stage: 'proposal', probability: 60, closeDate: '2026-04-20' },
+  { id: 'DEAL-004', title: 'حجز 10 أجنحة — معرض الدمام', contact: 'نورة القحطاني', value: 3200000, stage: 'qualification', probability: 40, closeDate: '2026-05-01' },
+  { id: 'DEAL-005', title: 'حجز 3 أجنحة — معرض الرياض', contact: 'فهد الدوسري', value: 450000, stage: 'lead', probability: 20, closeDate: '2026-05-15' },
+  { id: 'DEAL-006', title: 'رعاية فضية — معرض المدينة', contact: 'ريم الحربي', value: 250000, stage: 'proposal', probability: 55, closeDate: '2026-04-25' },
+]
 
-const mockDeals: Deal[] = [
-  { id: 1, title: 'رعاية ذهبية — معرض التقنية', contact: 'فهد العتيبي', value: 250000, stage: 'negotiation', probability: 75, expectedClose: '2026-04-15', assignee: 'سارة' },
-  { id: 2, title: 'حجز 4 أجنحة — معرض الأغذية', contact: 'عبدالله الشمري', value: 180000, stage: 'proposal', probability: 60, expectedClose: '2026-04-20', assignee: 'أحمد' },
-  { id: 3, title: 'استثمار في معرض السيارات', contact: 'خالد الدوسري', value: 500000, stage: 'qualified', probability: 40, expectedClose: '2026-05-01', assignee: 'نور' },
-  { id: 4, title: 'رعاية بلاتينية — موسم الرياض', contact: 'أحمد التقنية', value: 400000, stage: 'won', probability: 100, expectedClose: '2026-03-20', assignee: 'سارة' },
-  { id: 5, title: 'حجز جناح مميز', contact: 'سعد المطيري', value: 45000, stage: 'lead', probability: 20, expectedClose: '2026-05-15', assignee: 'أحمد' },
-  { id: 6, title: 'رعاية فضية — معرض العقار', contact: 'عمر الزهراني', value: 120000, stage: 'proposal', probability: 55, expectedClose: '2026-04-25', assignee: 'نور' },
-  { id: 7, title: 'حجز مساحة F&B', contact: 'محمد الحربي', value: 35000, stage: 'won', probability: 100, expectedClose: '2026-03-15', assignee: 'أحمد' },
-  { id: 8, title: 'رعاية — لم يتم الاتفاق', contact: 'يوسف النجم', value: 80000, stage: 'lost', probability: 0, expectedClose: '2026-03-01', assignee: 'سارة' },
-];
+const pipelineStages = [
+  { id: 'lead', label: 'عميل محتمل', color: 'bg-chrome/50', count: 1, value: 450000 },
+  { id: 'qualification', label: 'تأهيل', color: 'bg-info', count: 1, value: 3200000 },
+  { id: 'proposal', label: 'عرض سعر', color: 'bg-warning', count: 2, value: 750000 },
+  { id: 'negotiation', label: 'تفاوض', color: 'bg-gold', count: 1, value: 2500000 },
+  { id: 'won', label: 'مكسوبة', color: 'bg-success', count: 1, value: 1500000 },
+]
 
-const stageLabels: Record<string, string> = { lead: 'عميل محتمل', qualified: 'مؤهل', proposal: 'عرض مقدم', negotiation: 'تفاوض', won: 'مكتسب', lost: 'خاسر' };
-const stageColors: Record<string, string> = { lead: '#6B7280', qualified: '#3B82F6', proposal: '#F59E0B', negotiation: '#8B5CF6', won: '#10B981', lost: '#EF4444' };
-const typeLabels: Record<string, string> = { investor: 'مستثمر', merchant: 'تاجر', sponsor: 'راعي', lead: 'عميل محتمل' };
+const activities = [
+  { id: 1, type: 'call', contact: 'أحمد الراشد', desc: 'مكالمة متابعة — مناقشة شروط العقد', date: '2026-03-30 10:30', status: 'completed' },
+  { id: 2, type: 'email', contact: 'خالد العتيبي', desc: 'إرسال عرض الرعاية الذهبية المحدث', date: '2026-03-30 14:00', status: 'completed' },
+  { id: 3, type: 'meeting', contact: 'نورة القحطاني', desc: 'اجتماع تقديمي — عرض فرص الاستثمار', date: '2026-03-31 09:00', status: 'scheduled' },
+  { id: 4, type: 'call', contact: 'فهد الدوسري', desc: 'مكالمة تعريفية — تقديم المنصة', date: '2026-03-31 11:30', status: 'scheduled' },
+  { id: 5, type: 'email', contact: 'عبدالله الشمري', desc: 'إرسال تقرير ROI الربع الأول', date: '2026-04-01 08:00', status: 'scheduled' },
+  { id: 6, type: 'meeting', contact: 'ريم الحربي', desc: 'عرض تقديمي لخدمات المعرض', date: '2026-04-01 14:00', status: 'scheduled' },
+  { id: 7, type: 'call', contact: 'محمد العنزي', desc: 'متابعة بعد العرض التقديمي', date: '2026-04-02 10:00', status: 'scheduled' },
+]
 
-const pipelineData = [
-  { stage: 'عميل محتمل', count: 12, value: 340000 },
-  { stage: 'مؤهل', count: 8, value: 580000 },
-  { stage: 'عرض مقدم', count: 6, value: 420000 },
-  { stage: 'تفاوض', count: 4, value: 650000 },
-  { stage: 'مكتسب', count: 15, value: 1200000 },
-];
+const conversionData = [
+  { month: 'يناير', leads: 45, qualified: 28, proposals: 18, won: 8 },
+  { month: 'فبراير', leads: 52, qualified: 35, proposals: 22, won: 12 },
+  { month: 'مارس', leads: 68, qualified: 42, proposals: 28, won: 15 },
+]
 
-const activityData = [
-  { date: '2026-03-30', type: 'call', contact: 'خالد الدوسري', note: 'مكالمة متابعة — مهتم بمعرض السيارات', user: 'نور' },
-  { date: '2026-03-29', type: 'email', contact: 'أحمد التقنية', note: 'إرسال عقد الرعاية البلاتينية', user: 'سارة' },
-  { date: '2026-03-28', type: 'meeting', contact: 'عبدالله الشمري', note: 'اجتماع لمناقشة حجز الأجنحة', user: 'أحمد' },
-  { date: '2026-03-27', type: 'call', contact: 'فهد العتيبي', note: 'تفاوض على قيمة الرعاية الذهبية', user: 'سارة' },
-  { date: '2026-03-25', type: 'email', contact: 'سعد المطيري', note: 'إرسال كتالوج المعرض', user: 'أحمد' },
-  { date: '2026-03-22', type: 'meeting', contact: 'محمد الحربي', note: 'زيارة موقع المعرض', user: 'نور' },
-];
+export default function CrmPage() {
+  const [activeTab, setActiveTab] = useState('overview')
+  const [searchTerm, setSearchTerm] = useState('')
 
-type TabKey = 'overview' | 'contacts' | 'deals' | 'pipeline' | 'activities' | 'reports';
-const tabs: { key: TabKey; label: string; icon: any }[] = [
-  { key: 'overview', label: 'نظرة عامة', icon: Activity },
-  { key: 'contacts', label: 'جهات الاتصال', icon: Users },
-  { key: 'deals', label: 'الصفقات', icon: Briefcase },
-  { key: 'pipeline', label: 'Pipeline', icon: Target },
-  { key: 'activities', label: 'الأنشطة', icon: Calendar },
-  { key: 'reports', label: 'التقارير', icon: TrendingUp },
-];
+  const filteredContacts = contacts.filter(c => c.name.includes(searchTerm) || c.company.includes(searchTerm))
+  const totalPipelineValue = deals.reduce((s, d) => s + d.value, 0)
+  const wonValue = deals.filter(d => d.stage === 'won').reduce((s, d) => s + d.value, 0)
 
-// ========== OVERVIEW TAB ==========
-function OverviewTab() {
-  const totalRevenue = mockContacts.reduce((s, c) => s + c.revenue, 0);
-  const activeDeals = mockDeals.filter(d => !['won', 'lost'].includes(d.stage));
-  const pipelineValue = activeDeals.reduce((s, d) => s + d.value, 0);
-  const wonValue = mockDeals.filter(d => d.stage === 'won').reduce((s, d) => s + d.value, 0);
-  const conversionRate = Math.round((mockDeals.filter(d => d.stage === 'won').length / mockDeals.length) * 100);
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="جهات الاتصال" value={mockContacts.length} icon={Users} trend={12} />
-        <StatsCard title="قيمة Pipeline" value={formatCurrency(pipelineValue)} icon={Target} delay={0.1} />
-        <StatsCard title="صفقات مكتسبة" value={formatCurrency(wonValue)} icon={DollarSign} trend={18} delay={0.2} />
-        <StatsCard title="معدل التحويل" value={`${conversionRate}%`} icon={TrendingUp} delay={0.3} />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass-card p-5">
-          <h3 className="text-sm font-bold mb-4">Pipeline حسب المرحلة</h3>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={pipelineData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-              <XAxis dataKey="stage" tick={{ fontSize: 10, fill: '#888' }} />
-              <YAxis tick={{ fontSize: 10, fill: '#888' }} tickFormatter={v => `${v / 1000}k`} />
-              <Tooltip contentStyle={{ background: '#1a1917', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', fontSize: '11px', color: '#fff' }} formatter={(v: number) => [formatCurrency(v), '']} />
-              <Bar dataKey="value" fill="#C9A84C" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="glass-card p-5">
-          <h3 className="text-sm font-bold mb-4">آخر الأنشطة</h3>
-          <div className="space-y-3">
-            {activityData.slice(0, 5).map((a, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${a.type === 'call' ? 'bg-success/10' : a.type === 'email' ? 'bg-info/10' : 'bg-accent/10'}`}>
-                  {a.type === 'call' ? <Phone className="w-3.5 h-3.5 text-success" /> : a.type === 'email' ? <Mail className="w-3.5 h-3.5 text-info" /> : <Calendar className="w-3.5 h-3.5 text-accent" />}
-                </div>
-                <div className="flex-1 min-w-0"><p className="text-sm truncate">{a.note}</p><p className="text-[10px] text-muted-foreground">{a.contact} — {a.user} — {formatDate(a.date)}</p></div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
+    <AdminLayout>
+      <PageHeader
+        title="إدارة علاقات العملاء — CRM"
+        subtitle="إدارة جهات الاتصال والصفقات وخط الأنابيب والأنشطة"
+        actions={
+          <button onClick={() => toast.info('إضافة جهة اتصال — قريباً')} className="h-9 px-4 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all flex items-center gap-2">
+            <UserPlus size={16} /> جهة اتصال جديدة
+          </button>
+        }
+      />
 
-// ========== CONTACTS TAB ==========
-function ContactsTab() {
-  const [search, setSearch] = useState('');
-  const [filterType, setFilterType] = useState('all');
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
-  const filtered = mockContacts.filter(c => {
-    const ms = c.name.includes(search) || c.company.includes(search) || c.email.includes(search);
-    const mf = filterType === 'all' || c.type === filterType;
-    return ms && mf;
-  });
-  const columns: Column<Contact>[] = [
-    { key: 'name', label: 'الاسم', render: (_, r) => <div><p className="font-medium text-sm">{r.name}</p><p className="text-xs text-muted-foreground">{r.company}</p></div> },
-    { key: 'type', label: 'النوع', render: v => <span className={`text-xs px-2 py-0.5 rounded-full ${v === 'investor' ? 'bg-accent/15 text-accent' : v === 'sponsor' ? 'bg-info/15 text-info' : v === 'merchant' ? 'bg-success/15 text-success' : 'bg-muted/50 text-muted-foreground'}`}>{typeLabels[v]}</span> },
-    { key: 'score', label: 'Score', sortable: true, render: v => <div className="flex items-center gap-2"><div className="w-10 h-1.5 rounded-full bg-card/80 overflow-hidden"><div className={`h-full rounded-full ${v >= 80 ? 'bg-success' : v >= 60 ? 'bg-warning' : 'bg-danger'}`} style={{ width: `${v}%` }} /></div><span className="text-xs font-mono">{v}</span></div> },
-    { key: 'city', label: 'المدينة', render: v => <span className="text-xs flex items-center gap-1"><MapPin className="w-3 h-3" />{v}</span> },
-    { key: 'deals', label: 'الصفقات', render: v => <span className="font-mono text-sm">{v}</span> },
-    { key: 'revenue', label: 'الإيرادات', sortable: true, render: v => <span className="font-mono text-sm">{formatCurrency(v)}</span> },
-    { key: 'status', label: 'الحالة', render: (_, r) => <StatusBadge status={r.status} /> },
-    { key: 'actions', label: '', render: (_, r) => <button onClick={e => { e.stopPropagation(); setSelectedContact(r); }} className="p-1.5 rounded-lg hover:bg-accent/10"><Eye className="w-4 h-4 text-accent" /></button> },
-  ];
-  return (
-    <div className="space-y-4">
-      <div className="flex gap-2 flex-wrap">
-        {['all', 'investor', 'merchant', 'sponsor', 'lead'].map(t => (
-          <button key={t} onClick={() => setFilterType(t)} className={cn('px-3 py-1.5 rounded-lg text-sm transition-colors', filterType === t ? 'bg-accent/20 text-accent border border-accent/30' : 'bg-card/50 text-muted-foreground border border-border/50 hover:bg-card')}>
-            {t === 'all' ? 'الكل' : typeLabels[t]} ({t === 'all' ? mockContacts.length : mockContacts.filter(c => c.type === t).length})
+      <div className="flex gap-1 p-1 bg-card/50 rounded-xl border border-border/50 overflow-x-auto mb-6">
+        {tabs.map(tab => (
+          <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={cn('flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all', activeTab === tab.id ? 'bg-gold/10 text-gold border border-gold/20 shadow-lg' : 'text-muted-foreground hover:text-foreground hover:bg-surface2/50')}>
+            <tab.icon size={16} /> {tab.label}
           </button>
         ))}
       </div>
-      <DataTable columns={columns} data={filtered} searchValue={search} onSearch={setSearch} searchPlaceholder="بحث في جهات الاتصال..." emptyMessage="لا توجد جهات اتصال" onRowClick={setSelectedContact} />
-      <Dialog open={!!selectedContact} onOpenChange={v => { if (!v) setSelectedContact(null); }}>
-        <DialogContent className="glass-card border-border/50 max-w-lg" dir="rtl">
-          <DialogHeader><DialogTitle>{selectedContact?.name}</DialogTitle></DialogHeader>
-          {selectedContact && (
-            <div className="space-y-4 mt-2">
-              <div className="glass-card p-4 flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-xl font-bold text-accent">{selectedContact.name.charAt(0)}</div>
-                <div><p className="font-bold">{selectedContact.name}</p><p className="text-sm text-muted-foreground">{selectedContact.company}</p><span className={`text-xs px-2 py-0.5 rounded-full ${selectedContact.type === 'investor' ? 'bg-accent/15 text-accent' : selectedContact.type === 'sponsor' ? 'bg-info/15 text-info' : 'bg-success/15 text-success'}`}>{typeLabels[selectedContact.type]}</span></div>
+
+      <AnimatePresence mode="wait">
+        <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatsCard title="إجمالي جهات الاتصال" value="268" icon={Users} trend={12} delay={0} />
+                <StatsCard title="صفقات نشطة" value="6" icon={Handshake} trend={25} delay={0.1} />
+                <StatsCard title="قيمة خط الأنابيب" value={formatCurrency(totalPipelineValue)} icon={DollarSign} trend={18} delay={0.2} />
+                <StatsCard title="معدل التحويل" value="22%" icon={Target} trend={5} delay={0.3} />
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="glass-card p-3"><p className="text-xs text-muted-foreground">البريد</p><p className="text-sm">{selectedContact.email}</p></div>
-                <div className="glass-card p-3"><p className="text-xs text-muted-foreground">الهاتف</p><p className="text-sm font-mono">{selectedContact.phone}</p></div>
-                <div className="glass-card p-3"><p className="text-xs text-muted-foreground">المدينة</p><p className="text-sm">{selectedContact.city}</p></div>
-                <div className="glass-card p-3"><p className="text-xs text-muted-foreground">Score</p><p className="text-sm font-bold text-accent">{selectedContact.score}/100</p></div>
-                <div className="glass-card p-3"><p className="text-xs text-muted-foreground">الصفقات</p><p className="text-sm font-mono">{selectedContact.deals}</p></div>
-                <div className="glass-card p-3"><p className="text-xs text-muted-foreground">الإيرادات</p><p className="text-sm font-mono text-accent">{formatCurrency(selectedContact.revenue)}</p></div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="glass-card p-6">
+                  <h3 className="text-sm font-bold text-foreground mb-4">قمع التحويل — Q1 2026</h3>
+                  <ResponsiveContainer width="100%" height={220}>
+                    <BarChart data={conversionData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                      <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#888' }} />
+                      <YAxis tick={{ fontSize: 10, fill: '#888' }} />
+                      <Tooltip contentStyle={{ background: '#1a1917', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', fontSize: '11px', color: '#fff' }} />
+                      <Bar dataKey="leads" fill="#A0A0A0" name="عملاء محتملون" radius={[4,4,0,0]} />
+                      <Bar dataKey="qualified" fill="#3b82f6" name="مؤهلون" radius={[4,4,0,0]} />
+                      <Bar dataKey="proposals" fill="#f59e0b" name="عروض" radius={[4,4,0,0]} />
+                      <Bar dataKey="won" fill="#C9A84C" name="مكسوبة" radius={[4,4,0,0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="glass-card p-6">
+                  <h3 className="text-sm font-bold text-foreground mb-4">أحدث الأنشطة</h3>
+                  <div className="space-y-3">
+                    {activities.slice(0, 5).map(act => (
+                      <div key={act.id} className="flex items-center gap-3 p-3 rounded-xl bg-surface2/30">
+                        <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center', act.type === 'call' ? 'bg-success/10 text-success' : act.type === 'email' ? 'bg-info/10 text-info' : 'bg-gold/10 text-gold')}>
+                          {act.type === 'call' ? <Phone size={14} /> : act.type === 'email' ? <Mail size={14} /> : <Calendar size={14} />}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-foreground">{act.desc}</p>
+                          <p className="text-[10px] text-muted-foreground">{act.contact} — {act.date}</p>
+                        </div>
+                        <StatusBadge status={act.status === 'completed' ? 'approved' : 'pending'} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="glass-card p-6">
+                <h3 className="text-sm font-bold text-foreground mb-4">أعلى جهات الاتصال تقييماً</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {contacts.filter(c => c.score >= 90).map(c => (
+                    <div key={c.id} className="p-4 rounded-xl bg-surface2/30 border border-border/30 hover:border-gold/30 transition-colors">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center text-gold font-bold text-sm">{c.name.charAt(0)}</div>
+                        <div><p className="text-sm font-bold text-foreground">{c.name}</p><p className="text-[10px] text-muted-foreground">{c.company}</p></div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className={cn('text-xs px-2 py-0.5 rounded-full', c.role === 'مستثمر' ? 'bg-gold/10 text-gold' : c.role === 'تاجر' ? 'bg-info/10 text-info' : 'bg-warning/10 text-warning')}>{c.role}</span>
+                        <span className="text-sm font-bold text-gold">{c.score}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
 
-// ========== DEALS TAB ==========
-function DealsTab() {
-  const [search, setSearch] = useState('');
-  const columns: Column<Deal>[] = [
-    { key: 'title', label: 'الصفقة', render: (_, r) => <div><p className="font-medium text-sm">{r.title}</p><p className="text-xs text-muted-foreground">{r.contact}</p></div> },
-    { key: 'value', label: 'القيمة', sortable: true, render: v => <span className="font-mono font-bold text-sm">{formatCurrency(v)}</span> },
-    { key: 'stage', label: 'المرحلة', render: v => <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: `${stageColors[v]}20`, color: stageColors[v] }}>{stageLabels[v]}</span> },
-    { key: 'probability', label: 'الاحتمالية', render: v => <div className="flex items-center gap-2"><div className="w-12 h-1.5 rounded-full bg-card/80 overflow-hidden"><div className="h-full rounded-full bg-accent" style={{ width: `${v}%` }} /></div><span className="text-xs font-mono">{v}%</span></div> },
-    { key: 'expectedClose', label: 'الإغلاق المتوقع', render: v => <span className="text-xs">{formatDate(v)}</span> },
-    { key: 'assignee', label: 'المسؤول', render: v => <span className="text-xs bg-card/80 px-2 py-0.5 rounded border border-border/50">{v}</span> },
-  ];
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatsCard title="إجمالي الصفقات" value={mockDeals.length} icon={Briefcase} />
-        <StatsCard title="نشطة" value={mockDeals.filter(d => !['won', 'lost'].includes(d.stage)).length} icon={Activity} delay={0.1} />
-        <StatsCard title="مكتسبة" value={mockDeals.filter(d => d.stage === 'won').length} icon={CheckCircle} delay={0.2} />
-        <StatsCard title="خاسرة" value={mockDeals.filter(d => d.stage === 'lost').length} icon={XCircle} delay={0.3} />
-      </div>
-      <DataTable columns={columns} data={mockDeals.filter(d => d.title.includes(search) || d.contact.includes(search))} searchValue={search} onSearch={setSearch} searchPlaceholder="بحث في الصفقات..." emptyMessage="لا توجد صفقات" />
-    </div>
-  );
-}
-
-// ========== PIPELINE TAB ==========
-function PipelineTab() {
-  const stages = ['lead', 'qualified', 'proposal', 'negotiation', 'won'];
-  return (
-    <div className="space-y-6">
-      <div className="flex gap-3 overflow-x-auto pb-4">
-        {stages.map((stage, i) => {
-          const deals = mockDeals.filter(d => d.stage === stage);
-          const total = deals.reduce((s, d) => s + d.value, 0);
-          return (
-            <motion.div key={stage} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 * i }} className="min-w-[260px] flex-1">
-              <div className="flex items-center justify-between mb-3 px-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: stageColors[stage] }} />
-                  <span className="text-sm font-bold">{stageLabels[stage]}</span>
-                  <span className="text-xs bg-card/80 px-1.5 py-0.5 rounded text-muted-foreground">{deals.length}</span>
+          {activeTab === 'contacts' && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                  <input type="text" placeholder="بحث بالاسم أو الشركة..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pr-10 pl-4 py-2.5 rounded-xl bg-card border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50" />
                 </div>
-                <span className="text-xs font-mono text-muted-foreground">{formatCurrency(total)}</span>
+                <button className="h-10 px-3 rounded-xl bg-surface2 border border-border/50 text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm"><Filter size={14} /> فلترة</button>
               </div>
-              <div className="space-y-2">
-                {deals.map(d => (
-                  <div key={d.id} className="glass-card p-3 cursor-pointer hover:border-accent/30 transition-all">
-                    <p className="text-sm font-medium truncate">{d.title}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{d.contact}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="font-mono text-sm font-bold text-accent">{formatCurrency(d.value)}</span>
-                      <span className="text-[10px] text-muted-foreground">{d.assignee}</span>
+              <div className="glass-card overflow-hidden">
+                <table className="w-full">
+                  <thead><tr className="border-b border-border/50">
+                    {['الاسم','الشركة','الدور','التقييم','آخر تواصل','الصفقات','الحالة','إجراءات'].map(h => (
+                      <th key={h} className="text-right p-4 text-xs font-medium text-muted-foreground">{h}</th>
+                    ))}
+                  </tr></thead>
+                  <tbody>
+                    {filteredContacts.map((c, i) => (
+                      <motion.tr key={c.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }} className="border-b border-border/30 hover:bg-surface2/30 transition-colors">
+                        <td className="p-4"><div className="flex items-center gap-3"><div className="w-9 h-9 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center text-gold font-bold text-sm">{c.name.charAt(0)}</div><div><p className="text-sm font-bold text-foreground">{c.name}</p><p className="text-[10px] text-muted-foreground">{c.email}</p></div></div></td>
+                        <td className="p-4 text-sm text-foreground">{c.company}</td>
+                        <td className="p-4"><span className={cn('text-xs px-2 py-0.5 rounded-full', c.role === 'مستثمر' ? 'bg-gold/10 text-gold' : c.role === 'تاجر' ? 'bg-info/10 text-info' : 'bg-warning/10 text-warning')}>{c.role}</span></td>
+                        <td className="p-4"><div className="flex items-center gap-2"><div className="w-16 h-1.5 rounded-full bg-surface3"><div className={cn('h-full rounded-full', c.score >= 90 ? 'bg-gold' : c.score >= 70 ? 'bg-info' : 'bg-chrome')} style={{ width: `${c.score}%` }} /></div><span className="text-xs font-mono font-bold">{c.score}</span></div></td>
+                        <td className="p-4 text-sm text-muted-foreground">{formatDate(c.lastContact)}</td>
+                        <td className="p-4 text-sm text-foreground font-bold">{c.deals}</td>
+                        <td className="p-4"><StatusBadge status={c.status === 'active' ? 'approved' : 'pending'} /></td>
+                        <td className="p-4"><div className="flex gap-1">
+                          <button className="p-1.5 rounded-lg hover:bg-surface2 text-muted-foreground hover:text-gold"><Eye size={14} /></button>
+                          <button className="p-1.5 rounded-lg hover:bg-surface2 text-muted-foreground hover:text-info"><Phone size={14} /></button>
+                          <button className="p-1.5 rounded-lg hover:bg-surface2 text-muted-foreground hover:text-success"><Mail size={14} /></button>
+                        </div></td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'deals' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <StatsCard title="قيمة الصفقات" value={formatCurrency(totalPipelineValue)} icon={DollarSign} delay={0} />
+                <StatsCard title="مكسوبة" value={formatCurrency(wonValue)} icon={CheckCircle} trend={100} delay={0.1} />
+                <StatsCard title="متوسط الاحتمالية" value="59%" icon={Target} delay={0.2} />
+              </div>
+              <div className="glass-card overflow-hidden">
+                <table className="w-full">
+                  <thead><tr className="border-b border-border/50">
+                    {['الصفقة','جهة الاتصال','القيمة','المرحلة','الاحتمالية','تاريخ الإغلاق'].map(h => (
+                      <th key={h} className="text-right p-4 text-xs font-medium text-muted-foreground">{h}</th>
+                    ))}
+                  </tr></thead>
+                  <tbody>
+                    {deals.map((d, i) => (
+                      <motion.tr key={d.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }} className="border-b border-border/30 hover:bg-surface2/30 transition-colors">
+                        <td className="p-4"><div><p className="text-sm font-bold text-foreground">{d.title}</p><p className="text-[10px] font-mono text-muted-foreground">{d.id}</p></div></td>
+                        <td className="p-4 text-sm text-foreground">{d.contact}</td>
+                        <td className="p-4 text-sm font-mono font-bold text-gold">{formatCurrency(d.value)}</td>
+                        <td className="p-4"><span className={cn('text-xs px-2 py-0.5 rounded-full font-bold', d.stage === 'won' ? 'bg-success/15 text-success' : d.stage === 'negotiation' ? 'bg-gold/15 text-gold' : d.stage === 'proposal' ? 'bg-warning/15 text-warning' : 'bg-chrome/15 text-chrome')}>{pipelineStages.find(s => s.id === d.stage)?.label}</span></td>
+                        <td className="p-4"><div className="flex items-center gap-2"><div className="w-12 h-1.5 rounded-full bg-surface3"><div className={cn('h-full rounded-full', d.probability >= 80 ? 'bg-success' : d.probability >= 50 ? 'bg-gold' : 'bg-chrome')} style={{ width: `${d.probability}%` }} /></div><span className="text-xs font-mono">{d.probability}%</span></div></td>
+                        <td className="p-4 text-sm text-muted-foreground">{formatDate(d.closeDate)}</td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'pipeline' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <StatsCard title="إجمالي خط الأنابيب" value={formatCurrency(totalPipelineValue)} icon={DollarSign} delay={0} />
+                <StatsCard title="صفقات نشطة" value="6" icon={Handshake} delay={0.1} />
+                <StatsCard title="معدل الإغلاق" value="17%" icon={Target} delay={0.2} />
+                <StatsCard title="متوسط دورة البيع" value="18 يوم" icon={Clock} delay={0.3} />
+              </div>
+              <div className="flex gap-3 overflow-x-auto pb-4">
+                {pipelineStages.map((stage, i) => (
+                  <motion.div key={stage.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="min-w-[240px] glass-card p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className={cn('w-3 h-3 rounded-full', stage.color)} />
+                      <h4 className="text-sm font-bold text-foreground">{stage.label}</h4>
+                      <span className="text-[10px] bg-surface2 px-1.5 py-0.5 rounded text-muted-foreground">{stage.count}</span>
                     </div>
-                  </div>
+                    <p className="text-lg font-mono font-bold text-gold mb-3">{formatCurrency(stage.value)}</p>
+                    {deals.filter(d => d.stage === stage.id).map(d => (
+                      <div key={d.id} className="p-3 rounded-xl bg-surface2/30 border border-border/20 hover:border-gold/20 transition-colors mb-2">
+                        <p className="text-xs font-bold text-foreground mb-1">{d.title}</p>
+                        <p className="text-[10px] text-muted-foreground">{d.contact}</p>
+                        <div className="flex items-center justify-between mt-2">
+                          <p className="text-xs font-mono text-gold">{formatCurrency(d.value)}</p>
+                          <span className="text-[10px] text-muted-foreground">{d.probability}%</span>
+                        </div>
+                      </div>
+                    ))}
+                  </motion.div>
                 ))}
-                {deals.length === 0 && <div className="glass-card p-4 text-center text-xs text-muted-foreground">لا توجد صفقات</div>}
               </div>
-            </motion.div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// ========== ACTIVITIES TAB ==========
-function ActivitiesTab() {
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatsCard title="مكالمات" value={activityData.filter(a => a.type === 'call').length} icon={Phone} />
-        <StatsCard title="رسائل" value={activityData.filter(a => a.type === 'email').length} icon={Mail} delay={0.1} />
-        <StatsCard title="اجتماعات" value={activityData.filter(a => a.type === 'meeting').length} icon={Calendar} delay={0.2} />
-      </div>
-      <div className="space-y-3">
-        {activityData.map((a, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 * i }} className="glass-card p-4 flex items-start gap-4">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${a.type === 'call' ? 'bg-success/10 border border-success/20' : a.type === 'email' ? 'bg-info/10 border border-info/20' : 'bg-accent/10 border border-accent/20'}`}>
-              {a.type === 'call' ? <Phone className="w-4 h-4 text-success" /> : a.type === 'email' ? <Mail className="w-4 h-4 text-info" /> : <Calendar className="w-4 h-4 text-accent" />}
             </div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between"><p className="text-sm font-medium">{a.note}</p><span className="text-xs text-muted-foreground">{formatDate(a.date)}</span></div>
-              <p className="text-xs text-muted-foreground mt-1">{a.contact} — بواسطة {a.user}</p>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-}
+          )}
 
-// ========== REPORTS TAB ==========
-function CrmReportsTab() {
-  const conversionData = [
-    { month: 'يناير', leads: 25, converted: 8 },
-    { month: 'فبراير', leads: 32, converted: 12 },
-    { month: 'مارس', leads: 28, converted: 10 },
-    { month: 'أبريل', leads: 35, converted: 15 },
-    { month: 'مايو', leads: 40, converted: 18 },
-    { month: 'يونيو', leads: 38, converted: 14 },
-  ];
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-5">
-          <h3 className="text-sm font-bold mb-4">معدل التحويل الشهري</h3>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={conversionData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-              <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#888' }} />
-              <YAxis tick={{ fontSize: 10, fill: '#888' }} />
-              <Tooltip contentStyle={{ background: '#1a1917', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', fontSize: '11px', color: '#fff' }} />
-              <Bar dataKey="leads" fill="rgba(201,168,76,0.3)" name="عملاء محتملون" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="converted" fill="#C9A84C" name="تم التحويل" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-5">
-          <h3 className="text-sm font-bold mb-4">أداء فريق المبيعات</h3>
-          <div className="space-y-3">
-            {[{ name: 'سارة', deals: 5, value: 730000, rate: 62 }, { name: 'أحمد', deals: 4, value: 260000, rate: 50 }, { name: 'نور', deals: 3, value: 620000, rate: 43 }].map((m) => (
-              <div key={m.name} className="glass-card p-3 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center font-bold text-accent">{m.name.charAt(0)}</div>
-                <div className="flex-1"><p className="text-sm font-medium">{m.name}</p><p className="text-xs text-muted-foreground">{m.deals} صفقات — {formatCurrency(m.value)}</p></div>
-                <div className="text-left"><p className="text-sm font-bold text-accent">{m.rate}%</p><p className="text-[10px] text-muted-foreground">معدل التحويل</p></div>
+          {activeTab === 'activities' && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 mb-4">
+                <button onClick={() => toast.info('إضافة نشاط — قريباً')} className="h-9 px-4 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all flex items-center gap-2">
+                  <Plus size={16} /> نشاط جديد
+                </button>
               </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
+              {activities.map((act, i) => (
+                <motion.div key={act.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-card p-4">
+                  <div className="flex items-center gap-3">
+                    <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', act.type === 'call' ? 'bg-success/10 text-success border border-success/20' : act.type === 'email' ? 'bg-info/10 text-info border border-info/20' : 'bg-gold/10 text-gold border border-gold/20')}>
+                      {act.type === 'call' ? <Phone size={18} /> : act.type === 'email' ? <Mail size={18} /> : <Calendar size={18} />}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-foreground">{act.desc}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-muted-foreground">{act.contact}</span>
+                        <span className="text-[10px] text-muted-foreground">•</span>
+                        <span className="text-xs text-muted-foreground">{act.date}</span>
+                      </div>
+                    </div>
+                    <StatusBadge status={act.status === 'completed' ? 'approved' : 'pending'} />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
 
-// ========== MAIN PAGE ==========
-export default function CrmPage() {
-  const [activeTab, setActiveTab] = useState<TabKey>('overview');
-  return (
-    <AdminLayout>
-      <div className="p-6 space-y-6">
-        <PageHeader title="إدارة علاقات العملاء (CRM)" subtitle="إدارة جهات الاتصال والصفقات وأنشطة المبيعات" actions={
-          <Button onClick={() => toast.info('إضافة جهة اتصال — قريباً')} className="bg-accent hover:bg-accent/90 text-accent-foreground gap-2"><UserPlus className="w-4 h-4" /> جهة اتصال جديدة</Button>
-        } />
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
-          {tabs.map(t => (
-            <button key={t.key} onClick={() => setActiveTab(t.key)} className={cn('flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all', activeTab === t.key ? 'bg-accent/15 text-accent border border-accent/25' : 'bg-card/50 text-muted-foreground border border-border/50 hover:bg-card hover:text-foreground')}>
-              <t.icon className="w-4 h-4" />{t.label}
-            </button>
-          ))}
-        </div>
-        <AnimatePresence mode="wait">
-          <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-            {activeTab === 'overview' && <OverviewTab />}
-            {activeTab === 'contacts' && <ContactsTab />}
-            {activeTab === 'deals' && <DealsTab />}
-            {activeTab === 'pipeline' && <PipelineTab />}
-            {activeTab === 'activities' && <ActivitiesTab />}
-            {activeTab === 'reports' && <CrmReportsTab />}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+          {activeTab === 'reports' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatsCard title="معدل التحويل" value="22%" icon={Target} trend={5} delay={0} />
+                <StatsCard title="متوسط دورة البيع" value="18 يوم" icon={Clock} trend={-3} delay={0.1} />
+                <StatsCard title="قيمة الصفقة المتوسطة" value={formatCurrency(1400000)} icon={DollarSign} trend={12} delay={0.2} />
+                <StatsCard title="رضا العملاء" value="4.6/5" icon={Star} trend={8} delay={0.3} />
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="glass-card p-6">
+                  <h3 className="text-sm font-bold text-foreground mb-4">قمع المبيعات — Q1 2026</h3>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={conversionData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                      <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#888' }} />
+                      <YAxis tick={{ fontSize: 10, fill: '#888' }} />
+                      <Tooltip contentStyle={{ background: '#1a1917', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', fontSize: '11px', color: '#fff' }} />
+                      <Bar dataKey="leads" fill="#A0A0A0" name="عملاء محتملون" radius={[4,4,0,0]} />
+                      <Bar dataKey="qualified" fill="#3b82f6" name="مؤهلون" radius={[4,4,0,0]} />
+                      <Bar dataKey="proposals" fill="#f59e0b" name="عروض" radius={[4,4,0,0]} />
+                      <Bar dataKey="won" fill="#C9A84C" name="مكسوبة" radius={[4,4,0,0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="glass-card p-6">
+                  <h3 className="text-sm font-bold text-foreground mb-4">مصادر العملاء</h3>
+                  <div className="space-y-3">
+                    {[
+                      { source: 'الموقع الإلكتروني', count: 85, pct: 32, color: 'bg-gold' },
+                      { source: 'الإحالات', count: 62, pct: 23, color: 'bg-info' },
+                      { source: 'المعارض السابقة', count: 55, pct: 21, color: 'bg-success' },
+                      { source: 'وسائل التواصل', count: 38, pct: 14, color: 'bg-warning' },
+                      { source: 'اتصال مباشر', count: 28, pct: 10, color: 'bg-chrome' },
+                    ].map(s => (
+                      <div key={s.source} className="flex items-center gap-3">
+                        <span className={cn('w-2 h-2 rounded-full', s.color)} />
+                        <span className="text-sm text-foreground flex-1">{s.source}</span>
+                        <span className="text-xs font-mono text-muted-foreground">{s.count}</span>
+                        <div className="w-20 h-1.5 rounded-full bg-surface3"><div className={cn('h-full rounded-full', s.color)} style={{ width: `${s.pct}%` }} /></div>
+                        <span className="text-xs font-mono text-gold w-8 text-left">{s.pct}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+        </motion.div>
+      </AnimatePresence>
     </AdminLayout>
-  );
+  )
 }

@@ -1,140 +1,384 @@
-/*
- * RatingsPage — إدارة التقييمات والمراجعات
- * Matches Laravel Dashboard /dashboard/ratings
- */
-import { useState } from 'react';
-import { Star, ThumbsUp, ThumbsDown, Eye, Trash2, Flag, MessageSquare, Filter } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Star, 
+  Search, 
+  Filter, 
+  MessageSquare, 
+  ThumbsUp, 
+  ThumbsDown, 
+  ShieldCheck, 
+  User, 
+  Building2, 
+  CalendarDays,
+  MoreVertical,
+  CheckCircle2
+} from 'lucide-react';
+import { toast } from 'sonner';
+
 import AdminLayout from '@/components/layout/AdminLayout';
 import PageHeader from '@/components/shared/PageHeader';
-import DataTable, { Column } from '@/components/shared/DataTable';
 import StatsCard from '@/components/shared/StatsCard';
 import StatusBadge from '@/components/shared/StatusBadge';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { toast } from 'sonner';
-import { formatDate, formatNumber } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { cn, formatCurrency, formatDate } from '@/lib/utils';
+
+// Types
+type RatingType = 'event' | 'service' | 'exhibitor';
+type ReviewerRole = 'visitor' | 'exhibitor' | 'sponsor';
 
 interface Rating {
-  id: number; userName: string; userType: 'investor' | 'merchant' | 'sponsor' | 'visitor';
-  targetType: 'event' | 'space' | 'service' | 'platform'; targetName: string;
-  score: number; comment: string; status: 'approved' | 'pending' | 'rejected' | 'flagged';
-  helpfulCount: number; reportCount: number; createdAt: string;
+  id: string;
+  reviewer: {
+    name: string;
+    role: ReviewerRole;
+    avatar?: string;
+  };
+  target: string;
+  rating: number;
+  comment: string;
+  date: string;
+  type: RatingType;
+  verified: boolean;
+  status: 'published' | 'pending' | 'hidden';
 }
 
-const mockRatings: Rating[] = [
-  { id: 1, userName: 'أحمد الشمري', userType: 'merchant', targetType: 'event', targetName: 'معرض التقنية 2026', score: 5, comment: 'تجربة ممتازة! التنظيم كان رائعاً والموقع مميز.', status: 'approved', helpfulCount: 45, reportCount: 0, createdAt: '2026-03-20' },
-  { id: 2, userName: 'سارة العتيبي', userType: 'investor', targetType: 'platform', targetName: 'منصة مهام إكسبو', score: 4, comment: 'منصة سهلة الاستخدام، لكن تحتاج تحسين في سرعة التحميل.', status: 'approved', helpfulCount: 32, reportCount: 0, createdAt: '2026-03-18' },
-  { id: 3, userName: 'محمد القحطاني', userType: 'merchant', targetType: 'space', targetName: 'جناح A-12', score: 3, comment: 'المساحة جيدة لكن الإضاءة تحتاج تحسين.', status: 'approved', helpfulCount: 18, reportCount: 1, createdAt: '2026-03-15' },
-  { id: 4, userName: 'فهد الدوسري', userType: 'sponsor', targetType: 'service', targetName: 'خدمة التصميم', score: 5, comment: 'خدمة احترافية وسريعة. أنصح بها بشدة.', status: 'approved', helpfulCount: 28, reportCount: 0, createdAt: '2026-03-12' },
-  { id: 5, userName: 'خالد المطيري', userType: 'merchant', targetType: 'event', targetName: 'معرض الأغذية', score: 2, comment: 'التنظيم كان ضعيفاً والحضور قليل.', status: 'pending', helpfulCount: 5, reportCount: 3, createdAt: '2026-03-10' },
-  { id: 6, userName: 'نورة السبيعي', userType: 'visitor', targetType: 'event', targetName: 'معرض التقنية 2026', score: 4, comment: 'معرض جميل ومتنوع. أتمنى زيادة الأنشطة التفاعلية.', status: 'approved', helpfulCount: 22, reportCount: 0, createdAt: '2026-03-08' },
-  { id: 7, userName: 'عبدالله الحربي', userType: 'merchant', targetType: 'space', targetName: 'جناح B-05', score: 1, comment: 'سيء جداً. محتوى غير لائق.', status: 'flagged', helpfulCount: 0, reportCount: 8, createdAt: '2026-03-05' },
-  { id: 8, userName: 'ريم الزهراني', userType: 'investor', targetType: 'service', targetName: 'خدمة الاستشارات', score: 5, comment: 'استشارة قيمة ساعدتني في اتخاذ قرار الاستثمار.', status: 'approved', helpfulCount: 38, reportCount: 0, createdAt: '2026-03-01' },
+// Mock Data
+const MOCK_RATINGS: Rating[] = [
+  {
+    id: 'R-1001',
+    reviewer: { name: 'أحمد عبد الله', role: 'visitor' },
+    target: 'معرض التقنية السعودي',
+    rating: 5,
+    comment: 'تنظيم ممتاز وتجربة رائعة. المنصات كانت واضحة وسهلة الوصول.',
+    date: '2024-05-15T10:30:00Z',
+    type: 'event',
+    verified: true,
+    status: 'published'
+  },
+  {
+    id: 'R-1002',
+    reviewer: { name: 'شركة الابتكار المحدودة', role: 'exhibitor' },
+    target: 'خدمات التنظيف والصيانة',
+    rating: 4,
+    comment: 'الخدمات جيدة بشكل عام، لكن نتمنى تحسين سرعة الاستجابة في أوقات الذروة.',
+    date: '2024-05-14T14:20:00Z',
+    type: 'service',
+    verified: true,
+    status: 'published'
+  },
+  {
+    id: 'R-1003',
+    reviewer: { name: 'مجموعة الأفق', role: 'sponsor' },
+    target: 'جناح شركة التقدم',
+    rating: 5,
+    comment: 'عرض مبهر ومنتجات مبتكرة. فريق العمل كان محترفاً جداً.',
+    date: '2024-05-12T09:15:00Z',
+    type: 'exhibitor',
+    verified: true,
+    status: 'published'
+  },
+  {
+    id: 'R-1004',
+    reviewer: { name: 'سارة خالد', role: 'visitor' },
+    target: 'معرض البناء والتشييد',
+    rating: 2,
+    comment: 'الازدحام كان شديداً ولم يكن هناك مسارات واضحة للحركة.',
+    date: '2024-05-10T16:45:00Z',
+    type: 'event',
+    verified: false,
+    status: 'pending'
+  },
+  {
+    id: 'R-1005',
+    reviewer: { name: 'مؤسسة الرواد', role: 'exhibitor' },
+    target: 'خدمات الإنترنت والشبكات',
+    rating: 1,
+    comment: 'انقطاع متكرر في الاتصال أثر على عروضنا التقديمية.',
+    date: '2024-05-09T11:00:00Z',
+    type: 'service',
+    verified: true,
+    status: 'published'
+  },
+  {
+    id: 'R-1006',
+    reviewer: { name: 'محمد فهد', role: 'visitor' },
+    target: 'جناح الإبداع الرقمي',
+    rating: 4,
+    comment: 'تقنيات مثيرة للاهتمام، لكن المساحة كانت ضيقة قليلاً.',
+    date: '2024-05-08T13:30:00Z',
+    type: 'exhibitor',
+    verified: true,
+    status: 'published'
+  }
 ];
 
-const userTypeLabels: Record<string, string> = { investor: 'مستثمر', merchant: 'تاجر', sponsor: 'راعي', visitor: 'زائر' };
-const targetTypeLabels: Record<string, string> = { event: 'فعالية', space: 'مساحة', service: 'خدمة', platform: 'المنصة' };
-
-function StarRating({ score }: { score: number }) {
-  return (
-    <div className="flex gap-0.5">
-      {[1, 2, 3, 4, 5].map(s => (
-        <Star key={s} className={`w-3.5 h-3.5 ${s <= score ? 'text-accent fill-accent' : 'text-muted-foreground/30'}`} />
-      ))}
-    </div>
-  );
-}
-
 export default function RatingsPage() {
-  const [ratings, setRatings] = useState(mockRatings);
-  const [search, setSearch] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [selectedRating, setSelectedRating] = useState<Rating | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'events' | 'services' | 'exhibitors'>('overview');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [ratings, setRatings] = useState<Rating[]>(MOCK_RATINGS);
 
-  const filtered = ratings.filter(r => {
-    const matchSearch = r.userName.includes(search) || r.comment.includes(search) || r.targetName.includes(search);
-    const matchStatus = filterStatus === 'all' || r.status === filterStatus;
-    return matchSearch && matchStatus;
+  // Filter ratings based on active tab and search query
+  const filteredRatings = ratings.filter(rating => {
+    const matchesSearch = 
+      rating.reviewer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      rating.target.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      rating.comment.toLowerCase().includes(searchQuery.toLowerCase());
+      
+    if (!matchesSearch) return false;
+    
+    if (activeTab === 'events') return rating.type === 'event';
+    if (activeTab === 'services') return rating.type === 'service';
+    if (activeTab === 'exhibitors') return rating.type === 'exhibitor';
+    
+    return true; // overview tab
   });
 
-  const handleApprove = (id: number) => { setRatings(prev => prev.map(r => r.id === id ? { ...r, status: 'approved' as const } : r)); toast.success('تم اعتماد التقييم'); };
-  const handleReject = (id: number) => { setRatings(prev => prev.map(r => r.id === id ? { ...r, status: 'rejected' as const } : r)); toast.success('تم رفض التقييم'); };
-  const handleDelete = (id: number) => { setRatings(prev => prev.filter(r => r.id !== id)); toast.success('تم حذف التقييم'); };
+  // Calculate stats
+  const totalRatings = ratings.length;
+  const averageRating = ratings.reduce((acc, curr) => acc + curr.rating, 0) / totalRatings;
+  const positiveRatings = ratings.filter(r => r.rating >= 4).length;
+  const negativeRatings = ratings.filter(r => r.rating <= 2).length;
 
-  const avgScore = ratings.length > 0 ? (ratings.reduce((s, r) => s + r.score, 0) / ratings.length).toFixed(1) : '0';
+  const handleAction = (id: string, action: string) => {
+    toast.success(`تم تنفيذ الإجراء: ${action} للتقييم ${id}`);
+  };
 
-  const columns: Column<Rating>[] = [
-    { key: 'userName', label: 'المستخدم', render: (_, r) => (
-      <div><p className="font-semibold text-foreground text-sm">{r.userName}</p><p className="text-xs text-muted-foreground">{userTypeLabels[r.userType]}</p></div>
-    )},
-    { key: 'targetName', label: 'الهدف', render: (_, r) => (
-      <div><p className="text-sm">{r.targetName}</p><p className="text-xs text-muted-foreground">{targetTypeLabels[r.targetType]}</p></div>
-    )},
-    { key: 'score', label: 'التقييم', sortable: true, render: (v) => <StarRating score={v} /> },
-    { key: 'comment', label: 'التعليق', render: (v) => <p className="text-sm text-muted-foreground truncate max-w-[200px]">{v}</p> },
-    { key: 'status', label: 'الحالة', render: (_, r) => <StatusBadge status={r.status} /> },
-    { key: 'helpfulCount', label: 'مفيد', render: (v) => <span className="text-xs font-mono">{v}</span> },
-    { key: 'createdAt', label: 'التاريخ', render: (v) => <span className="text-xs">{formatDate(v)}</span> },
-    { key: 'actions', label: 'إجراءات', render: (_, r) => (
-      <div className="flex gap-1">
-        <button onClick={(e) => { e.stopPropagation(); setSelectedRating(r); }} className="p-1.5 rounded-lg hover:bg-accent/10 transition-colors"><Eye className="w-4 h-4 text-accent" /></button>
-        {r.status === 'pending' && <button onClick={(e) => { e.stopPropagation(); handleApprove(r.id); }} className="p-1.5 rounded-lg hover:bg-success/10 transition-colors"><ThumbsUp className="w-4 h-4 text-success" /></button>}
-        {r.status === 'pending' && <button onClick={(e) => { e.stopPropagation(); handleReject(r.id); }} className="p-1.5 rounded-lg hover:bg-danger/10 transition-colors"><ThumbsDown className="w-4 h-4 text-danger" /></button>}
-        <button onClick={(e) => { e.stopPropagation(); handleDelete(r.id); }} className="p-1.5 rounded-lg hover:bg-danger/10 transition-colors"><Trash2 className="w-4 h-4 text-danger" /></button>
+  const renderStars = (rating: number) => {
+    return (
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star 
+            key={star} 
+            className={cn(
+              "w-4 h-4",
+              star <= rating ? "fill-gold text-gold" : "fill-muted text-muted"
+            )} 
+          />
+        ))}
       </div>
-    )},
-  ];
+    );
+  };
+
+  const getRoleLabel = (role: ReviewerRole) => {
+    switch (role) {
+      case 'visitor': return 'زائر';
+      case 'exhibitor': return 'عارض';
+      case 'sponsor': return 'راعي';
+      default: return role;
+    }
+  };
+
+  const getTypeLabel = (type: RatingType) => {
+    switch (type) {
+      case 'event': return 'فعالية';
+      case 'service': return 'خدمة';
+      case 'exhibitor': return 'جناح عارض';
+      default: return type;
+    }
+  };
 
   return (
     <AdminLayout>
-      <div className="p-6 space-y-6">
-        <PageHeader title="إدارة التقييمات والمراجعات" subtitle={`${ratings.length} تقييم`} />
+      <div className="space-y-6">
+        <PageHeader 
+          title="التقييمات والمراجعات" 
+          subtitle="إدارة ومتابعة تقييمات الزوار والعارضين للفعاليات والخدمات"
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <StatsCard title="إجمالي التقييمات" value={ratings.length} icon={Star} />
-          <StatsCard title="المعدل العام" value={`${avgScore}/5`} icon={Star} delay={0.1} />
-          <StatsCard title="بانتظار المراجعة" value={ratings.filter(r => r.status === 'pending').length} icon={MessageSquare} delay={0.2} />
-          <StatsCard title="مبلّغ عنها" value={ratings.filter(r => r.status === 'flagged').length} icon={Flag} delay={0.3} />
-          <StatsCard title="معتمدة" value={ratings.filter(r => r.status === 'approved').length} icon={ThumbsUp} delay={0.4} />
+        {/* Stats Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard
+            title="متوسط التقييم العام"
+            value={averageRating.toFixed(1)}
+            icon={Star}
+            trend={5}
+            delay={0.1}
+          />
+          <StatsCard
+            title="إجمالي التقييمات"
+            value={totalRatings.toString()}
+            icon={MessageSquare}
+            trend={12}
+            delay={0.2}
+          />
+          <StatsCard
+            title="تقييمات إيجابية"
+            value={positiveRatings.toString()}
+            icon={ThumbsUp}
+            trend={8}
+            delay={0.3}
+          />
+          <StatsCard
+            title="تقييمات سلبية"
+            value={negativeRatings.toString()}
+            icon={ThumbsDown}
+            trend={2}
+            delay={0.4}
+          />
         </div>
 
-        <div className="flex gap-2 flex-wrap">
-          {['all', 'approved', 'pending', 'rejected', 'flagged'].map(s => (
-            <button key={s} onClick={() => setFilterStatus(s)} className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${filterStatus === s ? 'bg-accent/20 text-accent border border-accent/30' : 'bg-card/50 text-muted-foreground border border-border/50 hover:bg-card'}`}>
-              {s === 'all' ? 'الكل' : s === 'approved' ? 'معتمدة' : s === 'pending' ? 'بانتظار' : s === 'rejected' ? 'مرفوضة' : 'مبلّغ عنها'} ({s === 'all' ? ratings.length : ratings.filter(r => r.status === s).length})
-            </button>
-          ))}
+        {/* Main Content */}
+        <div className="glass-card rounded-2xl border border-border/50 overflow-hidden bg-surface2">
+          {/* Tabs */}
+          <div className="flex flex-wrap items-center gap-2 p-4 border-b border-border/50 bg-surface2/50">
+            {[
+              { id: 'overview', label: 'نظرة عامة' },
+              { id: 'events', label: 'تقييمات الفعاليات' },
+              { id: 'services', label: 'تقييمات الخدمات' },
+              { id: 'exhibitors', label: 'تقييمات العارضين' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={cn(
+                  "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 relative",
+                  activeTab === tab.id 
+                    ? "text-gold" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-surface3"
+                )}
+              >
+                {activeTab === tab.id && (
+                  <motion.div
+                    layoutId="activeTabRatings"
+                    className="absolute inset-0 bg-gold/10 rounded-xl border border-gold/20"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+                <span className="relative z-10">{tab.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Controls */}
+          <div className="p-4 flex flex-col sm:flex-row gap-4 items-center justify-between bg-surface2/30">
+            <div className="relative w-full sm:w-96">
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input 
+                type="text"
+                placeholder="ابحث في التقييمات، الأسماء، أو التعليقات..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-4 pr-10 py-2 rounded-xl bg-surface3 border border-border/50 focus:border-gold/50 focus:ring-1 focus:ring-gold/50 transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground"
+              />
+            </div>
+            
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface3 border border-border/50 hover:border-gold/30 hover:bg-gold/5 transition-all text-sm text-foreground">
+                <Filter className="w-4 h-4 text-gold" />
+                <span>تصفية</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Ratings List */}
+          <div className="p-4 space-y-4">
+            <AnimatePresence mode="popLayout">
+              {filteredRatings.length > 0 ? (
+                filteredRatings.map((rating, index) => (
+                  <motion.div
+                    key={rating.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="p-5 rounded-2xl bg-surface3 border border-border/50 hover:border-gold/30 transition-all group"
+                  >
+                    <div className="flex flex-col md:flex-row gap-4 justify-between items-start">
+                      {/* Reviewer Info */}
+                      <div className="flex items-start gap-4 w-full md:w-1/3">
+                        <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
+                          {rating.reviewer.role === 'visitor' ? <User className="w-5 h-5 text-gold" /> : 
+                           rating.reviewer.role === 'exhibitor' ? <Building2 className="w-5 h-5 text-gold" /> : 
+                           <ShieldCheck className="w-5 h-5 text-gold" />}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-medium text-foreground">{rating.reviewer.name}</h4>
+                            {rating.verified && (
+                              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                            <span>{getRoleLabel(rating.reviewer.role)}</span>
+                            <span>•</span>
+                            <span className="flex items-center gap-1">
+                              <CalendarDays className="w-3 h-3" />
+                              {formatDate(rating.date)}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Rating Content */}
+                      <div className="flex-1 w-full">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium px-2 py-1 rounded-md bg-surface2 border border-border/50 text-muted-foreground">
+                              {getTypeLabel(rating.type)}
+                            </span>
+                            <span className="text-sm font-medium text-foreground">
+                              {rating.target}
+                            </span>
+                          </div>
+                          {renderStars(rating.rating)}
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed mt-2">
+                          "{rating.comment}"
+                        </p>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex items-center justify-end gap-2 w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-border/50">
+                        <StatusBadge status={rating.status === 'published' ? 'active' : rating.status === 'pending' ? 'pending' : 'inactive'} />
+                        
+                        <div className="relative group/menu">
+                          <button className="p-2 rounded-lg hover:bg-surface2 text-muted-foreground hover:text-foreground transition-colors">
+                            <MoreVertical className="w-4 h-4" />
+                          </button>
+                          
+                          <div className="absolute left-0 top-full mt-1 w-40 rounded-xl bg-surface3 border border-border/50 shadow-lg opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all z-10 overflow-hidden">
+                            <button 
+                              onClick={() => handleAction(rating.id, 'نشر')}
+                              className="w-full text-right px-4 py-2 text-sm hover:bg-surface2 text-foreground transition-colors"
+                            >
+                              نشر التقييم
+                            </button>
+                            <button 
+                              onClick={() => handleAction(rating.id, 'إخفاء')}
+                              className="w-full text-right px-4 py-2 text-sm hover:bg-surface2 text-foreground transition-colors"
+                            >
+                              إخفاء التقييم
+                            </button>
+                            <button 
+                              onClick={() => handleAction(rating.id, 'رد')}
+                              className="w-full text-right px-4 py-2 text-sm hover:bg-surface2 text-gold transition-colors"
+                            >
+                              إضافة رد
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))
+              ) : (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="py-12 flex flex-col items-center justify-center text-center"
+                >
+                  <div className="w-16 h-16 rounded-full bg-surface3 border border-border/50 flex items-center justify-center mb-4">
+                    <MessageSquare className="w-8 h-8 text-muted-foreground/50" />
+                  </div>
+                  <h3 className="text-lg font-medium text-foreground mb-1">لا توجد تقييمات</h3>
+                  <p className="text-sm text-muted-foreground">
+                    لم يتم العثور على تقييمات تطابق معايير البحث الخاصة بك.
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
-
-        <DataTable columns={columns} data={filtered} searchValue={search} onSearch={setSearch} searchPlaceholder="بحث في التقييمات..." emptyMessage="لا توجد تقييمات" onRowClick={setSelectedRating} />
-
-        <Dialog open={!!selectedRating} onOpenChange={(v) => { if (!v) setSelectedRating(null); }}>
-          <DialogContent className="glass-card border-border/50 max-w-lg" dir="rtl">
-            <DialogHeader><DialogTitle>تفاصيل التقييم</DialogTitle></DialogHeader>
-            {selectedRating && (
-              <div className="space-y-4 mt-4">
-                <div className="flex items-center justify-between">
-                  <div><p className="font-semibold">{selectedRating.userName}</p><p className="text-xs text-muted-foreground">{userTypeLabels[selectedRating.userType]}</p></div>
-                  <StarRating score={selectedRating.score} />
-                </div>
-                <div className="glass-card p-3"><p className="text-xs text-muted-foreground mb-1">{targetTypeLabels[selectedRating.targetType]}</p><p className="font-medium">{selectedRating.targetName}</p></div>
-                <div className="glass-card p-3"><p className="text-sm leading-relaxed">{selectedRating.comment}</p></div>
-                <div className="flex gap-4 text-xs text-muted-foreground">
-                  <span><ThumbsUp className="w-3 h-3 inline" /> {selectedRating.helpfulCount} مفيد</span>
-                  <span><Flag className="w-3 h-3 inline" /> {selectedRating.reportCount} بلاغ</span>
-                  <span>{formatDate(selectedRating.createdAt)}</span>
-                </div>
-                <StatusBadge status={selectedRating.status} />
-                <div className="flex gap-2 pt-2">
-                  {selectedRating.status !== 'approved' && <Button onClick={() => { handleApprove(selectedRating.id); setSelectedRating(null); }} className="flex-1 bg-success/20 hover:bg-success/30 text-success">اعتماد</Button>}
-                  {selectedRating.status !== 'rejected' && <Button onClick={() => { handleReject(selectedRating.id); setSelectedRating(null); }} variant="outline" className="flex-1 border-danger/30 text-danger hover:bg-danger/10">رفض</Button>}
-                  <Button onClick={() => { handleDelete(selectedRating.id); setSelectedRating(null); }} variant="outline" className="border-danger/30 text-danger hover:bg-danger/10"><Trash2 className="w-4 h-4" /></Button>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
       </div>
     </AdminLayout>
   );

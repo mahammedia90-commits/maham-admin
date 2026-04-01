@@ -11,9 +11,9 @@ import {
   Scale, Cog, HeadphonesIcon, FolderKanban, Handshake, Building2,
   Monitor, FileArchive, Shield, ChevronDown, LogOut, PanelRightClose,
   PanelRightOpen, Workflow, Globe, ClipboardList, UsersRound,
-  FolderOpen, MessageSquare, Bell, Award, Clock, Image, Package,
-  Map, Wrench, UsersIcon, Lightbulb, Tags, MapPin, ImageIcon,
-  FileCode, HelpCircle, Star, ShieldCheck, Building, Gift
+  MessageSquare, Bell, Fingerprint, MapPin, BookOpen, Clock,
+  UserPlus, Target, Wrench, Image, Star, DoorOpen, Cpu,
+  Activity, Radio, Eye, Gift, PieChart, Network, Award, Landmark
 } from 'lucide-react'
 
 interface NavItem {
@@ -49,7 +49,10 @@ const navSections: { title: string; items: NavItem[] }[] = [
         { label: 'إنشاء فعالية', path: '/events/create' },
       ]},
       { label: 'الطلبات', icon: FileText, path: '/requests' },
+      { label: 'الحجوزات', icon: BookOpen, path: '/bookings' },
+      { label: 'المساحات والأجنحة', icon: MapPin, path: '/spaces' },
       { label: 'إدارة الحشود', icon: UsersRound, path: '/crowd' },
+      { label: 'قوائم الانتظار', icon: Clock, path: '/waitlist' },
     ],
   },
   {
@@ -57,6 +60,8 @@ const navSections: { title: string; items: NavItem[] }[] = [
     items: [
       { label: 'المستخدمون', icon: Users, path: '/users' },
       { label: 'الأدوار والصلاحيات', icon: Shield, path: '/roles' },
+      { label: 'التحقق من الهوية KYC', icon: Fingerprint, path: '/kyc' },
+      { label: 'إدارة الفرق', icon: UserPlus, path: '/teams' },
     ],
   },
   {
@@ -74,32 +79,26 @@ const navSections: { title: string; items: NavItem[] }[] = [
     ],
   },
   {
-    title: 'المستندات والتواصل',
+    title: 'الاستثمار والرعاية',
     items: [
-      { label: 'المستندات', icon: FolderOpen, path: '/documents' },
-      { label: 'الرسائل', icon: MessageSquare, path: '/messages', badge: 'جديد' },
-      { label: 'الإشعارات', icon: Bell, path: '/notifications' },
-      { label: 'الشارات', icon: Award, path: '/badges' },
-      { label: 'قائمة الانتظار', icon: Clock, path: '/waitlist' },
-    ],
-  },
-  {
-    title: 'الرعاية والحزم',
-    items: [
+      { label: 'الرعاة والشركاء', icon: Handshake, path: '/sponsors' },
+      { label: 'فرص الاستثمار', icon: Target, path: '/opportunities' },
+      { label: 'فرص الرعاية', icon: Award, path: '/sponsorship-opportunities' },
+      { label: 'غرف الصفقات', icon: DoorOpen, path: '/deal-rooms' },
       { label: 'أصول الرعاة', icon: Image, path: '/sponsor-assets' },
-      { label: 'الحزم والقطاعات', icon: Package, path: '/packages' },
-      { label: 'مزايا الرعاية', icon: Gift, path: '/sponsor-benefits' },
+      { label: 'التسليمات', icon: Gift, path: '/deliverables' },
+      { label: 'تقارير ROI', icon: PieChart, path: '/roi-reports' },
+      { label: 'الظهور الإعلامي', icon: Eye, path: '/brand-visibility' },
     ],
   },
   {
     title: 'التشغيل',
     items: [
       { label: 'العمليات', icon: Cog, path: '/operations' },
+      { label: 'العمليات الميدانية', icon: Radio, path: '/field-operations' },
       { label: 'سير العمل', icon: Workflow, path: '/workflows' },
-      { label: 'خريطة المعرض', icon: Map, path: '/exhibition-map' },
       { label: 'خدمات العارضين', icon: Wrench, path: '/exhibitor-services' },
-      { label: 'إدارة الفرق', icon: UsersIcon, path: '/teams' },
-      { label: 'فرص الاستثمار', icon: Lightbulb, path: '/opportunities' },
+      { label: 'التواصل والشبكات', icon: Network, path: '/networking' },
     ],
   },
   {
@@ -109,31 +108,30 @@ const navSections: { title: string; items: NavItem[] }[] = [
       { label: 'الموارد البشرية', icon: ClipboardList, path: '/hr' },
       { label: 'خدمة العملاء 360', icon: HeadphonesIcon, path: '/support' },
       { label: 'إدارة المشاريع', icon: FolderKanban, path: '/projects' },
-      { label: 'الرعاة والشركاء', icon: Handshake, path: '/sponsors' },
     ],
   },
   {
-    title: 'إدارة المحتوى',
+    title: 'التواصل',
     items: [
-      { label: 'الفئات', icon: Tags, path: '/categories' },
-      { label: 'المدن', icon: MapPin, path: '/cities' },
-      { label: 'البانرات', icon: ImageIcon, path: '/banners' },
-      { label: 'صفحات المحتوى', icon: FileCode, path: '/cms-pages' },
-      { label: 'الأسئلة الشائعة', icon: HelpCircle, path: '/faqs' },
-      { label: 'التقييمات', icon: Star, path: '/ratings' },
+      { label: 'الرسائل', icon: MessageSquare, path: '/messages' },
+      { label: 'الإشعارات', icon: Bell, path: '/notifications' },
+      { label: 'خزنة المستندات', icon: FileArchive, path: '/documents' },
     ],
   },
   {
-    title: 'التحقق والملفات التجارية',
+    title: 'التقنية والمراقبة',
     items: [
-      { label: 'التحقق KYC', icon: ShieldCheck, path: '/kyc', badge: 'مهم' },
-      { label: 'الملفات التجارية', icon: Building, path: '/business-profiles' },
+      { label: 'التوأم الرقمي', icon: Cpu, path: '/digital-twin' },
+      { label: 'الاقتصاد الحي', icon: Activity, path: '/live-economy' },
+      { label: 'مراقبة النظام', icon: Monitor, path: '/monitoring' },
+      { label: 'الخدمات الحكومية', icon: Landmark, path: '/government' },
     ],
   },
   {
     title: 'النظام',
     items: [
       { label: 'التقارير والتحليلات', icon: BarChart3, path: '/reports' },
+      { label: 'التقييمات', icon: Star, path: '/ratings' },
       { label: 'سجل التدقيق', icon: Shield, path: '/audit' },
       { label: 'إدارة الملفات', icon: FileArchive, path: '/files' },
       { label: 'الإعدادات', icon: Settings, path: '/settings' },

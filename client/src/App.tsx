@@ -80,7 +80,7 @@ import WorkflowsPage from "./pages/workflows/WorkflowsPage";
 // Files
 import FilesPage from "./pages/files/FilesPage";
 
-// Documents Vault
+// Documents
 import DocumentsPage from "./pages/documents/DocumentsPage";
 
 // Messages
@@ -89,23 +89,17 @@ import MessagesPage from "./pages/messages/MessagesPage";
 // Notifications
 import NotificationsPage from "./pages/notifications/NotificationsPage";
 
-// Badges
-import BadgesPage from "./pages/badges/BadgesPage";
+// KYC
+import KycPage from "./pages/kyc/KycPage";
+
+// Spaces
+import SpacesPage from "./pages/spaces/SpacesPage";
+
+// Bookings
+import BookingsPage from "./pages/bookings/BookingsPage";
 
 // Waitlist
 import WaitlistPage from "./pages/waitlist/WaitlistPage";
-
-// Sponsor Assets
-import SponsorAssetsPage from "./pages/sponsor-assets/SponsorAssetsPage";
-
-// Packages & Sectors
-import PackagesPage from "./pages/packages/PackagesPage";
-
-// Exhibition Map
-import ExhibitionMapPage from "./pages/exhibition-map/ExhibitionMapPage";
-
-// Exhibitor Services
-import ExhibitorServicesPage from "./pages/exhibitor-services/ExhibitorServicesPage";
 
 // Teams
 import TeamsPage from "./pages/teams/TeamsPage";
@@ -113,16 +107,47 @@ import TeamsPage from "./pages/teams/TeamsPage";
 // Opportunities
 import OpportunitiesPage from "./pages/opportunities/OpportunitiesPage";
 
-// Laravel Dashboard Pages
-import CategoriesPage from "./pages/categories/CategoriesPage";
-import CitiesPage from "./pages/cities/CitiesPage";
-import BannersPage from "./pages/banners/BannersPage";
-import CmsPagesPage from "./pages/cms-pages/CmsPagesPage";
-import FaqsPage from "./pages/faqs/FaqsPage";
+// Exhibitor Services
+import ExhibitorServicesPage from "./pages/exhibitor-services/ExhibitorServicesPage";
+
+// Sponsor Assets
+import SponsorAssetsPage from "./pages/sponsor-assets/SponsorAssetsPage";
+
+// Ratings
 import RatingsPage from "./pages/ratings/RatingsPage";
-import KycPage from "./pages/kyc/KycPage";
-import BusinessProfilesPage from "./pages/business-profiles/BusinessProfilesPage";
-import SponsorBenefitsPage from "./pages/sponsor-benefits/SponsorBenefitsPage";
+
+// Deal Rooms
+import DealRoomsPage from "./pages/deal-rooms/DealRoomsPage";
+
+// Digital Twin
+import DigitalTwinPage from "./pages/digital-twin/DigitalTwinPage";
+
+// Live Economy
+import LiveEconomyPage from "./pages/live-economy/LiveEconomyPage";
+
+// Field Operations
+import FieldOpsPage from "./pages/field-operations/FieldOpsPage";
+
+// Brand Visibility
+import BrandVisibilityPage from "./pages/brand-visibility/BrandVisibilityPage";
+
+// Deliverables
+import DeliverablesPage from "./pages/deliverables/DeliverablesPage";
+
+// ROI Reports
+import RoiReportsPage from "./pages/roi-reports/RoiReportsPage";
+
+// Networking
+import NetworkingPage from "./pages/networking/NetworkingPage";
+
+// Sponsorship Opportunities
+import SponsorshipOppsPage from "./pages/sponsorship-opportunities/SponsorshipOppsPage";
+
+// Monitoring
+import MonitoringPage from "./pages/monitoring/MonitoringPage";
+
+// Government
+import GovernmentPage from "./pages/government/GovernmentPage";
 
 function Router() {
   return (
@@ -202,7 +227,7 @@ function Router() {
       {/* Files */}
       <Route path="/files" component={FilesPage} />
 
-      {/* Documents Vault */}
+      {/* Documents */}
       <Route path="/documents" component={DocumentsPage} />
 
       {/* Messages */}
@@ -211,23 +236,17 @@ function Router() {
       {/* Notifications */}
       <Route path="/notifications" component={NotificationsPage} />
 
-      {/* Badges */}
-      <Route path="/badges" component={BadgesPage} />
+      {/* KYC */}
+      <Route path="/kyc" component={KycPage} />
+
+      {/* Spaces */}
+      <Route path="/spaces" component={SpacesPage} />
+
+      {/* Bookings */}
+      <Route path="/bookings" component={BookingsPage} />
 
       {/* Waitlist */}
       <Route path="/waitlist" component={WaitlistPage} />
-
-      {/* Sponsor Assets */}
-      <Route path="/sponsor-assets" component={SponsorAssetsPage} />
-
-      {/* Packages & Sectors */}
-      <Route path="/packages" component={PackagesPage} />
-
-      {/* Exhibition Map */}
-      <Route path="/exhibition-map" component={ExhibitionMapPage} />
-
-      {/* Exhibitor Services */}
-      <Route path="/exhibitor-services" component={ExhibitorServicesPage} />
 
       {/* Teams */}
       <Route path="/teams" component={TeamsPage} />
@@ -235,16 +254,47 @@ function Router() {
       {/* Opportunities */}
       <Route path="/opportunities" component={OpportunitiesPage} />
 
-      {/* Laravel Dashboard Pages */}
-      <Route path="/categories" component={CategoriesPage} />
-      <Route path="/cities" component={CitiesPage} />
-      <Route path="/banners" component={BannersPage} />
-      <Route path="/cms-pages" component={CmsPagesPage} />
-      <Route path="/faqs" component={FaqsPage} />
+      {/* Exhibitor Services */}
+      <Route path="/exhibitor-services" component={ExhibitorServicesPage} />
+
+      {/* Sponsor Assets */}
+      <Route path="/sponsor-assets" component={SponsorAssetsPage} />
+
+      {/* Ratings */}
       <Route path="/ratings" component={RatingsPage} />
-      <Route path="/kyc" component={KycPage} />
-      <Route path="/business-profiles" component={BusinessProfilesPage} />
-      <Route path="/sponsor-benefits" component={SponsorBenefitsPage} />
+
+      {/* Deal Rooms */}
+      <Route path="/deal-rooms" component={DealRoomsPage} />
+
+      {/* Digital Twin */}
+      <Route path="/digital-twin" component={DigitalTwinPage} />
+
+      {/* Live Economy */}
+      <Route path="/live-economy" component={LiveEconomyPage} />
+
+      {/* Field Operations */}
+      <Route path="/field-operations" component={FieldOpsPage} />
+
+      {/* Brand Visibility */}
+      <Route path="/brand-visibility" component={BrandVisibilityPage} />
+
+      {/* Deliverables */}
+      <Route path="/deliverables" component={DeliverablesPage} />
+
+      {/* ROI Reports */}
+      <Route path="/roi-reports" component={RoiReportsPage} />
+
+      {/* Networking */}
+      <Route path="/networking" component={NetworkingPage} />
+
+      {/* Sponsorship Opportunities */}
+      <Route path="/sponsorship-opportunities" component={SponsorshipOppsPage} />
+
+      {/* Monitoring */}
+      <Route path="/monitoring" component={MonitoringPage} />
+
+      {/* Government */}
+      <Route path="/government" component={GovernmentPage} />
 
       {/* 404 */}
       <Route path="/404" component={NotFound} />
