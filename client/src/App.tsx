@@ -18,6 +18,7 @@ import DashboardPage from "./pages/dashboard/DashboardPage";
 import EventsListPage from "./pages/events/EventsListPage";
 import EventCreatePage from "./pages/events/EventCreatePage";
 import EventDetailPage from "./pages/events/EventDetailPage";
+import CrowdManagementPage from "./pages/events/CrowdManagementPage";
 
 // Requests
 import RequestsPage from "./pages/requests/RequestsPage";
@@ -95,6 +96,7 @@ function Router() {
       <Route path="/events" component={EventsListPage} />
       <Route path="/events/create" component={EventCreatePage} />
       <Route path="/events/:id" component={EventDetailPage} />
+      <Route path="/crowd" component={CrowdManagementPage} />
 
       {/* Requests */}
       <Route path="/requests" component={RequestsPage} />

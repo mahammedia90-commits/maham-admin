@@ -10,7 +10,7 @@ import {
   TrendingUp, Settings, BarChart3, Brain, UserCheck, Briefcase,
   Scale, Cog, HeadphonesIcon, FolderKanban, Handshake, Building2,
   Monitor, FileArchive, Shield, ChevronDown, LogOut, PanelRightClose,
-  PanelRightOpen, Workflow, Globe, ClipboardList
+  PanelRightOpen, Workflow, Globe, ClipboardList, UsersRound
 } from 'lucide-react'
 
 interface NavItem {
@@ -19,15 +19,16 @@ interface NavItem {
   path: string
   children?: { label: string; path: string }[]
   permission?: string
+  badge?: string
 }
 
 const navSections: { title: string; items: NavItem[] }[] = [
   {
     title: 'البوابات',
     items: [
-      { label: 'بوابة المستثمر', icon: Building2, path: '/portals/investor' },
-      { label: 'بوابة التاجر', icon: Briefcase, path: '/portals/merchant' },
-      { label: 'بوابة الراعي', icon: Handshake, path: '/portals/sponsor' },
+      { label: 'بوابة المستثمر', icon: Building2, path: '/portal/investor', badge: 'مركز تحكم' },
+      { label: 'بوابة التاجر', icon: Briefcase, path: '/portal/merchant', badge: 'مركز تحكم' },
+      { label: 'بوابة الراعي', icon: Handshake, path: '/portal/sponsor', badge: 'مركز تحكم' },
     ],
   },
   {
@@ -45,27 +46,33 @@ const navSections: { title: string; items: NavItem[] }[] = [
         { label: 'إنشاء فعالية', path: '/events/create' },
       ]},
       { label: 'الطلبات', icon: FileText, path: '/requests' },
-      { label: 'المستخدمون', icon: Users, path: '/users', children: [
-        { label: 'قائمة المستخدمين', path: '/users' },
-        { label: 'الأدوار والصلاحيات', path: '/users/roles' },
-      ]},
+      { label: 'إدارة الحشود', icon: UsersRound, path: '/crowd' },
     ],
   },
   {
-    title: 'المالية والمبيعات',
+    title: 'المستخدمون والصلاحيات',
     items: [
-      { label: 'النظام المالي', icon: DollarSign, path: '/finance', children: [
-        { label: 'الفواتير', path: '/finance/invoices' },
-        { label: 'المدفوعات', path: '/finance/payments' },
-      ]},
+      { label: 'المستخدمون', icon: Users, path: '/users' },
+      { label: 'الأدوار والصلاحيات', icon: Shield, path: '/roles' },
+    ],
+  },
+  {
+    title: 'المالية',
+    items: [
+      { label: 'النظام المالي', icon: DollarSign, path: '/finance' },
+    ],
+  },
+  {
+    title: 'التسويق والمبيعات',
+    items: [
       { label: 'المبيعات', icon: TrendingUp, path: '/sales' },
       { label: 'إدارة العملاء CRM', icon: UserCheck, path: '/crm' },
+      { label: 'التسويق', icon: Megaphone, path: '/marketing' },
     ],
   },
   {
-    title: 'التسويق والعمليات',
+    title: 'التشغيل',
     items: [
-      { label: 'التسويق', icon: Megaphone, path: '/marketing' },
       { label: 'العمليات', icon: Cog, path: '/operations' },
       { label: 'سير العمل', icon: Workflow, path: '/workflows' },
     ],
@@ -85,8 +92,6 @@ const navSections: { title: string; items: NavItem[] }[] = [
     items: [
       { label: 'التقارير والتحليلات', icon: BarChart3, path: '/reports' },
       { label: 'سجل التدقيق', icon: Shield, path: '/audit' },
-      { label: 'الخدمات الحكومية', icon: Globe, path: '/government' },
-      { label: 'مراقبة النظام', icon: Monitor, path: '/monitoring' },
       { label: 'إدارة الملفات', icon: FileArchive, path: '/files' },
       { label: 'الإعدادات', icon: Settings, path: '/settings' },
     ],
@@ -118,12 +123,15 @@ export default function Sidebar() {
   return (
     <motion.aside
       initial={false}
-      animate={{ width: sidebarCollapsed ? 72 : 260 }}
+      animate={{ width: sidebarCollapsed ? 72 : 272 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
       className="fixed right-0 top-0 h-screen z-40 flex flex-col bg-sidebar border-l border-sidebar-border overflow-hidden"
+      style={{
+        background: 'linear-gradient(180deg, var(--sidebar) 0%, rgba(24,23,21,0.98) 100%)',
+      }}
     >
       {/* Logo */}
-      <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
+      <div className="flex items-center justify-between p-4 border-b border-sidebar-border/50">
         <AnimatePresence>
           {!sidebarCollapsed && (
             <motion.div
@@ -132,7 +140,7 @@ export default function Sidebar() {
               exit={{ opacity: 0 }}
               className="flex items-center gap-2"
             >
-              <img src={LOGO_URL} alt="Maham Expo" className="h-9 object-contain" />
+              <img src={LOGO_URL} alt="Maham Expo" className="h-10 object-contain" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -145,16 +153,23 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-1 scrollbar-thin">
-        {navSections.map((section) => (
-          <div key={section.title} className="mb-3">
+      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-1 scrollbar-thin">
+        {navSections.map((section, sIdx) => (
+          <div key={section.title} className="mb-2">
+            {/* Section divider for portals */}
+            {sIdx === 1 && (
+              <div className="mx-3 my-2 border-t border-gold/10" />
+            )}
             <AnimatePresence>
               {!sidebarCollapsed && (
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="px-3 py-1.5 text-[10px] font-bold text-gold/60 uppercase tracking-widest"
+                  className={cn(
+                    "px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest",
+                    sIdx === 0 ? "text-gold/80" : "text-gold/50"
+                  )}
                 >
                   {section.title}
                 </motion.p>
@@ -164,6 +179,7 @@ export default function Sidebar() {
               const active = isActive(item.path)
               const expanded = expandedItems.includes(item.path)
               const hasChildren = item.children && item.children.length > 0
+              const isPortal = sIdx === 0
 
               return (
                 <div key={item.path}>
@@ -177,17 +193,21 @@ export default function Sidebar() {
                       }
                     }}
                     className={cn(
-                      'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 group',
+                      'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative',
                       active
-                        ? 'bg-gold/10 text-gold border border-gold/20'
-                        : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground border border-transparent',
+                        ? isPortal
+                          ? 'bg-gradient-to-l from-gold/15 to-gold/5 text-gold border border-gold/25 shadow-[0_0_12px_rgba(201,168,76,0.1)]'
+                          : 'bg-gold/10 text-gold border border-gold/20'
+                        : isPortal
+                          ? 'text-sidebar-foreground/80 hover:bg-gold/8 hover:text-gold border border-transparent hover:border-gold/15'
+                          : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground border border-transparent',
                       sidebarCollapsed && 'justify-center px-2'
                     )}
                     title={sidebarCollapsed ? item.label : undefined}
                   >
                     <item.icon size={18} className={cn(
                       'shrink-0 transition-colors',
-                      active ? 'text-gold' : 'text-muted-foreground group-hover:text-gold/70'
+                      active ? 'text-gold' : isPortal ? 'text-gold/60 group-hover:text-gold' : 'text-muted-foreground group-hover:text-gold/70'
                     )} />
                     <AnimatePresence>
                       {!sidebarCollapsed && (
@@ -201,6 +221,11 @@ export default function Sidebar() {
                         </motion.span>
                       )}
                     </AnimatePresence>
+                    {item.badge && !sidebarCollapsed && (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-gold/10 text-gold/70 border border-gold/15">
+                        {item.badge}
+                      </span>
+                    )}
                     {hasChildren && !sidebarCollapsed && (
                       <ChevronDown
                         size={14}
@@ -246,19 +271,19 @@ export default function Sidebar() {
       </nav>
 
       {/* User & Logout */}
-      <div className="p-3 border-t border-sidebar-border">
+      <div className="p-3 border-t border-sidebar-border/50">
         {!sidebarCollapsed ? (
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-gold/15 border border-gold/25 flex items-center justify-center text-gold font-bold text-sm">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold/20 to-gold/5 border border-gold/25 flex items-center justify-center text-gold font-bold text-sm shadow-[0_0_8px_rgba(201,168,76,0.1)]">
               {user?.name?.charAt(0) || 'م'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{user?.name || 'المدير'}</p>
-              <p className="text-[10px] text-muted-foreground truncate">{user?.role || 'مدير عام'}</p>
+              <p className="text-sm font-semibold text-foreground truncate">{user?.name || 'المدير'}</p>
+              <p className="text-[10px] text-gold/60 truncate">{user?.role || 'مشرف / إداري'}</p>
             </div>
             <button
               onClick={handleLogout}
-              className="p-2 rounded-lg hover:bg-danger/10 text-muted-foreground hover:text-danger transition-all"
+              className="p-2 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all"
               title="تسجيل الخروج"
             >
               <LogOut size={16} />
@@ -267,7 +292,7 @@ export default function Sidebar() {
         ) : (
           <button
             onClick={handleLogout}
-            className="w-full p-2 rounded-lg hover:bg-danger/10 text-muted-foreground hover:text-danger transition-all flex justify-center"
+            className="w-full p-2 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all flex justify-center"
             title="تسجيل الخروج"
           >
             <LogOut size={16} />
