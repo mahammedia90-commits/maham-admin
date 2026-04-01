@@ -1,7 +1,8 @@
 /**
- * MAHAM EXPO — Login Page (3-Step Flow)
+ * MAHAM EXPO — Login Page (3 Internal Roles Only + Demo Entry)
  * Design: Liquid Gold Executive — Nour Theme
- * Steps: 1) Choose Role → 2) Specialty Code (OTP 4-digit) → 3) Identity Confirmation (Phone + Password)
+ * Roles: مشرف/إداري, مدير قسم, موظف (NO merchant/investor/sponsor — they have separate portals)
+ * Demo: Each role has a "دخول تجريبي" button that bypasses auth and goes straight to dashboard
  * RED RULES: Uses authApi from api/index.ts, setUser from authStore — NO changes to those files
  */
 import { useState, useRef, useCallback } from 'react';
@@ -10,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShieldCheck, Users, UserCheck, ArrowRight, ArrowLeft,
   Lock, Key, Fingerprint, Shield, Eye, EyeOff, Loader2,
-  Phone, Building2, TrendingUp, Handshake, Sparkles
+  Phone, Sparkles, Zap
 } from 'lucide-react';
 import { authApi } from '@/api';
 import { useAuthStore } from '@/store/authStore';
@@ -25,15 +26,30 @@ interface Role {
   icon: typeof ShieldCheck;
   code: string;
   gradient: string;
+  roleCode: number;
+  roleName: string;
 }
 
+// Only 3 internal roles — merchant/investor/sponsor have separate portals
 const ROLES: Role[] = [
-  { id: 'admin', title: 'مشرف / إداري', subtitle: 'Super Admin', desc: 'لوحة التحكم المركزية', icon: ShieldCheck, code: '1989', gradient: 'from-amber-500/20 to-yellow-600/10' },
-  { id: 'manager', title: 'مدير قسم', subtitle: 'Dept. Manager', desc: 'إدارة القسم والفريق', icon: Users, code: '6060', gradient: 'from-amber-500/15 to-orange-600/10' },
-  { id: 'staff', title: 'موظف', subtitle: 'Staff', desc: 'الوصول حسب الصلاحيات', icon: UserCheck, code: '5050', gradient: 'from-amber-500/10 to-yellow-700/10' },
-  { id: 'merchant', title: 'تاجر', subtitle: 'Merchant', desc: 'حجز الوحدات والعقود', icon: Building2, code: '2024', gradient: 'from-amber-600/15 to-amber-800/10' },
-  { id: 'investor', title: 'مستثمر', subtitle: 'Investor', desc: 'فرص استثمارية وتحليلات', icon: TrendingUp, code: '3030', gradient: 'from-yellow-500/15 to-amber-700/10' },
-  { id: 'sponsor', title: 'راعي', subtitle: 'Sponsor', desc: 'باقات الرعاية والحملات', icon: Handshake, code: '4040', gradient: 'from-amber-400/15 to-yellow-800/10' },
+  {
+    id: 'admin', title: 'مشرف / إداري', subtitle: 'Super Admin',
+    desc: 'لوحة التحكم المركزية', icon: ShieldCheck, code: '1989',
+    gradient: 'from-amber-500/20 to-yellow-600/10',
+    roleCode: 1989, roleName: 'super_admin'
+  },
+  {
+    id: 'manager', title: 'مدير قسم', subtitle: 'Dept. Manager',
+    desc: 'إدارة القسم والفريق', icon: Users, code: '6060',
+    gradient: 'from-amber-500/15 to-orange-600/10',
+    roleCode: 6060, roleName: 'department_manager'
+  },
+  {
+    id: 'staff', title: 'موظف', subtitle: 'Staff',
+    desc: 'الوصول حسب الصلاحيات', icon: UserCheck, code: '5050',
+    gradient: 'from-amber-500/10 to-yellow-700/10',
+    roleCode: 5050, roleName: 'staff'
+  },
 ];
 
 const STEPS = [
@@ -49,6 +65,13 @@ const STATS = [
   { value: '+150', label: 'فعالية مُدارة' },
 ];
 
+const PERMISSIONS = [
+  'dashboard.view', 'events.view', 'events.create', 'events.edit', 'events.delete',
+  'users.view', 'users.create', 'users.edit', 'requests.view', 'requests.approve',
+  'finance.view', 'reports.view', 'settings.view', 'ai.view', 'crm.view',
+  'marketing.view', 'sales.view',
+];
+
 export default function LoginPage() {
   const [, navigate] = useLocation();
   const { setUser } = useAuthStore();
@@ -62,6 +85,23 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [direction, setDirection] = useState(0);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // ─── Demo Login — bypasses API, goes straight to dashboard ───
+  const handleDemoLogin = (role: Role) => {
+    const demoUser = {
+      id: 999,
+      name: role.title === 'مشرف / إداري' ? 'نور كرم' : role.title === 'مدير قسم' ? 'أحمد المدير' : 'سارة الموظفة',
+      email: `demo.${role.id}@mahamexpo.sa`,
+      phone: '0500000000',
+      role: role.roleName,
+      role_code: role.roleCode,
+      permissions: PERMISSIONS,
+      avatar: undefined,
+    };
+    setUser(demoUser);
+    toast.success(`تم الدخول التجريبي كـ ${role.title}`);
+    navigate('/dashboard');
+  };
 
   // ─── OTP Input Handler ───
   const handleOtpChange = useCallback((index: number, value: string) => {
@@ -206,7 +246,7 @@ export default function LoginPage() {
             </motion.div>
 
             <AnimatePresence mode="wait" custom={direction}>
-              {/* ═══ Step 1: Choose Role ═══ */}
+              {/* ═══ Step 1: Choose Role (3 roles only) ═══ */}
               {step === 1 && (
                 <motion.div
                   key="step1"
@@ -224,39 +264,62 @@ export default function LoginPage() {
                     <p className="text-sm" style={{ color: '#A09A8E' }}>اختر دورك الوظيفي للدخول إلى القسم المخصص لك</p>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-2.5">
+                  <div className="grid grid-cols-1 gap-3">
                     {ROLES.map((role, i) => (
-                      <motion.button
+                      <motion.div
                         key={role.id}
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.06, duration: 0.35 }}
-                        whileHover={{ scale: 1.015, x: -3 }}
-                        whileTap={{ scale: 0.985 }}
-                        onClick={() => {
-                          setSelectedRole(role);
-                          goToStep(2);
-                        }}
-                        className="w-full p-3.5 rounded-xl flex items-center justify-between group transition-all duration-300"
+                        transition={{ delay: i * 0.08, duration: 0.35 }}
+                        className="rounded-xl overflow-hidden"
                         style={{
                           background: 'rgba(201, 168, 76, 0.04)',
                           border: '1px solid rgba(201, 168, 76, 0.1)',
                         }}
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:shadow-[0_0_15px_rgba(201,168,76,0.2)]" style={{ background: 'linear-gradient(135deg, rgba(201, 168, 76, 0.15), rgba(201, 168, 76, 0.05))' }}>
-                            <role.icon className="w-5 h-5" style={{ color: '#C9A84C' }} />
-                          </div>
-                          <div className="text-right">
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-bold text-sm" style={{ color: '#E8E4DC' }}>{role.title}</h3>
-                              <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(201, 168, 76, 0.1)', color: '#C9A84C' }}>{role.subtitle}</span>
+                        {/* Role Button — goes to Step 2 (OTP) */}
+                        <motion.button
+                          whileHover={{ scale: 1.01, x: -2 }}
+                          whileTap={{ scale: 0.99 }}
+                          onClick={() => {
+                            setSelectedRole(role);
+                            goToStep(2);
+                          }}
+                          className="w-full p-4 flex items-center justify-between group transition-all duration-300"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110" style={{ background: 'rgba(201, 168, 76, 0.1)', boxShadow: '0 0 15px rgba(201, 168, 76, 0.05)' }}>
+                              <role.icon className="w-5 h-5" style={{ color: '#C9A84C' }} />
                             </div>
-                            <p className="text-xs mt-0.5" style={{ color: '#6B6560' }}>{role.desc}</p>
+                            <div className="text-right">
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-bold text-sm" style={{ color: '#E8E4DC' }}>{role.title}</h3>
+                                <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(201, 168, 76, 0.1)', color: '#C9A84C' }}>{role.subtitle}</span>
+                              </div>
+                              <p className="text-xs mt-0.5" style={{ color: '#6B6560' }}>{role.desc}</p>
+                            </div>
                           </div>
+                          <ArrowLeft className="w-4 h-4 opacity-40 group-hover:opacity-100 group-hover:-translate-x-1 transition-all duration-300" style={{ color: '#C9A84C' }} />
+                        </motion.button>
+
+                        {/* Demo Entry Button */}
+                        <div className="px-4 pb-3">
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => handleDemoLogin(role)}
+                            className="w-full py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-2 transition-all duration-300"
+                            style={{
+                              background: 'linear-gradient(135deg, rgba(201, 168, 76, 0.08), rgba(201, 168, 76, 0.03))',
+                              border: '1px dashed rgba(201, 168, 76, 0.2)',
+                              color: '#C9A84C',
+                            }}
+                          >
+                            <Zap className="w-3.5 h-3.5" />
+                            دخول تجريبي
+                          </motion.button>
                         </div>
-                        <ArrowLeft className="w-4 h-4 opacity-40 group-hover:opacity-100 group-hover:-translate-x-1 transition-all duration-300" style={{ color: '#C9A84C' }} />
-                      </motion.button>
+                      </motion.div>
                     ))}
                   </div>
                 </motion.div>
@@ -361,6 +424,24 @@ export default function LoginPage() {
                     <Shield className="w-4 h-4" />
                     تأكيد الرمز
                   </motion.button>
+
+                  {/* Demo Entry from Step 2 */}
+                  <div className="mt-4 text-center">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleDemoLogin(selectedRole)}
+                      className="inline-flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-medium transition-all duration-300"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(201, 168, 76, 0.08), rgba(201, 168, 76, 0.03))',
+                        border: '1px dashed rgba(201, 168, 76, 0.2)',
+                        color: '#C9A84C',
+                      }}
+                    >
+                      <Zap className="w-3.5 h-3.5" />
+                      دخول تجريبي بدون رمز
+                    </motion.button>
+                  </div>
 
                   <p className="text-center text-xs mt-4" style={{ color: '#3A3530' }}>
                     لا تملك رمز تخصص؟{' '}
@@ -485,6 +566,25 @@ export default function LoginPage() {
                         </>
                       )}
                     </motion.button>
+
+                    {/* Demo Entry from Step 3 */}
+                    <div className="text-center pt-1">
+                      <motion.button
+                        type="button"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleDemoLogin(selectedRole)}
+                        className="inline-flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-medium transition-all duration-300"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(201, 168, 76, 0.08), rgba(201, 168, 76, 0.03))',
+                          border: '1px dashed rgba(201, 168, 76, 0.2)',
+                          color: '#C9A84C',
+                        }}
+                      >
+                        <Zap className="w-3.5 h-3.5" />
+                        دخول تجريبي بدون بيانات
+                      </motion.button>
+                    </div>
                   </form>
                 </motion.div>
               )}
@@ -545,7 +645,6 @@ export default function LoginPage() {
               }}
             />
           ))}
-          {/* Floating gold orbs */}
           <motion.div
             animate={{ y: [0, -20, 0], opacity: [0.15, 0.3, 0.15] }}
             transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
@@ -568,7 +667,6 @@ export default function LoginPage() {
             transition={{ delay: 0.3, duration: 0.7 }}
             className="text-center max-w-lg"
           >
-            {/* Sparkle badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
