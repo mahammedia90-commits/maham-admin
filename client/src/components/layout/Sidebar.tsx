@@ -153,7 +153,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
 
 export default function Sidebar() {
   const [location, navigate] = useLocation()
-  const { sidebarCollapsed, sidebarOpen, setSidebarOpen, toggleCollapse } = useUIStore()
+  const { theme, sidebarCollapsed, sidebarOpen, setSidebarOpen, toggleCollapse } = useUIStore()
   const { user, logout: authLogout } = useAuthStore()
   const [expandedItems, setExpandedItems] = useState<string[]>([])
   const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true)
@@ -165,6 +165,7 @@ export default function Sidebar() {
   }, [])
 
   const showLabels = !sidebarCollapsed || sidebarOpen
+  const isDark = theme === 'dark'
 
   const toggleExpand = (path: string) => {
     setExpandedItems(prev =>
@@ -201,9 +202,16 @@ export default function Sidebar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.35 }}
             onClick={() => setSidebarOpen(false)}
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-40 lg:hidden"
+            style={{
+              background: isDark
+                ? 'oklch(0 0 0 / 50%)'
+                : 'oklch(0 0 0 / 25%)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+            }}
           />
         )}
       </AnimatePresence>
@@ -214,20 +222,36 @@ export default function Sidebar() {
           width: sidebarCollapsed && isDesktop ? 72 : 280,
           x: 0,
         }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
           'fixed right-0 top-0 h-screen z-50 flex flex-col overflow-hidden',
-          'max-lg:transition-transform max-lg:duration-300 max-lg:ease-[cubic-bezier(0.22,1,0.36,1)]',
+          'max-lg:transition-transform max-lg:duration-350 max-lg:ease-[cubic-bezier(0.22,1,0.36,1)]',
           sidebarOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full',
           'max-lg:w-[280px]',
         )}
         style={{
-          background: 'var(--sidebar)',
-          borderLeft: '1px solid var(--sidebar-border)',
+          background: isDark
+            ? 'oklch(0.11 0.008 78 / 88%)'
+            : 'oklch(0.965 0.008 78 / 88%)',
+          backdropFilter: 'blur(72px) saturate(1.6)',
+          WebkitBackdropFilter: 'blur(72px) saturate(1.6)',
+          borderLeft: isDark
+            ? '1px solid oklch(0.78 0.11 85 / 6%)'
+            : '1px solid oklch(0.55 0.14 80 / 8%)',
+          boxShadow: isDark
+            ? '-8px 0 32px oklch(0 0 0 / 20%), inset 1px 0 0 oklch(1 0 0 / 2%)'
+            : '-8px 0 32px oklch(0 0 0 / 5%), inset 1px 0 0 oklch(1 0 0 / 40%)',
         }}
       >
         {/* ── Decorative gold line at top ── */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-l from-transparent via-[var(--sidebar-primary)] to-transparent opacity-40" />
+        <div
+          className="absolute top-0 left-0 right-0 h-[2px]"
+          style={{
+            background: isDark
+              ? 'linear-gradient(90deg, transparent, oklch(0.78 0.11 85 / 40%), oklch(0.78 0.11 85 / 60%), oklch(0.78 0.11 85 / 40%), transparent)'
+              : 'linear-gradient(90deg, transparent, oklch(0.55 0.14 80 / 35%), oklch(0.55 0.14 80 / 50%), oklch(0.55 0.14 80 / 35%), transparent)',
+          }}
+        />
 
         {/* ── Logo Area ── */}
         <div className="relative flex items-center justify-between px-4 py-4">
@@ -237,7 +261,7 @@ export default function Sidebar() {
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 10 }}
-                transition={{ duration: 0.25 }}
+                transition={{ duration: 0.3 }}
                 className="flex items-center gap-2.5"
               >
                 <img src={LOGO_URL} alt="Maham Expo" className="h-9 object-contain" />
@@ -252,26 +276,41 @@ export default function Sidebar() {
                 toggleCollapse()
               }
             }}
-            className={cn(
-              'p-2 rounded-xl transition-all duration-300',
-              'text-[var(--sidebar-foreground)]/50 hover:text-[var(--sidebar-primary)]',
-              'hover:bg-[var(--sidebar-accent)]',
-            )}
+            className="p-2 rounded-xl transition-all duration-300 hover:scale-105"
+            style={{
+              color: isDark
+                ? 'oklch(0.88 0.005 85 / 50%)'
+                : 'oklch(0.22 0.015 75 / 50%)',
+            }}
           >
             {sidebarCollapsed && isDesktop ? <PanelRightOpen size={18} /> : <PanelRightClose size={18} />}
           </button>
         </div>
 
         {/* ── Divider ── */}
-        <div className="mx-4 h-px bg-gradient-to-l from-transparent via-[var(--sidebar-border)] to-transparent" />
+        <div
+          className="mx-4 h-px"
+          style={{
+            background: isDark
+              ? 'linear-gradient(90deg, transparent, oklch(0.78 0.11 85 / 12%), transparent)'
+              : 'linear-gradient(90deg, transparent, oklch(0.55 0.14 80 / 15%), transparent)',
+          }}
+        />
 
         {/* ── Navigation ── */}
         <nav className="flex-1 overflow-y-auto py-3 px-2.5 space-y-0.5 scrollbar-thin">
           {navSections.map((section, sIdx) => (
             <div key={section.title} className="mb-1">
-              {/* Section divider (not for first section) */}
+              {/* Section divider */}
               {sIdx > 0 && (
-                <div className="mx-3 my-2.5 h-px bg-gradient-to-l from-transparent via-[var(--sidebar-border)] to-transparent opacity-60" />
+                <div
+                  className="mx-3 my-2.5 h-px opacity-50"
+                  style={{
+                    background: isDark
+                      ? 'linear-gradient(90deg, transparent, oklch(0.78 0.11 85 / 10%), transparent)'
+                      : 'linear-gradient(90deg, transparent, oklch(0.55 0.14 80 / 12%), transparent)',
+                  }}
+                />
               )}
 
               {/* Section title */}
@@ -283,10 +322,12 @@ export default function Sidebar() {
                     exit={{ opacity: 0 }}
                     className={cn(
                       'px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em]',
-                      sIdx === 0
-                        ? 'text-[var(--sidebar-primary)]'
-                        : 'text-[var(--sidebar-foreground)] opacity-40'
                     )}
+                    style={{
+                      color: sIdx === 0
+                        ? (isDark ? 'oklch(0.78 0.11 85)' : 'oklch(0.55 0.14 80)')
+                        : (isDark ? 'oklch(0.88 0.005 85 / 35%)' : 'oklch(0.22 0.015 75 / 40%)'),
+                    }}
                   >
                     {section.title}
                   </motion.p>
@@ -298,7 +339,6 @@ export default function Sidebar() {
                 const active = isActive(item.path)
                 const expanded = expandedItems.includes(item.path)
                 const hasChildren = item.children && item.children.length > 0
-                const isPortal = sIdx === 0
 
                 return (
                   <div key={item.path}>
@@ -306,44 +346,75 @@ export default function Sidebar() {
                       onClick={() => handleNavClick(item.path, !!hasChildren)}
                       className={cn(
                         'w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-300 group relative',
-                        active
-                          ? isPortal
-                            ? [
-                                'text-[var(--sidebar-primary)]',
-                                'bg-[var(--sidebar-accent)]',
-                                'shadow-[0_0_16px_var(--sidebar-primary)/8%]',
-                              ].join(' ')
-                            : [
-                                'text-[var(--sidebar-primary)]',
-                                'bg-[var(--sidebar-accent)]',
-                              ].join(' ')
-                          : [
-                              'text-[var(--sidebar-foreground)] opacity-70',
-                              'hover:opacity-100',
-                              'hover:bg-[var(--sidebar-accent)]',
-                            ].join(' '),
                         !showLabels && 'justify-center px-2'
                       )}
+                      style={{
+                        color: active
+                          ? (isDark ? 'oklch(0.78 0.11 85)' : 'oklch(0.55 0.14 80)')
+                          : (isDark ? 'oklch(0.88 0.005 85 / 65%)' : 'oklch(0.22 0.015 75 / 65%)'),
+                        background: active
+                          ? (isDark
+                              ? 'linear-gradient(135deg, oklch(0.78 0.11 85 / 10%), oklch(0.78 0.11 85 / 4%))'
+                              : 'linear-gradient(135deg, oklch(0.55 0.14 80 / 8%), oklch(0.55 0.14 80 / 3%))')
+                          : 'transparent',
+                        boxShadow: active
+                          ? (isDark
+                              ? '0 0 16px oklch(0.78 0.11 85 / 5%), inset 0 1px 0 oklch(1 0 0 / 3%)'
+                              : '0 0 16px oklch(0.55 0.14 80 / 4%), inset 0 1px 0 oklch(1 0 0 / 30%)')
+                          : 'none',
+                      }}
                       title={!showLabels ? item.label : undefined}
+                      onMouseEnter={(e) => {
+                        if (!active) {
+                          e.currentTarget.style.background = isDark
+                            ? 'oklch(0.78 0.11 85 / 5%)'
+                            : 'oklch(0.55 0.14 80 / 4%)'
+                          e.currentTarget.style.color = isDark
+                            ? 'oklch(0.88 0.005 85 / 90%)'
+                            : 'oklch(0.22 0.015 75 / 90%)'
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!active) {
+                          e.currentTarget.style.background = 'transparent'
+                          e.currentTarget.style.color = isDark
+                            ? 'oklch(0.88 0.005 85 / 65%)'
+                            : 'oklch(0.22 0.015 75 / 65%)'
+                        }
+                      }}
                     >
                       {/* Active indicator bar */}
                       {active && (
                         <motion.div
                           layoutId="sidebar-active-indicator"
-                          className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-l-full bg-[var(--sidebar-primary)]"
+                          className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-l-full"
+                          style={{
+                            background: isDark
+                              ? 'oklch(0.78 0.11 85)'
+                              : 'oklch(0.55 0.14 80)',
+                            boxShadow: isDark
+                              ? '0 0 8px oklch(0.78 0.11 85 / 40%)'
+                              : '0 0 8px oklch(0.55 0.14 80 / 30%)',
+                          }}
                           transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                         />
                       )}
 
-                      {/* Icon */}
+                      {/* Icon with gold glow on active */}
                       <item.icon
                         size={18}
-                        className={cn(
-                          'shrink-0 transition-all duration-300',
-                          active
-                            ? 'text-[var(--sidebar-primary)]'
-                            : 'text-[var(--sidebar-foreground)] opacity-50 group-hover:opacity-80'
-                        )}
+                        className="shrink-0 transition-all duration-300"
+                        style={{
+                          color: active
+                            ? (isDark ? 'oklch(0.78 0.11 85)' : 'oklch(0.55 0.14 80)')
+                            : undefined,
+                          filter: active
+                            ? (isDark
+                                ? 'drop-shadow(0 0 6px oklch(0.78 0.11 85 / 30%))'
+                                : 'drop-shadow(0 0 6px oklch(0.55 0.14 80 / 25%))')
+                            : 'none',
+                          opacity: active ? 1 : 0.55,
+                        }}
                       />
 
                       {/* Label */}
@@ -353,13 +424,23 @@ export default function Sidebar() {
                         </span>
                       )}
 
-                      {/* Badge */}
+                      {/* Badge — glass style */}
                       {item.badge && showLabels && (
-                        <span className={cn(
-                          'text-[9px] px-1.5 py-0.5 rounded-full font-semibold',
-                          'bg-[var(--sidebar-primary)]/8 text-[var(--sidebar-primary)]/60',
-                          'border border-[var(--sidebar-primary)]/10',
-                        )}>
+                        <span
+                          className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold"
+                          style={{
+                            background: isDark
+                              ? 'oklch(0.78 0.11 85 / 10%)'
+                              : 'oklch(0.55 0.14 80 / 8%)',
+                            color: isDark
+                              ? 'oklch(0.78 0.11 85 / 70%)'
+                              : 'oklch(0.55 0.14 80 / 65%)',
+                            border: isDark
+                              ? '1px solid oklch(0.78 0.11 85 / 12%)'
+                              : '1px solid oklch(0.55 0.14 80 / 10%)',
+                            backdropFilter: 'blur(8px)',
+                          }}
+                        >
                           {item.badge}
                         </span>
                       )}
@@ -369,9 +450,10 @@ export default function Sidebar() {
                         <ChevronDown
                           size={14}
                           className={cn(
-                            'transition-transform duration-300 opacity-40',
+                            'transition-transform duration-300',
                             expanded && 'rotate-180'
                           )}
+                          style={{ opacity: 0.4 }}
                         />
                       )}
                     </button>
@@ -383,26 +465,35 @@ export default function Sidebar() {
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: 'auto', opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                           className="overflow-hidden mr-7 mt-0.5 space-y-0.5"
                         >
-                          {item.children!.map((child) => (
-                            <button
-                              key={child.path}
-                              onClick={() => {
-                                navigate(child.path)
-                                setSidebarOpen(false)
-                              }}
-                              className={cn(
-                                'w-full text-right px-3 py-1.5 rounded-lg text-xs transition-all duration-300 border-r-2',
-                                location === child.path
-                                  ? 'text-[var(--sidebar-primary)] border-[var(--sidebar-primary)] bg-[var(--sidebar-accent)]'
-                                  : 'text-[var(--sidebar-foreground)] opacity-50 hover:opacity-80 border-transparent hover:border-[var(--sidebar-primary)]/30'
-                              )}
-                            >
-                              {child.label}
-                            </button>
-                          ))}
+                          {item.children!.map((child) => {
+                            const childActive = location === child.path
+                            return (
+                              <button
+                                key={child.path}
+                                onClick={() => {
+                                  navigate(child.path)
+                                  setSidebarOpen(false)
+                                }}
+                                className="w-full text-right px-3 py-1.5 rounded-lg text-xs transition-all duration-300 border-r-2"
+                                style={{
+                                  color: childActive
+                                    ? (isDark ? 'oklch(0.78 0.11 85)' : 'oklch(0.55 0.14 80)')
+                                    : (isDark ? 'oklch(0.88 0.005 85 / 45%)' : 'oklch(0.22 0.015 75 / 45%)'),
+                                  borderColor: childActive
+                                    ? (isDark ? 'oklch(0.78 0.11 85)' : 'oklch(0.55 0.14 80)')
+                                    : 'transparent',
+                                  background: childActive
+                                    ? (isDark ? 'oklch(0.78 0.11 85 / 6%)' : 'oklch(0.55 0.14 80 / 5%)')
+                                    : 'transparent',
+                                }}
+                              >
+                                {child.label}
+                              </button>
+                            )
+                          })}
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -414,31 +505,74 @@ export default function Sidebar() {
         </nav>
 
         {/* ── Divider ── */}
-        <div className="mx-4 h-px bg-gradient-to-l from-transparent via-[var(--sidebar-border)] to-transparent" />
+        <div
+          className="mx-4 h-px"
+          style={{
+            background: isDark
+              ? 'linear-gradient(90deg, transparent, oklch(0.78 0.11 85 / 12%), transparent)'
+              : 'linear-gradient(90deg, transparent, oklch(0.55 0.14 80 / 15%), transparent)',
+          }}
+        />
 
         {/* ── User & Logout ── */}
         <div className="p-3">
           {showLabels ? (
-            <div className="flex items-center gap-3 p-2 rounded-xl bg-[var(--sidebar-accent)]/50 transition-all duration-300 hover:bg-[var(--sidebar-accent)]">
-              <div className={cn(
-                'w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold',
-                'bg-gradient-to-br from-[var(--sidebar-primary)]/20 to-[var(--sidebar-primary)]/5',
-                'text-[var(--sidebar-primary)]',
-                'border border-[var(--sidebar-primary)]/15',
-              )}>
+            <div
+              className="flex items-center gap-3 p-2.5 rounded-xl transition-all duration-300"
+              style={{
+                background: isDark
+                  ? 'oklch(0.78 0.11 85 / 4%)'
+                  : 'oklch(0.55 0.14 80 / 3%)',
+                border: isDark
+                  ? '1px solid oklch(0.78 0.11 85 / 6%)'
+                  : '1px solid oklch(0.55 0.14 80 / 5%)',
+              }}
+            >
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold"
+                style={{
+                  background: isDark
+                    ? 'linear-gradient(135deg, oklch(0.78 0.11 85 / 18%), oklch(0.78 0.11 85 / 6%))'
+                    : 'linear-gradient(135deg, oklch(0.55 0.14 80 / 15%), oklch(0.55 0.14 80 / 5%))',
+                  color: isDark ? 'oklch(0.78 0.11 85)' : 'oklch(0.55 0.14 80)',
+                  border: isDark
+                    ? '1px solid oklch(0.78 0.11 85 / 15%)'
+                    : '1px solid oklch(0.55 0.14 80 / 12%)',
+                  boxShadow: isDark
+                    ? '0 0 10px oklch(0.78 0.11 85 / 8%)'
+                    : '0 0 10px oklch(0.55 0.14 80 / 6%)',
+                }}
+              >
                 {user?.name?.charAt(0) || 'م'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-semibold text-[var(--sidebar-foreground)] truncate">
+                <p
+                  className="text-[13px] font-semibold truncate"
+                  style={{ color: isDark ? 'oklch(0.88 0.005 85)' : 'oklch(0.22 0.015 75)' }}
+                >
                   {user?.name || 'المدير'}
                 </p>
-                <p className="text-[10px] text-[var(--sidebar-primary)] opacity-60 truncate">
+                <p
+                  className="text-[10px] truncate"
+                  style={{ color: isDark ? 'oklch(0.78 0.11 85 / 55%)' : 'oklch(0.55 0.14 80 / 55%)' }}
+                >
                   {user?.role || 'مشرف / إداري'}
                 </p>
               </div>
               <button
                 onClick={handleLogout}
-                className="p-2 rounded-lg hover:bg-red-500/10 text-[var(--sidebar-foreground)] opacity-40 hover:opacity-100 hover:text-red-400 transition-all duration-300"
+                className="p-2 rounded-lg transition-all duration-300"
+                style={{
+                  color: isDark ? 'oklch(0.88 0.005 85 / 35%)' : 'oklch(0.22 0.015 75 / 35%)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'oklch(0.62 0.22 25)'
+                  e.currentTarget.style.background = 'oklch(0.62 0.22 25 / 10%)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = isDark ? 'oklch(0.88 0.005 85 / 35%)' : 'oklch(0.22 0.015 75 / 35%)'
+                  e.currentTarget.style.background = 'transparent'
+                }}
                 title="تسجيل الخروج"
               >
                 <LogOut size={15} />
@@ -447,7 +581,18 @@ export default function Sidebar() {
           ) : (
             <button
               onClick={handleLogout}
-              className="w-full p-2 rounded-xl hover:bg-red-500/10 text-[var(--sidebar-foreground)] opacity-40 hover:text-red-400 transition-all duration-300 flex justify-center"
+              className="w-full p-2 rounded-xl transition-all duration-300 flex justify-center"
+              style={{
+                color: isDark ? 'oklch(0.88 0.005 85 / 35%)' : 'oklch(0.22 0.015 75 / 35%)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'oklch(0.62 0.22 25)'
+                e.currentTarget.style.background = 'oklch(0.62 0.22 25 / 10%)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = isDark ? 'oklch(0.88 0.005 85 / 35%)' : 'oklch(0.22 0.015 75 / 35%)'
+                e.currentTarget.style.background = 'transparent'
+              }}
               title="تسجيل الخروج"
             >
               <LogOut size={15} />
