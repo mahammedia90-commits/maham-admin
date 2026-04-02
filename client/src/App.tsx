@@ -77,6 +77,9 @@ import AuditLogPage from "./pages/audit/AuditLogPage";
 // Workflows
 import WorkflowsPage from "./pages/workflows/WorkflowsPage";
 
+// Contracts
+import ContractsPage from "./pages/contracts/ContractsPage";
+
 // Files
 import FilesPage from "./pages/files/FilesPage";
 
@@ -240,6 +243,7 @@ function Router() {
 
       {/* Audit */}
       <Route path="/audit" component={AuditLogPage} />
+      <Route path="/contracts" component={ContractsPage} />
 
       {/* Workflows */}
       <Route path="/workflows" component={WorkflowsPage} />

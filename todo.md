@@ -1,25 +1,20 @@
-# Revenue Engine Build — Todo
+# المهام المتبقية
 
-## Phase 1: Foundation
-- [ ] إنشاء API client wrapper + TypeScript types
-- [ ] بناء Lead Generation Center (/marketing/leads)
-- [ ] بناء CRM Pipeline Kanban (/sales/pipeline)
-- [ ] بناء Lead Detail Page
+## Phase 1: إصلاح تجاوب الموبايل
+- [ ] إصلاح TopBar — hamburger يفتح sidebar
+- [ ] التحقق من 0 أخطاء TypeScript
 
-## Phase 2: Enforcement
-- [ ] بناء Follow-Up Engine (/sales/followups)
-- [ ] بناء Employee Enforcement Dashboard (/hr/enforcement)
-- [ ] بناء Daily Report + Warning System
+## Phase 2: تعميق بوابة المستثمر (+5 تابات)
+- [ ] الفرص الاستثمارية + المحفظة + التقارير المالية + العقود + التواصل
 
-## Phase 3: Revenue
-- [ ] بناء Sales Performance + Leaderboard (/sales/performance)
-- [ ] تعميق Revenue Dashboard (/dashboard)
+## Phase 3: تعميق بوابة التاجر (+4 تابات)
+- [ ] الحجوزات + العقود والمدفوعات + الخدمات اللوجستية + التقارير
 
-## Phase 4: Intelligence
-- [ ] تعميق AI Sales Intelligence (/ai)
-- [ ] بناء Workflow Automation Engine (/workflows)
+## Phase 4: تعميق بوابة الراعي (+5 تابات)
+- [ ] حزم الرعاية + التسليمات + ROI + الظهور الإعلامي + الدعم
+
+## Phase 5: نظام العقود المعمق
+- [ ] مراحل + e-signature + ZATCA + قوالب + سجل تعديلات
 
 ## Cleanup
-- [ ] تحديث App.tsx + Sidebar
-- [ ] حذف Government + Monitoring
-- [ ] إصلاح أخطاء TypeScript + حفظ checkpoint
+- [ ] تحديث App.tsx + Sidebar + إصلاح أخطاء + checkpoint

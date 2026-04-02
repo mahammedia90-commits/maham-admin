@@ -118,6 +118,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
     title: 'الإدارة',
     items: [
       { label: 'الشؤون القانونية', icon: Scale, path: '/legal' },
+      { label: 'إدارة العقود', icon: FileText, path: '/contracts' },
       { label: 'الموارد البشرية', icon: ClipboardList, path: '/hr' },
       { label: 'خدمة العملاء 360', icon: HeadphonesIcon, path: '/support' },
       { label: 'إدارة المشاريع', icon: FolderKanban, path: '/projects' },
@@ -152,7 +153,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
 
 export default function Sidebar() {
   const [location, navigate] = useLocation()
-  const { sidebarCollapsed, toggleCollapse } = useUIStore()
+  const { sidebarCollapsed, sidebarOpen, setSidebarOpen, toggleCollapse } = useUIStore()
   const { user, logout: authLogout } = useAuthStore()
   const [expandedItems, setExpandedItems] = useState<string[]>([])
 
@@ -172,12 +173,37 @@ export default function Sidebar() {
     navigate('/login')
   }
 
+  const handleNavClick = (path: string, hasChildren: boolean) => {
+    if (hasChildren) {
+      toggleExpand(path)
+      if (!isActive(path)) navigate(path)
+    } else {
+      navigate(path)
+      // Close sidebar on mobile after navigation
+      setSidebarOpen(false)
+    }
+  }
+
+  // On mobile: show/hide via sidebarOpen
+  // On desktop: always visible, collapse/expand via sidebarCollapsed
+  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024
+
   return (
     <motion.aside
       initial={false}
-      animate={{ width: sidebarCollapsed ? 72 : 272 }}
+      animate={{
+        width: sidebarCollapsed ? 72 : 272,
+        x: 0,
+      }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      className="fixed right-0 top-0 h-screen z-40 flex flex-col bg-sidebar border-l border-sidebar-border overflow-hidden"
+      className={cn(
+        'fixed right-0 top-0 h-screen z-50 flex flex-col bg-sidebar border-l border-sidebar-border overflow-hidden',
+        // Mobile: slide in/out
+        'max-lg:transition-transform max-lg:duration-300',
+        sidebarOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full',
+        // Mobile: always full width 272px
+        'max-lg:w-[272px]',
+      )}
       style={{
         background: 'linear-gradient(180deg, var(--sidebar) 0%, rgba(24,23,21,0.98) 100%)',
       }}
@@ -185,7 +211,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="flex items-center justify-between p-4 border-b border-sidebar-border/50">
         <AnimatePresence>
-          {!sidebarCollapsed && (
+          {(!sidebarCollapsed || sidebarOpen) && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -196,8 +222,15 @@ export default function Sidebar() {
             </motion.div>
           )}
         </AnimatePresence>
+        {/* Desktop: collapse toggle. Mobile: close button */}
         <button
-          onClick={toggleCollapse}
+          onClick={() => {
+            if (window.innerWidth < 1024) {
+              setSidebarOpen(false)
+            } else {
+              toggleCollapse()
+            }
+          }}
           className="p-2 rounded-lg hover:bg-sidebar-accent text-muted-foreground hover:text-gold transition-all"
         >
           {sidebarCollapsed ? <PanelRightOpen size={18} /> : <PanelRightClose size={18} />}
@@ -208,12 +241,11 @@ export default function Sidebar() {
       <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-1 scrollbar-thin">
         {navSections.map((section, sIdx) => (
           <div key={section.title} className="mb-2">
-            {/* Section divider for portals */}
             {sIdx === 1 && (
               <div className="mx-3 my-2 border-t border-gold/10" />
             )}
             <AnimatePresence>
-              {!sidebarCollapsed && (
+              {(!sidebarCollapsed || sidebarOpen) && (
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -232,18 +264,12 @@ export default function Sidebar() {
               const expanded = expandedItems.includes(item.path)
               const hasChildren = item.children && item.children.length > 0
               const isPortal = sIdx === 0
+              const showLabels = !sidebarCollapsed || sidebarOpen
 
               return (
                 <div key={item.path}>
                   <button
-                    onClick={() => {
-                      if (hasChildren) {
-                        toggleExpand(item.path)
-                        if (!active) navigate(item.path)
-                      } else {
-                        navigate(item.path)
-                      }
-                    }}
+                    onClick={() => handleNavClick(item.path, !!hasChildren)}
                     className={cn(
                       'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative',
                       active
@@ -253,32 +279,25 @@ export default function Sidebar() {
                         : isPortal
                           ? 'text-sidebar-foreground/80 hover:bg-gold/8 hover:text-gold border border-transparent hover:border-gold/15'
                           : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground border border-transparent',
-                      sidebarCollapsed && 'justify-center px-2'
+                      !showLabels && 'justify-center px-2'
                     )}
-                    title={sidebarCollapsed ? item.label : undefined}
+                    title={!showLabels ? item.label : undefined}
                   >
                     <item.icon size={18} className={cn(
                       'shrink-0 transition-colors',
                       active ? 'text-gold' : isPortal ? 'text-gold/60 group-hover:text-gold' : 'text-muted-foreground group-hover:text-gold/70'
                     )} />
-                    <AnimatePresence>
-                      {!sidebarCollapsed && (
-                        <motion.span
-                          initial={{ opacity: 0, width: 0 }}
-                          animate={{ opacity: 1, width: 'auto' }}
-                          exit={{ opacity: 0, width: 0 }}
-                          className="flex-1 text-right whitespace-nowrap overflow-hidden"
-                        >
-                          {item.label}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                    {item.badge && !sidebarCollapsed && (
+                    {showLabels && (
+                      <span className="flex-1 text-right whitespace-nowrap overflow-hidden text-ellipsis">
+                        {item.label}
+                      </span>
+                    )}
+                    {item.badge && showLabels && (
                       <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-gold/10 text-gold/70 border border-gold/15">
                         {item.badge}
                       </span>
                     )}
-                    {hasChildren && !sidebarCollapsed && (
+                    {hasChildren && showLabels && (
                       <ChevronDown
                         size={14}
                         className={cn(
@@ -290,18 +309,20 @@ export default function Sidebar() {
                   </button>
                   {/* Children */}
                   <AnimatePresence>
-                    {hasChildren && expanded && !sidebarCollapsed && (
+                    {hasChildren && expanded && showLabels && (
                       <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
                         className="overflow-hidden mr-6 mt-0.5 space-y-0.5"
                       >
                         {item.children!.map((child) => (
                           <button
                             key={child.path}
-                            onClick={() => navigate(child.path)}
+                            onClick={() => {
+                              navigate(child.path)
+                              setSidebarOpen(false)
+                            }}
                             className={cn(
                               'w-full text-right px-3 py-1.5 rounded-md text-xs transition-all border-r-2',
                               location === child.path
@@ -324,7 +345,7 @@ export default function Sidebar() {
 
       {/* User & Logout */}
       <div className="p-3 border-t border-sidebar-border/50">
-        {!sidebarCollapsed ? (
+        {showLabels() ? (
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold/20 to-gold/5 border border-gold/25 flex items-center justify-center text-gold font-bold text-sm shadow-[0_0_8px_rgba(201,168,76,0.1)]">
               {user?.name?.charAt(0) || 'م'}
@@ -353,4 +374,9 @@ export default function Sidebar() {
       </div>
     </motion.aside>
   )
+}
+
+function showLabels() {
+  const { sidebarCollapsed, sidebarOpen } = useUIStore.getState()
+  return !sidebarCollapsed || sidebarOpen
 }
