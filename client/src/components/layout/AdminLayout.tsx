@@ -25,30 +25,24 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }, [location, setSidebarOpen])
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
+    <div className="min-h-screen bg-background text-foreground" dir="rtl">
       <Sidebar />
 
       <div
         className={cn(
-          'transition-all duration-300',
+          'transition-all duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
           // Desktop: margin based on sidebar state
-          'lg:mr-[260px]',
+          'lg:mr-[280px]',
           sidebarCollapsed && 'lg:mr-[72px]',
           // Mobile: no margin
           'mr-0'
         )}
       >
         <TopBar />
-        <main className="p-3 sm:p-4 md:p-6 min-h-[calc(100vh-4rem)]">
-          {children}
+        <main className="p-3 sm:p-4 md:p-6 lg:p-8 min-h-[calc(100vh-4rem)]">
+          <div className="animate-fade-in">
+            {children}
+          </div>
         </main>
       </div>
     </div>
