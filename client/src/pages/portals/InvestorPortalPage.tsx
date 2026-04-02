@@ -175,7 +175,7 @@ export default function InvestorPortalPage() {
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(201,168,76,0.06)" />
                         <XAxis dataKey="month" tick={{ fill: '#6B6560', fontSize: 11 }} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fill: '#6B6560', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${(v/1000000).toFixed(1)}M`} />
-                        <Tooltip contentStyle={{ background: 'rgba(26,25,23,0.95)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 12, color: '#F5F0E8', fontSize: 12 }} />
+                        <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--card-foreground)', fontSize: 12, backdropFilter: 'blur(20px)' }} />
                         <Area type="monotone" dataKey="استثمارات" stroke="#C9A84C" fill="url(#investGrad)" strokeWidth={2} />
                         <Area type="monotone" dataKey="عوائد" stroke="#22c55e" fill="url(#returnGrad)" strokeWidth={2} />
                       </AreaChart>
@@ -189,7 +189,7 @@ export default function InvestorPortalPage() {
                         <Pie data={sectorDistribution} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
                           {sectorDistribution.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                         </Pie>
-                        <Tooltip contentStyle={{ background: 'rgba(26,25,23,0.95)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 12, color: '#F5F0E8', fontSize: 11 }} />
+                        <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--card-foreground)', fontSize: 11, backdropFilter: 'blur(20px)' }} />
                       </RechartsPie>
                     </ResponsiveContainer>
                     <div className="space-y-2 mt-2">
@@ -263,7 +263,7 @@ export default function InvestorPortalPage() {
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(201,168,76,0.06)" />
                         <XAxis dataKey="month" tick={{ fill: '#6B6560', fontSize: 11 }} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fill: '#6B6560', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${(v/1000000).toFixed(1)}M`} />
-                        <Tooltip contentStyle={{ background: 'rgba(26,25,23,0.95)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 12, color: '#F5F0E8', fontSize: 12 }} />
+                        <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--card-foreground)', fontSize: 12, backdropFilter: 'blur(20px)' }} />
                         <Bar dataKey="استثمارات" fill="#C9A84C" radius={[6, 6, 0, 0]} />
                         <Bar dataKey="عوائد" fill="#22c55e" radius={[6, 6, 0, 0]} />
                       </BarChart>

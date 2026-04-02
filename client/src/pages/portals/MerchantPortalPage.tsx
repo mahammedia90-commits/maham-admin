@@ -155,7 +155,7 @@ export default function MerchantPortalPage() {
                         <XAxis dataKey="month" tick={{ fill: '#6B6560', fontSize: 11 }} axisLine={false} tickLine={false} />
                         <YAxis yAxisId="left" tick={{ fill: '#6B6560', fontSize: 10 }} axisLine={false} tickLine={false} />
                         <YAxis yAxisId="right" orientation="left" tick={{ fill: '#6B6560', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${(v/1000000).toFixed(1)}M`} />
-                        <Tooltip contentStyle={{ background: 'rgba(26,25,23,0.95)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 12, color: '#F5F0E8', fontSize: 12 }} />
+                        <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--card-foreground)', fontSize: 12, backdropFilter: 'blur(20px)' }} />
                         <Bar yAxisId="left" dataKey="حجوزات" fill="#C9A84C" radius={[6, 6, 0, 0]} />
                         <Bar yAxisId="right" dataKey="إيرادات" fill="#22c55e" radius={[6, 6, 0, 0]} opacity={0.7} />
                       </BarChart>
@@ -169,7 +169,7 @@ export default function MerchantPortalPage() {
                         <Pie data={boothTypes} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
                           {boothTypes.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                         </Pie>
-                        <Tooltip contentStyle={{ background: 'rgba(26,25,23,0.95)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 12, color: '#F5F0E8', fontSize: 11 }} />
+                        <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--card-foreground)', fontSize: 11, backdropFilter: 'blur(20px)' }} />
                       </RechartsPie>
                     </ResponsiveContainer>
                     <div className="space-y-2 mt-2">
@@ -252,7 +252,7 @@ export default function MerchantPortalPage() {
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(201,168,76,0.06)" />
                       <XAxis dataKey="name" tick={{ fill: '#6B6560', fontSize: 10 }} axisLine={false} tickLine={false} />
                       <YAxis tick={{ fill: '#6B6560', fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <Tooltip contentStyle={{ background: 'rgba(26,25,23,0.95)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 12, color: '#F5F0E8', fontSize: 12 }} />
+                      <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--card-foreground)', fontSize: 12, backdropFilter: 'blur(20px)' }} />
                       <Bar dataKey="total" fill="#6B6560" radius={[6, 6, 0, 0]} name="الإجمالي" />
                       <Bar dataKey="occupied" fill="#C9A84C" radius={[6, 6, 0, 0]} name="محجوز" />
                     </BarChart>
@@ -456,7 +456,7 @@ export default function MerchantPortalPage() {
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(201,168,76,0.06)" />
                       <XAxis dataKey="month" tick={{ fill: '#6B6560', fontSize: 11 }} axisLine={false} tickLine={false} />
                       <YAxis tick={{ fill: '#6B6560', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${(v/1000000).toFixed(1)}M`} />
-                      <Tooltip contentStyle={{ background: 'rgba(26,25,23,0.95)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 12, color: '#F5F0E8', fontSize: 12 }} />
+                      <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--card-foreground)', fontSize: 12, backdropFilter: 'blur(20px)' }} />
                       <Area type="monotone" dataKey="محصّل" stroke="#22c55e" fill="url(#collGrad)" strokeWidth={2} />
                       <Area type="monotone" dataKey="معلّق" stroke="#f59e0b" fill="url(#pendGrad)" strokeWidth={2} />
                     </AreaChart>

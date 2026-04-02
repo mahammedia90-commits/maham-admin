@@ -64,7 +64,7 @@ export default function StatsCard({ title, value, icon: Icon, trend, trendLabel,
         <div className="flex-1">
           <p
             className="text-xs font-semibold mb-1.5 tracking-wide"
-            style={{ color: isDark ? 'oklch(0.88 0.005 85 / 55%)' : 'oklch(0.22 0.015 75 / 55%)' }}
+            style={{ color: isDark ? 'oklch(0.88 0.005 85 / 65%)' : 'oklch(0.22 0.015 75 / 65%)' }}
           >
             {title}
           </p>
@@ -102,7 +102,7 @@ export default function StatsCard({ title, value, icon: Icon, trend, trendLabel,
               {trendLabel && (
                 <span
                   className="text-[11px]"
-                  style={{ color: isDark ? 'oklch(0.88 0.005 85 / 40%)' : 'oklch(0.22 0.015 75 / 40%)' }}
+                  style={{ color: isDark ? 'oklch(0.88 0.005 85 / 60%)' : 'oklch(0.22 0.015 75 / 55%)' }}
                 >
                   {trendLabel}
                 </span>

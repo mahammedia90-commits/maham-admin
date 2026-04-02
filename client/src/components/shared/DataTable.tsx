@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, ChevronRight, ChevronLeft, ChevronsRight, ChevronsLeft, Download, Filter } from 'lucide-react'
+import { Search, ChevronRight, ChevronLeft, ChevronsRight, ChevronsLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export interface Column<T> {
@@ -63,18 +63,18 @@ export default function DataTable<T extends Record<string, any>>({
 
   return (
     <div className="glass-card overflow-hidden">
-      {/* Header */}
+      {/* Header — Glass search + actions */}
       {(onSearch || actions) && (
-        <div className="flex items-center justify-between p-4 border-b border-border/50">
+        <div className="flex items-center justify-between p-4 border-b border-border/40">
           {onSearch && (
             <div className="relative w-72">
-              <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground gold-icon" />
               <input
                 type="text"
                 value={searchValue || ''}
                 onChange={(e) => onSearch(e.target.value)}
                 placeholder={searchPlaceholder}
-                className="w-full h-10 pr-10 pl-4 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/20 transition-all"
+                className="w-full h-10 pr-10 pl-4 rounded-xl bg-surface2/60 backdrop-blur-sm border border-border/40 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/15 focus:bg-surface2/80 transition-all duration-300"
               />
             </div>
           )}
@@ -86,21 +86,21 @@ export default function DataTable<T extends Record<string, any>>({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border/50">
+            <tr className="border-b border-border/40 bg-surface/30">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   className={cn(
-                    'px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider',
-                    col.sortable && 'cursor-pointer hover:text-gold transition-colors',
+                    'px-4 py-3.5 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider',
+                    col.sortable && 'cursor-pointer hover:text-primary transition-colors duration-300',
                     col.width
                   )}
                   onClick={() => col.sortable && handleSort(col.key)}
                 >
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1.5">
                     {col.label}
                     {col.sortable && sortKey === col.key && (
-                      <span className="text-gold">{sortDir === 'asc' ? '↑' : '↓'}</span>
+                      <span className="text-primary text-[10px]">{sortDir === 'asc' ? '▲' : '▼'}</span>
                     )}
                   </span>
                 </th>
@@ -110,18 +110,23 @@ export default function DataTable<T extends Record<string, any>>({
           <tbody>
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="border-b border-border/30">
+                <tr key={i} className="border-b border-border/20">
                   {columns.map((col) => (
-                    <td key={col.key} className="px-4 py-3">
-                      <div className="h-4 rounded shimmer" />
+                    <td key={col.key} className="px-4 py-3.5">
+                      <div className="h-4 rounded-lg shimmer" />
                     </td>
                   ))}
                 </tr>
               ))
             ) : sortedData.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-4 py-12 text-center text-muted-foreground">
-                  {emptyMessage}
+                <td colSpan={columns.length} className="px-4 py-16 text-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-surface2/60 flex items-center justify-center">
+                      <Search size={20} className="text-muted-foreground/50" />
+                    </div>
+                    <p className="text-muted-foreground text-sm">{emptyMessage}</p>
+                  </div>
                 </td>
               </tr>
             ) : (
@@ -129,18 +134,18 @@ export default function DataTable<T extends Record<string, any>>({
                 {sortedData.map((row, idx) => (
                   <motion.tr
                     key={row.id || idx}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: idx * 0.02 }}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.015, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                     className={cn(
-                      'border-b border-border/30 transition-colors',
-                      onRowClick && 'cursor-pointer hover:bg-gold/5',
-                      !onRowClick && 'hover:bg-surface2/50'
+                      'border-b border-border/20 transition-all duration-300',
+                      onRowClick && 'cursor-pointer hover:bg-primary/[0.04] hover:shadow-[inset_3px_0_0_var(--primary)]',
+                      !onRowClick && 'hover:bg-surface2/40'
                     )}
                     onClick={() => onRowClick?.(row)}
                   >
                     {columns.map((col) => (
-                      <td key={col.key} className="px-4 py-3 text-sm text-foreground">
+                      <td key={col.key} className="px-4 py-3.5 text-sm text-foreground">
                         {col.render ? col.render(row[col.key], row) : row[col.key]}
                       </td>
                     ))}
@@ -152,24 +157,24 @@ export default function DataTable<T extends Record<string, any>>({
         </table>
       </div>
 
-      {/* Pagination */}
+      {/* Pagination — Glass buttons */}
       {totalPages > 1 && onPageChange && (
-        <div className="flex items-center justify-between p-4 border-t border-border/50">
-          <span className="text-xs text-muted-foreground">
+        <div className="flex items-center justify-between p-4 border-t border-border/40">
+          <span className="text-xs text-muted-foreground font-medium">
             صفحة {currentPage} من {totalPages}
           </span>
           <div className="flex items-center gap-1">
             <button
               onClick={() => onPageChange(1)}
               disabled={currentPage === 1}
-              className="p-2 rounded-lg hover:bg-surface2 disabled:opacity-30 transition-colors"
+              className="p-2 rounded-xl hover:bg-surface2/60 disabled:opacity-25 transition-all duration-300 hover:shadow-sm"
             >
               <ChevronsRight size={16} />
             </button>
             <button
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="p-2 rounded-lg hover:bg-surface2 disabled:opacity-30 transition-colors"
+              className="p-2 rounded-xl hover:bg-surface2/60 disabled:opacity-25 transition-all duration-300 hover:shadow-sm"
             >
               <ChevronRight size={16} />
             </button>
@@ -182,10 +187,10 @@ export default function DataTable<T extends Record<string, any>>({
                   key={page}
                   onClick={() => onPageChange(page)}
                   className={cn(
-                    'w-8 h-8 rounded-lg text-sm font-medium transition-all',
+                    'w-8 h-8 rounded-xl text-sm font-semibold transition-all duration-300',
                     page === currentPage
-                      ? 'bg-gold text-black'
-                      : 'hover:bg-surface2 text-muted-foreground'
+                      ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
+                      : 'hover:bg-surface2/60 text-muted-foreground hover:text-foreground'
                   )}
                 >
                   {page}
@@ -195,14 +200,14 @@ export default function DataTable<T extends Record<string, any>>({
             <button
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="p-2 rounded-lg hover:bg-surface2 disabled:opacity-30 transition-colors"
+              className="p-2 rounded-xl hover:bg-surface2/60 disabled:opacity-25 transition-all duration-300 hover:shadow-sm"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={() => onPageChange(totalPages)}
               disabled={currentPage === totalPages}
-              className="p-2 rounded-lg hover:bg-surface2 disabled:opacity-30 transition-colors"
+              className="p-2 rounded-xl hover:bg-surface2/60 disabled:opacity-25 transition-all duration-300 hover:shadow-sm"
             >
               <ChevronsLeft size={16} />
             </button>

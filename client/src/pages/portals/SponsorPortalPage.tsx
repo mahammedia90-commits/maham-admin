@@ -171,7 +171,7 @@ export default function SponsorPortalPage() {
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(201,168,76,0.06)" />
                         <XAxis dataKey="month" tick={{ fill: '#6B6560', fontSize: 11 }} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fill: '#6B6560', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${(v/1000000).toFixed(0)}M`} />
-                        <Tooltip contentStyle={{ background: 'rgba(26,25,23,0.95)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 12, color: '#F5F0E8', fontSize: 12 }} />
+                        <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--card-foreground)', fontSize: 12, backdropFilter: 'blur(20px)' }} />
                         <Area type="monotone" dataKey="قيمة" stroke="#C9A84C" fill="url(#goldGradSp)" strokeWidth={2} />
                       </AreaChart>
                     </ResponsiveContainer>
@@ -184,7 +184,7 @@ export default function SponsorPortalPage() {
                         <Pie data={tierDistribution} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
                           {tierDistribution.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                         </Pie>
-                        <Tooltip contentStyle={{ background: 'rgba(26,25,23,0.95)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 12, color: '#F5F0E8', fontSize: 11 }} />
+                        <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--card-foreground)', fontSize: 11, backdropFilter: 'blur(20px)' }} />
                       </RechartsPie>
                     </ResponsiveContainer>
                     <div className="space-y-2 mt-2">
@@ -379,7 +379,7 @@ export default function SponsorPortalPage() {
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(201,168,76,0.06)" />
                         <XAxis dataKey="tier" tick={{ fill: '#6B6560', fontSize: 11 }} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fill: '#6B6560', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${v}%`} />
-                        <Tooltip contentStyle={{ background: 'rgba(26,25,23,0.95)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 12, color: '#F5F0E8', fontSize: 12 }} />
+                        <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--card-foreground)', fontSize: 12, backdropFilter: 'blur(20px)' }} />
                         <Bar dataKey="roi" fill="#C9A84C" radius={[6, 6, 0, 0]} name="ROI %" />
                       </BarChart>
                     </ResponsiveContainer>

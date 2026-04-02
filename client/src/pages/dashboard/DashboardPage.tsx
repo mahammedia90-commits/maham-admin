@@ -103,11 +103,11 @@ export default function DashboardPage() {
         {/* Hero Banner */}
         <motion.div {...fadeUp} className="relative rounded-2xl overflow-hidden border border-gold/15">
           <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${DASHBOARD_HERO_URL})` }} />
-          <div className="absolute inset-0 bg-gradient-to-l from-black/90 via-black/70 to-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-l from-black/90 via-black/70 to-black/50 dark:from-black/90 dark:via-black/70 dark:to-black/50" />
           <div className="relative p-8 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">مركز القيادة</h1>
-              <p className="text-white/70 text-lg">المنظومة تعمل بكفاءة {aiHealthScore}% — العقل التنفيذي نشط</p>
+              <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">مركز القيادة</h1>
+              <p className="text-white/80 text-lg drop-shadow-md">المنظومة تعمل بكفاءة {aiHealthScore}% — العقل التنفيذي نشط</p>
             </div>
             <div className="flex items-center gap-4">
               <div className="relative w-24 h-24">
@@ -167,10 +167,10 @@ export default function DashboardPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   {activeChart === 'revenue' ? (
                     <BarChart data={revenueData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(201,168,76,0.08)" />
-                      <XAxis dataKey="month" stroke="rgba(201,168,76,0.4)" fontSize={11} />
-                      <YAxis stroke="rgba(201,168,76,0.4)" fontSize={11} tickFormatter={(v) => `${(v/1000).toFixed(0)}K`} />
-                      <Tooltip contentStyle={{ background: 'rgba(26,25,23,0.95)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', color: '#F5F0E8', fontFamily: 'Cairo', fontSize: '12px' }} formatter={(value: number) => [`${value.toLocaleString()} ر.س`, '']} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                      <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={11} />
+                      <YAxis stroke="var(--muted-foreground)" fontSize={11} tickFormatter={(v) => `${(v/1000).toFixed(0)}K`} />
+                      <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '12px', color: 'var(--card-foreground)', fontFamily: 'Cairo', fontSize: '12px', backdropFilter: 'blur(20px)' }} formatter={(value: number) => [`${value.toLocaleString()} ر.س`, '']} />
                       <Legend wrapperStyle={{ fontFamily: 'Cairo', fontSize: '11px' }} />
                       <Bar dataKey="revenue" name="الإيرادات" fill="#C9A84C" radius={[6, 6, 0, 0]} />
                       <Bar dataKey="expenses" name="المصروفات" fill="rgba(201,168,76,0.25)" radius={[6, 6, 0, 0]} />
@@ -178,10 +178,10 @@ export default function DashboardPage() {
                     </BarChart>
                   ) : activeChart === 'growth' ? (
                     <LineChart data={userGrowthData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(201,168,76,0.08)" />
-                      <XAxis dataKey="month" stroke="rgba(201,168,76,0.4)" fontSize={11} />
-                      <YAxis stroke="rgba(201,168,76,0.4)" fontSize={11} />
-                      <Tooltip contentStyle={{ background: 'rgba(26,25,23,0.95)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', color: '#F5F0E8', fontFamily: 'Cairo', fontSize: '12px' }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                      <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={11} />
+                      <YAxis stroke="var(--muted-foreground)" fontSize={11} />
+                      <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '12px', color: 'var(--card-foreground)', fontFamily: 'Cairo', fontSize: '12px', backdropFilter: 'blur(20px)' }} />
                       <Legend wrapperStyle={{ fontFamily: 'Cairo', fontSize: '11px' }} />
                       <Line type="monotone" dataKey="investors" name="المستثمرون" stroke="#60A5FA" strokeWidth={2} dot={{ fill: '#60A5FA', r: 4 }} />
                       <Line type="monotone" dataKey="merchants" name="التجار" stroke="#34D399" strokeWidth={2} dot={{ fill: '#34D399', r: 4 }} />
@@ -189,10 +189,10 @@ export default function DashboardPage() {
                     </LineChart>
                   ) : (
                     <AreaChart data={occupancyData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(201,168,76,0.08)" />
-                      <XAxis dataKey="month" stroke="rgba(201,168,76,0.4)" fontSize={11} />
-                      <YAxis stroke="rgba(201,168,76,0.4)" fontSize={11} domain={[60, 100]} tickFormatter={(v) => `${v}%`} />
-                      <Tooltip contentStyle={{ background: 'rgba(26,25,23,0.95)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', color: '#F5F0E8', fontFamily: 'Cairo', fontSize: '12px' }} formatter={(v: number) => [`${v}%`, 'معدل الإشغال']} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                      <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={11} />
+                      <YAxis stroke="var(--muted-foreground)" fontSize={11} domain={[60, 100]} tickFormatter={(v) => `${v}%`} />
+                      <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '12px', color: 'var(--card-foreground)', fontFamily: 'Cairo', fontSize: '12px', backdropFilter: 'blur(20px)' }} formatter={(v: number) => [`${v}%`, 'معدل الإشغال']} />
                       <defs>
                         <linearGradient id="occupancyGrad" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="#C9A84C" stopOpacity={0.3} />
@@ -216,7 +216,7 @@ export default function DashboardPage() {
                       <Pie data={revenueSourceData} cx="50%" cy="50%" innerRadius={50} outerRadius={75} dataKey="value" paddingAngle={3}>
                         {revenueSourceData.map((entry, idx) => (<Cell key={idx} fill={entry.color} />))}
                       </Pie>
-                      <Tooltip contentStyle={{ background: 'rgba(26,25,23,0.95)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', color: '#F5F0E8', fontFamily: 'Cairo', fontSize: '12px' }} formatter={(v: number) => [`${v}%`, '']} />
+                      <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '12px', color: 'var(--card-foreground)', fontFamily: 'Cairo', fontSize: '12px', backdropFilter: 'blur(20px)' }} formatter={(v: number) => [`${v}%`, '']} />
                     </RPieChart>
                   </ResponsiveContainer>
                 </div>
@@ -276,12 +276,12 @@ export default function DashboardPage() {
                       <span className="text-[10px] text-muted-foreground">{req.time}</span>
                     </div>
                     <div className="flex gap-2 mt-2">
-                      <button onClick={() => navigate('/requests')} className="flex-1 text-[10px] py-1 rounded-lg bg-gold/10 text-gold hover:bg-gold/20 transition-all border border-gold/15">مراجعة</button>
+                      <button onClick={() => navigate('/requests')} className="flex-1 text-[10px] py-1.5 rounded-lg bg-gold/12 text-gold hover:bg-gold/22 transition-all duration-300 border border-gold/20 hover:border-gold/35 font-semibold hover:shadow-[0_0_12px_oklch(0.78_0.11_85/12%)]">مراجعة</button>
                     </div>
                   </div>
                 ))}
               </div>
-              <button onClick={() => navigate('/requests')} className="w-full mt-3 text-xs text-gold/70 hover:text-gold transition-all py-2">عرض كل الطلبات ←</button>
+              <button onClick={() => navigate('/requests')} className="w-full mt-3 text-xs text-gold/70 hover:text-gold transition-all duration-300 py-2.5 rounded-xl hover:bg-gold/8 border border-transparent hover:border-gold/15 font-medium">عرض كل الطلبات ←</button>
             </div>
 
             {/* AI Alerts */}
