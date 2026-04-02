@@ -143,11 +143,31 @@ import NetworkingPage from "./pages/networking/NetworkingPage";
 // Sponsorship Opportunities
 import SponsorshipOppsPage from "./pages/sponsorship-opportunities/SponsorshipOppsPage";
 
-// Monitoring
-import MonitoringPage from "./pages/monitoring/MonitoringPage";
 
-// Government
-import GovernmentPage from "./pages/government/GovernmentPage";
+
+// Revenue Engine — Lead Generation
+import LeadGenerationPage from "./pages/lead-generation/LeadGenerationPage";
+
+// Revenue Engine — Pipeline Kanban
+import PipelinePage from "./pages/pipeline/PipelinePage";
+
+// Revenue Engine — Lead Detail
+import LeadDetailPage from "./pages/lead-detail/LeadDetailPage";
+
+// Revenue Engine — Follow-Ups
+import FollowUpsPage from "./pages/followups/FollowUpsPage";
+
+// Revenue Engine — Employee Enforcement
+import EnforcementPage from "./pages/enforcement/EnforcementPage";
+
+// Revenue Engine — Sales Performance
+import SalesPerformancePage from "./pages/sales-performance/SalesPerformancePage";
+
+// Revenue Engine — Payment Reminders
+import PaymentRemindersPage from "./pages/payment-reminders/PaymentRemindersPage";
+
+// Revenue Engine — AI Sales Intelligence
+import AISalesIntelligencePage from "./pages/ai-sales/AISalesIntelligencePage";
 
 function Router() {
   return (
@@ -290,11 +310,15 @@ function Router() {
       {/* Sponsorship Opportunities */}
       <Route path="/sponsorship-opportunities" component={SponsorshipOppsPage} />
 
-      {/* Monitoring */}
-      <Route path="/monitoring" component={MonitoringPage} />
-
-      {/* Government */}
-      <Route path="/government" component={GovernmentPage} />
+      {/* Revenue Engine */}
+      <Route path="/leads" component={LeadGenerationPage} />
+      <Route path="/pipeline" component={PipelinePage} />
+      <Route path="/leads/:id" component={LeadDetailPage} />
+      <Route path="/followups" component={FollowUpsPage} />
+      <Route path="/enforcement" component={EnforcementPage} />
+      <Route path="/sales-performance" component={SalesPerformancePage} />
+      <Route path="/payment-reminders" component={PaymentRemindersPage} />
+      <Route path="/ai/sales-intelligence" component={AISalesIntelligencePage} />
 
       {/* 404 */}
       <Route path="/404" component={NotFound} />

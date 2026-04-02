@@ -9,11 +9,12 @@ import {
   LayoutDashboard, Calendar, FileText, Users, DollarSign, Megaphone,
   TrendingUp, Settings, BarChart3, Brain, UserCheck, Briefcase,
   Scale, Cog, HeadphonesIcon, FolderKanban, Handshake, Building2,
-  Monitor, FileArchive, Shield, ChevronDown, LogOut, PanelRightClose,
-  PanelRightOpen, Workflow, Globe, ClipboardList, UsersRound,
+  FileArchive, Shield, ChevronDown, LogOut, PanelRightClose,
+  PanelRightOpen, Workflow, ClipboardList, UsersRound,
   MessageSquare, Bell, Fingerprint, MapPin, BookOpen, Clock,
   UserPlus, Target, Wrench, Image, Star, DoorOpen, Cpu,
-  Activity, Radio, Eye, Gift, PieChart, Network, Award, Landmark
+  Activity, Radio, Eye, Gift, PieChart, Network, Award,
+  Crosshair, Kanban, PhoneForwarded, ShieldAlert, Trophy, CreditCard, Zap
 } from 'lucide-react'
 
 interface NavItem {
@@ -79,6 +80,18 @@ const navSections: { title: string; items: NavItem[] }[] = [
     ],
   },
   {
+    title: 'محرك الإيرادات',
+    items: [
+      { label: 'توليد العملاء', icon: Crosshair, path: '/leads', badge: 'جديد' },
+      { label: 'أنبوب المبيعات', icon: Kanban, path: '/pipeline', badge: 'Kanban' },
+      { label: 'محرك المتابعات', icon: PhoneForwarded, path: '/followups' },
+      { label: 'متابعة الأداء', icon: ShieldAlert, path: '/enforcement' },
+      { label: 'أداء المبيعات', icon: Trophy, path: '/sales-performance' },
+      { label: 'تذكيرات الدفع', icon: CreditCard, path: '/payment-reminders' },
+      { label: 'ذكاء المبيعات AI', icon: Zap, path: '/ai/sales-intelligence', badge: 'AI' },
+    ],
+  },
+  {
     title: 'الاستثمار والرعاية',
     items: [
       { label: 'الرعاة والشركاء', icon: Handshake, path: '/sponsors' },
@@ -123,8 +136,6 @@ const navSections: { title: string; items: NavItem[] }[] = [
     items: [
       { label: 'التوأم الرقمي', icon: Cpu, path: '/digital-twin' },
       { label: 'الاقتصاد الحي', icon: Activity, path: '/live-economy' },
-      { label: 'مراقبة النظام', icon: Monitor, path: '/monitoring' },
-      { label: 'الخدمات الحكومية', icon: Landmark, path: '/government' },
     ],
   },
   {
