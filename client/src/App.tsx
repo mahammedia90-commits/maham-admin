@@ -148,6 +148,20 @@ import SponsorshipOppsPage from "./pages/sponsorship-opportunities/SponsorshipOp
 
 
 
+// Restored Pages
+import BadgesPage from "./pages/badges/BadgesPage";
+import BannersPage from "./pages/banners/BannersPage";
+import BusinessProfilesPage from "./pages/business-profiles/BusinessProfilesPage";
+import CategoriesPage from "./pages/categories/CategoriesPage";
+import CitiesPage from "./pages/cities/CitiesPage";
+import CmsPagesPage from "./pages/cms-pages/CmsPagesPage";
+import ExhibitionMapPage from "./pages/exhibition-map/ExhibitionMapPage";
+import FaqsPage from "./pages/faqs/FaqsPage";
+import PackagesPage from "./pages/packages/PackagesPage";
+import SponsorBenefitsPage from "./pages/sponsor-benefits/SponsorBenefitsPage";
+import GovernmentPage from "./pages/government/GovernmentPage";
+import MonitoringPage from "./pages/monitoring/MonitoringPage";
+
 // Revenue Engine — Lead Generation
 import LeadGenerationPage from "./pages/lead-generation/LeadGenerationPage";
 
@@ -313,6 +327,20 @@ function Router() {
 
       {/* Sponsorship Opportunities */}
       <Route path="/sponsorship-opportunities" component={SponsorshipOppsPage} />
+
+      {/* Restored Pages */}
+      <Route path="/badges" component={BadgesPage} />
+      <Route path="/banners" component={BannersPage} />
+      <Route path="/business-profiles" component={BusinessProfilesPage} />
+      <Route path="/categories" component={CategoriesPage} />
+      <Route path="/cities" component={CitiesPage} />
+      <Route path="/cms-pages" component={CmsPagesPage} />
+      <Route path="/exhibition-map" component={ExhibitionMapPage} />
+      <Route path="/faqs" component={FaqsPage} />
+      <Route path="/packages" component={PackagesPage} />
+      <Route path="/sponsor-benefits" component={SponsorBenefitsPage} />
+      <Route path="/government" component={GovernmentPage} />
+      <Route path="/monitoring" component={MonitoringPage} />
 
       {/* Revenue Engine */}
       <Route path="/leads" component={LeadGenerationPage} />

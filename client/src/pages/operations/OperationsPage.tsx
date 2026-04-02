@@ -1,265 +1,296 @@
-/*
- * OperationsPage — إدارة العمليات
- * تابات: نظرة عامة | المهام | اللوجستيات | الأمن والسلامة | الجدول الزمني
+/**
+ * ═══════════════════════════════════════════════════════
+ * Nour Theme — إدارة العمليات التشغيلية
+ * Features: مهام، تتبع تقدم، فرق، Kanban، CRUD
+ * ═══════════════════════════════════════════════════════
  */
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Settings2, ClipboardList, Truck, Shield, Calendar, Users,
-  CheckCircle, Clock, AlertTriangle, MapPin, Plus, BarChart3,
-  Package, Wrench, Zap, Activity, Eye
-} from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RPieChart, Pie, Cell } from 'recharts';
-import AdminLayout from '@/components/layout/AdminLayout';
-import PageHeader from '@/components/shared/PageHeader';
-import DataTable, { Column } from '@/components/shared/DataTable';
-import StatsCard from '@/components/shared/StatsCard';
-import StatusBadge from '@/components/shared/StatusBadge';
-import { Button } from '@/components/ui/button';
-import { cn, formatDate } from '@/lib/utils';
-import { toast } from 'sonner';
+  Settings2, Truck, Package, CheckCircle, AlertTriangle, Clock,
+  MapPin, Users, Wrench, ClipboardList, Activity, Zap, Plus,
+  Eye, Edit, Trash2, X, ArrowRight, Filter
+} from 'lucide-react'
+import AdminLayout from '@/components/layout/AdminLayout'
+import PageHeader from '@/components/shared/PageHeader'
+import StatsCard from '@/components/shared/StatsCard'
+import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 interface Task {
-  id: number; title: string; assignee: string; department: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'overdue';
-  priority: 'high' | 'medium' | 'low'; dueDate: string; event: string; progress: number;
+  id: number; title: string; event: string; assignee: string; status: string
+  priority: string; progress: number; dueDate: string; notes: string
 }
 
-const mockTasks: Task[] = [
-  { id: 1, title: 'تجهيز القاعة الرئيسية — الكهرباء والإنارة', assignee: 'فريق الصيانة', department: 'اللوجستيات', status: 'in_progress', priority: 'high', dueDate: '2026-04-05', event: 'معرض التقنية', progress: 65 },
-  { id: 2, title: 'تركيب أنظمة الصوت والعرض', assignee: 'شركة AV Solutions', department: 'التقنية', status: 'pending', priority: 'high', dueDate: '2026-04-08', event: 'معرض التقنية', progress: 0 },
-  { id: 3, title: 'تنسيق مواقف السيارات VIP', assignee: 'فريق الأمن', department: 'الأمن', status: 'completed', priority: 'medium', dueDate: '2026-04-01', event: 'معرض التقنية', progress: 100 },
-  { id: 4, title: 'توزيع أجنحة العارضين', assignee: 'فريق التشغيل', department: 'العمليات', status: 'in_progress', priority: 'high', dueDate: '2026-04-06', event: 'معرض التقنية', progress: 40 },
-  { id: 5, title: 'فحص أنظمة الإطفاء', assignee: 'شركة السلامة', department: 'الأمن', status: 'completed', priority: 'high', dueDate: '2026-03-30', event: 'معرض التقنية', progress: 100 },
-  { id: 6, title: 'تجهيز منطقة الطعام والشراب', assignee: 'فريق F&B', department: 'الضيافة', status: 'pending', priority: 'medium', dueDate: '2026-04-10', event: 'معرض التقنية', progress: 0 },
-  { id: 7, title: 'طباعة اللافتات والبانرات', assignee: 'مطبعة الإبداع', department: 'التسويق', status: 'overdue', priority: 'medium', dueDate: '2026-03-28', event: 'معرض التقنية', progress: 80 },
-  { id: 8, title: 'تنسيق نقل المعدات الثقيلة', assignee: 'شركة النقل', department: 'اللوجستيات', status: 'pending', priority: 'low', dueDate: '2026-04-12', event: 'معرض الأغذية', progress: 0 },
-];
+const priorityColors: Record<string, string> = { high: 'bg-danger/10 text-danger', medium: 'bg-warning/10 text-warning', low: 'bg-info/10 text-info' }
+const priorityLabels: Record<string, string> = { high: 'عالية', medium: 'متوسطة', low: 'منخفضة' }
+const statusLabels: Record<string, string> = { pending: 'معلقة', in_progress: 'قيد التنفيذ', completed: 'مكتملة', delayed: 'متأخرة' }
+const statusColors: Record<string, string> = { pending: 'bg-chrome/10 text-chrome', in_progress: 'bg-gold/10 text-gold', completed: 'bg-success/10 text-success', delayed: 'bg-danger/10 text-danger' }
 
-interface LogisticsItem {
-  id: number; item: string; supplier: string; quantity: number;
-  status: 'delivered' | 'in_transit' | 'ordered' | 'pending';
-  expectedDate: string; event: string; tracking: string;
-}
-
-const mockLogistics: LogisticsItem[] = [
-  { id: 1, item: 'أجنحة عرض معيارية (3x3م)', supplier: 'شركة المعارض المتحدة', quantity: 120, status: 'delivered', expectedDate: '2026-03-25', event: 'معرض التقنية', tracking: 'SA-2026-4521' },
-  { id: 2, item: 'شاشات LED كبيرة', supplier: 'AV Solutions', quantity: 15, status: 'in_transit', expectedDate: '2026-04-02', event: 'معرض التقنية', tracking: 'SA-2026-4522' },
-  { id: 3, item: 'كراسي ومقاعد VIP', supplier: 'مفروشات الرياض', quantity: 500, status: 'ordered', expectedDate: '2026-04-05', event: 'معرض التقنية', tracking: 'SA-2026-4523' },
-  { id: 4, item: 'أنظمة تكييف متنقلة', supplier: 'شركة التبريد', quantity: 20, status: 'delivered', expectedDate: '2026-03-20', event: 'معرض التقنية', tracking: 'SA-2026-4524' },
-  { id: 5, item: 'معدات مطبخ صناعي', supplier: 'معدات الضيافة', quantity: 8, status: 'pending', expectedDate: '2026-04-08', event: 'معرض الأغذية', tracking: 'SA-2026-4525' },
-];
-
-const securityChecks = [
-  { area: 'المدخل الرئيسي', status: 'pass' as const, inspector: 'محمد الأمن', date: '2026-03-30', notes: 'جميع البوابات تعمل' },
-  { area: 'القاعة A', status: 'pass' as const, inspector: 'أحمد السلامة', date: '2026-03-29', notes: 'أنظمة الإطفاء مفعلة' },
-  { area: 'القاعة B', status: 'warning' as const, inspector: 'أحمد السلامة', date: '2026-03-29', notes: 'مخرج طوارئ يحتاج صيانة' },
-  { area: 'مواقف السيارات', status: 'pass' as const, inspector: 'محمد الأمن', date: '2026-03-28', notes: 'الإنارة كاملة' },
-  { area: 'منطقة F&B', status: 'fail' as const, inspector: 'فهد الصحة', date: '2026-03-28', notes: 'يحتاج تصريح صحي' },
-];
-
-const tasksByDept = [
-  { dept: 'اللوجستيات', total: 15, completed: 10 },
-  { dept: 'الأمن', total: 12, completed: 9 },
-  { dept: 'التقنية', total: 8, completed: 5 },
-  { dept: 'الضيافة', total: 6, completed: 3 },
-  { dept: 'التسويق', total: 10, completed: 7 },
-];
-
-const priorityData = [
-  { name: 'عالية', value: 4, color: '#EF4444' },
-  { name: 'متوسطة', value: 3, color: '#F59E0B' },
-  { name: 'منخفضة', value: 1, color: '#10B981' },
-];
-
-type TabKey = 'overview' | 'tasks' | 'logistics' | 'security' | 'timeline';
-const tabs: { key: TabKey; label: string; icon: any }[] = [
-  { key: 'overview', label: 'نظرة عامة', icon: Activity },
-  { key: 'tasks', label: 'المهام', icon: ClipboardList },
-  { key: 'logistics', label: 'اللوجستيات', icon: Truck },
-  { key: 'security', label: 'الأمن والسلامة', icon: Shield },
-  { key: 'timeline', label: 'الجدول الزمني', icon: Calendar },
-];
-
-function OverviewTab() {
-  const completed = mockTasks.filter(t => t.status === 'completed').length;
-  const overdue = mockTasks.filter(t => t.status === 'overdue').length;
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="إجمالي المهام" value={mockTasks.length} icon={ClipboardList} />
-        <StatsCard title="مكتملة" value={completed} icon={CheckCircle} trend={Math.round((completed / mockTasks.length) * 100)} delay={0.1} />
-        <StatsCard title="متأخرة" value={overdue} icon={AlertTriangle} delay={0.2} />
-        <StatsCard title="جاهزية التشغيل" value="72%" icon={Zap} delay={0.3} />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass-card p-5 lg:col-span-2">
-          <h3 className="text-sm font-bold mb-4">تقدم الأقسام</h3>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={tasksByDept} layout="vertical"><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" /><XAxis type="number" tick={{ fontSize: 10, fill: '#888' }} /><YAxis dataKey="dept" type="category" tick={{ fontSize: 10, fill: '#888' }} width={80} /><Tooltip contentStyle={{ background: '#1a1917', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', fontSize: '11px', color: '#fff' }} /><Bar dataKey="completed" fill="#C9A84C" name="مكتمل" radius={[0, 4, 4, 0]} /><Bar dataKey="total" fill="rgba(201,168,76,0.2)" name="الإجمالي" radius={[0, 4, 4, 0]} /></BarChart>
-          </ResponsiveContainer>
-        </motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="glass-card p-5">
-          <h3 className="text-sm font-bold mb-4">توزيع الأولوية</h3>
-          <ResponsiveContainer width="100%" height={160}>
-            <RPieChart><Pie data={priorityData} cx="50%" cy="50%" innerRadius={40} outerRadius={65} dataKey="value" stroke="none">{priorityData.map((e, i) => <Cell key={i} fill={e.color} />)}</Pie></RPieChart>
-          </ResponsiveContainer>
-          <div className="space-y-1 mt-2">{priorityData.map(p => <div key={p.name} className="flex items-center justify-between text-xs"><span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full" style={{ background: p.color }} />{p.name}</span><span className="font-mono">{p.value}</span></div>)}</div>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
-
-function TasksTab() {
-  const [search, setSearch] = useState('');
-  const [filterPriority, setFilterPriority] = useState('all');
-  const filtered = mockTasks.filter(t => {
-    const ms = t.title.includes(search) || t.assignee.includes(search);
-    const mf = filterPriority === 'all' || t.priority === filterPriority;
-    return ms && mf;
-  });
-  return (
-    <div className="space-y-4">
-      <div className="flex gap-2 flex-wrap">
-        {['all', 'high', 'medium', 'low'].map(p => (
-          <button key={p} onClick={() => setFilterPriority(p)} className={cn('px-3 py-1.5 rounded-lg text-xs transition-colors', filterPriority === p ? 'bg-accent/20 text-accent border border-accent/30' : 'bg-card/50 text-muted-foreground border border-border/50 hover:bg-card')}>
-            {p === 'all' ? 'الكل' : p === 'high' ? 'عالية' : p === 'medium' ? 'متوسطة' : 'منخفضة'}
-          </button>
-        ))}
-      </div>
-      <div className="space-y-3">
-        {filtered.map((task, i) => (
-          <motion.div key={task.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }} className="glass-card p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', task.status === 'completed' ? 'bg-success/10 text-success' : task.status === 'in_progress' ? 'bg-accent/10 text-accent' : task.status === 'overdue' ? 'bg-danger/10 text-danger' : 'bg-card text-muted-foreground')}>
-                  {task.status === 'completed' ? <CheckCircle className="w-4 h-4" /> : task.status === 'in_progress' ? <Wrench className="w-4 h-4" /> : task.status === 'overdue' ? <AlertTriangle className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
-                </div>
-                <div>
-                  <p className="text-sm font-medium">{task.title}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-xs text-muted-foreground">{task.assignee}</span>
-                    <span className="text-xs bg-card/80 px-1.5 py-0.5 rounded border border-border/50">{task.department}</span>
-                    <span className={cn('text-[10px] px-1.5 py-0.5 rounded-full', task.priority === 'high' ? 'bg-danger/15 text-danger' : task.priority === 'medium' ? 'bg-warning/15 text-warning' : 'bg-success/15 text-success')}>{task.priority === 'high' ? 'عالية' : task.priority === 'medium' ? 'متوسطة' : 'منخفضة'}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="w-24">
-                  <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1"><span>التقدم</span><span>{task.progress}%</span></div>
-                  <div className="h-1.5 rounded-full bg-card/80 overflow-hidden"><div className={cn('h-full rounded-full transition-all', task.progress === 100 ? 'bg-success' : 'bg-accent')} style={{ width: `${task.progress}%` }} /></div>
-                </div>
-                <span className="text-xs text-muted-foreground">{formatDate(task.dueDate)}</span>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function LogisticsTab() {
-  const [search, setSearch] = useState('');
-  const columns: Column<LogisticsItem>[] = [
-    { key: 'item', label: 'الصنف', render: (_, r) => <div><p className="font-medium text-sm">{r.item}</p><p className="text-xs text-muted-foreground">{r.event} — {r.tracking}</p></div> },
-    { key: 'supplier', label: 'المورد', render: v => <span className="text-xs">{v}</span> },
-    { key: 'quantity', label: 'الكمية', render: v => <span className="font-mono text-sm">{v}</span> },
-    { key: 'status', label: 'الحالة', render: v => <span className={`text-xs px-2 py-0.5 rounded-full ${v === 'delivered' ? 'bg-success/15 text-success' : v === 'in_transit' ? 'bg-info/15 text-info' : v === 'ordered' ? 'bg-warning/15 text-warning' : 'bg-muted/50 text-muted-foreground'}`}>{v === 'delivered' ? 'تم التسليم' : v === 'in_transit' ? 'في الطريق' : v === 'ordered' ? 'تم الطلب' : 'قيد الانتظار'}</span> },
-    { key: 'expectedDate', label: 'التاريخ المتوقع', render: v => <span className="text-xs">{formatDate(v)}</span> },
-  ];
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatsCard title="إجمالي الأصناف" value={mockLogistics.length} icon={Package} />
-        <StatsCard title="تم التسليم" value={mockLogistics.filter(l => l.status === 'delivered').length} icon={CheckCircle} delay={0.1} />
-        <StatsCard title="في الطريق" value={mockLogistics.filter(l => l.status === 'in_transit').length} icon={Truck} delay={0.2} />
-        <StatsCard title="قيد الانتظار" value={mockLogistics.filter(l => l.status === 'pending').length} icon={Clock} delay={0.3} />
-      </div>
-      <DataTable columns={columns} data={mockLogistics.filter(l => l.item.includes(search) || l.supplier.includes(search))} searchValue={search} onSearch={setSearch} searchPlaceholder="بحث في اللوجستيات..." emptyMessage="لا توجد أصناف" />
-    </div>
-  );
-}
-
-function SecurityTab() {
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatsCard title="فحوصات ناجحة" value={securityChecks.filter(s => s.status === 'pass').length} icon={CheckCircle} />
-        <StatsCard title="تحذيرات" value={securityChecks.filter(s => s.status === 'warning').length} icon={AlertTriangle} delay={0.1} />
-        <StatsCard title="فشل" value={securityChecks.filter(s => s.status === 'fail').length} icon={Shield} delay={0.2} />
-      </div>
-      <div className="space-y-3">
-        {securityChecks.map((s, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }} className="glass-card p-4 flex items-center gap-4">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${s.status === 'pass' ? 'bg-success/10 border border-success/20' : s.status === 'warning' ? 'bg-warning/10 border border-warning/20' : 'bg-danger/10 border border-danger/20'}`}>
-              {s.status === 'pass' ? <CheckCircle className="w-4 h-4 text-success" /> : s.status === 'warning' ? <AlertTriangle className="w-4 h-4 text-warning" /> : <Shield className="w-4 h-4 text-danger" />}
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between"><p className="font-medium text-sm">{s.area}</p><span className={`text-xs px-2 py-0.5 rounded-full ${s.status === 'pass' ? 'bg-success/15 text-success' : s.status === 'warning' ? 'bg-warning/15 text-warning' : 'bg-danger/15 text-danger'}`}>{s.status === 'pass' ? 'ناجح' : s.status === 'warning' ? 'تحذير' : 'فشل'}</span></div>
-              <p className="text-xs text-muted-foreground mt-1">{s.notes}</p>
-              <p className="text-[10px] text-muted-foreground mt-1">{s.inspector} — {formatDate(s.date)}</p>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function TimelineTab() {
-  const timeline = [
-    { date: '2026-03-15', title: 'بدء التجهيزات الأولية', status: 'completed' as const },
-    { date: '2026-03-25', title: 'تسليم المعدات الأساسية', status: 'completed' as const },
-    { date: '2026-04-01', title: 'تركيب الأجنحة', status: 'in_progress' as const },
-    { date: '2026-04-05', title: 'فحص الأنظمة الكهربائية', status: 'pending' as const },
-    { date: '2026-04-08', title: 'تركيب أنظمة الصوت والعرض', status: 'pending' as const },
-    { date: '2026-04-10', title: 'تجهيز منطقة F&B', status: 'pending' as const },
-    { date: '2026-04-12', title: 'الفحص النهائي والتسليم', status: 'pending' as const },
-    { date: '2026-04-15', title: 'افتتاح المعرض', status: 'pending' as const },
-  ];
-  return (
-    <div className="space-y-4">
-      <div className="relative">
-        {timeline.map((t, i) => (
-          <motion.div key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.08 * i }} className="flex gap-4 mb-4 last:mb-0">
-            <div className="flex flex-col items-center">
-              <div className={`w-4 h-4 rounded-full border-2 shrink-0 ${t.status === 'completed' ? 'bg-success border-success' : t.status === 'in_progress' ? 'bg-accent border-accent animate-pulse' : 'bg-transparent border-muted-foreground/30'}`} />
-              {i < timeline.length - 1 && <div className={`w-0.5 flex-1 mt-1 ${t.status === 'completed' ? 'bg-success/30' : 'bg-border/30'}`} />}
-            </div>
-            <div className={`glass-card p-3 flex-1 ${t.status === 'in_progress' ? 'border-accent/30' : ''}`}>
-              <div className="flex items-center justify-between">
-                <p className={`text-sm font-medium ${t.status === 'completed' ? 'text-muted-foreground line-through' : ''}`}>{t.title}</p>
-                <span className="text-xs text-muted-foreground">{formatDate(t.date)}</span>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-}
+const demoTasks: Task[] = [
+  { id: 1, title: 'تجهيز القاعة الرئيسية', event: 'معرض الرياض 2026', assignee: 'فريق اللوجستيات', status: 'in_progress', priority: 'high', progress: 65, dueDate: '2026-04-10', notes: 'تركيب الأرضيات والإضاءة' },
+  { id: 2, title: 'تركيب أنظمة الصوت', event: 'معرض الرياض 2026', assignee: 'فريق التقنية', status: 'pending', priority: 'high', progress: 0, dueDate: '2026-04-12', notes: 'انتظار وصول المعدات' },
+  { id: 3, title: 'طباعة المواد الدعائية', event: 'معرض الرياض 2026', assignee: 'فريق التسويق', status: 'completed', priority: 'medium', progress: 100, dueDate: '2026-03-28', notes: 'تم التسليم' },
+  { id: 4, title: 'تنسيق الأمن والسلامة', event: 'معرض الرياض 2026', assignee: 'فريق الأمن', status: 'in_progress', priority: 'high', progress: 40, dueDate: '2026-04-08', notes: 'تدريب الفريق جاري' },
+  { id: 5, title: 'إعداد منطقة الطعام', event: 'معرض الرياض 2026', assignee: 'فريق الضيافة', status: 'pending', priority: 'medium', progress: 0, dueDate: '2026-04-14', notes: 'تنسيق مع الموردين' },
+  { id: 6, title: 'اختبار شبكة الإنترنت', event: 'معرض الرياض 2026', assignee: 'فريق IT', status: 'completed', priority: 'low', progress: 100, dueDate: '2026-03-25', notes: 'سرعة ممتازة' },
+  { id: 7, title: 'تجهيز مواقف السيارات', event: 'معرض الرياض 2026', assignee: 'فريق اللوجستيات', status: 'delayed', priority: 'high', progress: 20, dueDate: '2026-04-05', notes: 'تأخر بسبب الأمطار' },
+  { id: 8, title: 'تركيب اللافتات الإرشادية', event: 'معرض الرياض 2026', assignee: 'فريق التسويق', status: 'in_progress', priority: 'medium', progress: 50, dueDate: '2026-04-09', notes: 'تم تركيب 50% من اللافتات' },
+  { id: 9, title: 'فحص أنظمة الإطفاء', event: 'معرض الرياض 2026', assignee: 'فريق الأمن', status: 'completed', priority: 'high', progress: 100, dueDate: '2026-03-30', notes: 'اجتاز الفحص بنجاح' },
+  { id: 10, title: 'تجهيز غرف VIP', event: 'معرض الرياض 2026', assignee: 'فريق الضيافة', status: 'in_progress', priority: 'high', progress: 75, dueDate: '2026-04-11', notes: 'تأثيث وتجهيز' },
+]
 
 export default function OperationsPage() {
-  const [activeTab, setActiveTab] = useState<TabKey>('overview');
+  const [view, setView] = useState<'kanban' | 'list'>('kanban')
+  const [tasks, setTasks] = useState(demoTasks)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [detailTask, setDetailTask] = useState<Task | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null)
+  const [filterPriority, setFilterPriority] = useState('all')
+  const [newTask, setNewTask] = useState({ title: '', assignee: '', priority: 'medium', dueDate: '', notes: '' })
+
+  const stats = useMemo(() => ({
+    total: tasks.length,
+    completed: tasks.filter(t => t.status === 'completed').length,
+    inProgress: tasks.filter(t => t.status === 'in_progress').length,
+    delayed: tasks.filter(t => t.status === 'delayed').length,
+    avgProgress: Math.round(tasks.reduce((s, t) => s + t.progress, 0) / tasks.length),
+  }), [tasks])
+
+  const filtered = useMemo(() => filterPriority === 'all' ? tasks : tasks.filter(t => t.priority === filterPriority), [tasks, filterPriority])
+
+  const kanbanColumns = [
+    { key: 'pending', label: 'معلقة', icon: Clock, color: 'border-chrome/30' },
+    { key: 'in_progress', label: 'قيد التنفيذ', icon: Activity, color: 'border-gold/30' },
+    { key: 'delayed', label: 'متأخرة', icon: AlertTriangle, color: 'border-danger/30' },
+    { key: 'completed', label: 'مكتملة', icon: CheckCircle, color: 'border-success/30' },
+  ]
+
+  const handleAdd = () => {
+    if (!newTask.title) { toast.error('يرجى إدخال عنوان المهمة'); return }
+    const t: Task = {
+      id: Math.max(...tasks.map(t => t.id)) + 1, title: newTask.title, event: 'معرض الرياض 2026',
+      assignee: newTask.assignee || 'غير محدد', status: 'pending', priority: newTask.priority,
+      progress: 0, dueDate: newTask.dueDate || '2026-04-30', notes: newTask.notes,
+    }
+    setTasks(prev => [t, ...prev])
+    toast.success(`تمت إضافة المهمة: ${t.title}`)
+    setShowAddModal(false)
+    setNewTask({ title: '', assignee: '', priority: 'medium', dueDate: '', notes: '' })
+  }
+
+  const handleDelete = (id: number) => {
+    const t = tasks.find(t => t.id === id)
+    setTasks(prev => prev.filter(t => t.id !== id))
+    toast.success(`تم حذف المهمة: ${t?.title}`)
+    setDeleteConfirm(null)
+  }
+
+  const moveTask = (id: number, newStatus: string) => {
+    setTasks(prev => prev.map(t => {
+      if (t.id !== id) return t
+      const progress = newStatus === 'completed' ? 100 : newStatus === 'in_progress' ? Math.max(t.progress, 10) : t.progress
+      toast.info(`تم نقل "${t.title}" إلى: ${statusLabels[newStatus]}`)
+      return { ...t, status: newStatus, progress }
+    }))
+  }
+
+  const updateProgress = (id: number, delta: number) => {
+    setTasks(prev => prev.map(t => {
+      if (t.id !== id) return t
+      const newP = Math.max(0, Math.min(100, t.progress + delta))
+      const newStatus = newP === 100 ? 'completed' : newP > 0 ? 'in_progress' : t.status
+      return { ...t, progress: newP, status: newStatus }
+    }))
+  }
+
   return (
     <AdminLayout>
-      <div className="p-6 space-y-6">
-        <PageHeader title="إدارة العمليات" subtitle="المهام واللوجستيات والأمن والسلامة والجدول الزمني" actions={<Button onClick={() => toast.info('إضافة مهمة — قريباً')} className="bg-accent hover:bg-accent/90 text-accent-foreground gap-2"><Plus className="w-4 h-4" /> مهمة جديدة</Button>} />
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
-          {tabs.map(t => <button key={t.key} onClick={() => setActiveTab(t.key)} className={cn('flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all', activeTab === t.key ? 'bg-accent/15 text-accent border border-accent/25' : 'bg-card/50 text-muted-foreground border border-border/50 hover:bg-card hover:text-foreground')}><t.icon className="w-4 h-4" />{t.label}</button>)}
-        </div>
-        <AnimatePresence mode="wait">
-          <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-            {activeTab === 'overview' && <OverviewTab />}
-            {activeTab === 'tasks' && <TasksTab />}
-            {activeTab === 'logistics' && <LogisticsTab />}
-            {activeTab === 'security' && <SecurityTab />}
-            {activeTab === 'timeline' && <TimelineTab />}
-          </motion.div>
-        </AnimatePresence>
+      <PageHeader
+        title="إدارة العمليات التشغيلية"
+        subtitle={`${stats.total} مهمة — ${stats.completed} مكتملة — التقدم العام: ${stats.avgProgress}%`}
+        actions={
+          <div className="flex items-center gap-2">
+            <div className="flex items-center bg-surface2 rounded-xl p-0.5">
+              <button onClick={() => setView('kanban')} className={cn('h-8 px-3 rounded-lg text-xs font-medium transition-all', view === 'kanban' ? 'bg-gold/10 text-gold' : 'text-muted-foreground')}>Kanban</button>
+              <button onClick={() => setView('list')} className={cn('h-8 px-3 rounded-lg text-xs font-medium transition-all', view === 'list' ? 'bg-gold/10 text-gold' : 'text-muted-foreground')}>قائمة</button>
+            </div>
+            <button onClick={() => setShowAddModal(true)} className="h-9 px-4 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all flex items-center gap-2">
+              <Plus size={16} /> مهمة جديدة
+            </button>
+          </div>
+        }
+      />
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
+        <StatsCard title="إجمالي المهام" value={String(stats.total)} icon={ClipboardList} delay={0} />
+        <StatsCard title="قيد التنفيذ" value={String(stats.inProgress)} icon={Activity} trend={3} trendLabel="هذا الأسبوع" delay={0.05} />
+        <StatsCard title="مكتملة" value={String(stats.completed)} icon={CheckCircle} delay={0.1} />
+        <StatsCard title="متأخرة" value={String(stats.delayed)} icon={AlertTriangle} delay={0.15} />
       </div>
+
+      {/* شريط التقدم العام */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="glass-card p-4 mb-5">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-bold text-foreground">التقدم العام — معرض الرياض 2026</h3>
+          <span className="text-sm font-bold font-mono text-gold">{stats.avgProgress}%</span>
+        </div>
+        <div className="w-full h-3 rounded-full bg-surface3">
+          <motion.div initial={{ width: 0 }} animate={{ width: `${stats.avgProgress}%` }} transition={{ duration: 1, ease: 'easeOut' }}
+            className={cn('h-full rounded-full', stats.avgProgress >= 80 ? 'bg-success' : stats.avgProgress >= 50 ? 'bg-gold' : 'bg-warning')} />
+        </div>
+      </motion.div>
+
+      {view === 'kanban' ? (
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+          {kanbanColumns.map((col, ci) => {
+            const colTasks = filtered.filter(t => t.status === col.key)
+            return (
+              <motion.div key={col.key} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + ci * 0.05 }}
+                className={cn('glass-card p-3 border', col.color)}>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="flex items-center gap-1.5 text-xs font-bold text-foreground"><col.icon size={13} />{col.label}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-surface2 text-muted-foreground">{colTasks.length}</span>
+                </div>
+                <div className="space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar">
+                  {colTasks.map(t => (
+                    <div key={t.id} onClick={() => setDetailTask(t)} className="p-3 rounded-lg bg-surface2/50 border border-border/20 hover:border-gold/20 transition-all cursor-pointer group">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs font-medium text-foreground line-clamp-1">{t.title}</span>
+                        <span className={cn('text-[9px] px-1.5 py-0.5 rounded-full', priorityColors[t.priority])}>{priorityLabels[t.priority]}</span>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mb-2">{t.assignee}</p>
+                      <div className="flex items-center gap-1.5">
+                        <div className="flex-1 h-1 rounded-full bg-surface3">
+                          <div className={cn('h-full rounded-full', t.progress >= 80 ? 'bg-success' : t.progress >= 40 ? 'bg-gold' : 'bg-chrome')} style={{ width: `${t.progress}%` }} />
+                        </div>
+                        <span className="text-[9px] font-mono text-muted-foreground">{t.progress}%</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+      ) : (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card overflow-hidden">
+          <div className="p-4 border-b border-border/50 flex items-center gap-2">
+            {[{ key: 'all', label: 'الكل' }, { key: 'high', label: 'عالية' }, { key: 'medium', label: 'متوسطة' }, { key: 'low', label: 'منخفضة' }].map(f => (
+              <button key={f.key} onClick={() => setFilterPriority(f.key)} className={cn('h-7 px-2.5 rounded-lg text-[11px] font-medium transition-all', filterPriority === f.key ? 'bg-gold/10 text-gold border border-gold/20' : 'text-muted-foreground hover:text-foreground')}>{f.label}</button>
+            ))}
+          </div>
+          <div className="overflow-x-auto scrollbar-hide">
+            <table className="w-full">
+              <thead><tr className="border-b border-border/50">
+                <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">المهمة</th>
+                <th className="px-3 py-3 text-right text-xs font-semibold text-muted-foreground">المسؤول</th>
+                <th className="px-3 py-3 text-right text-xs font-semibold text-muted-foreground">الحالة</th>
+                <th className="px-3 py-3 text-right text-xs font-semibold text-muted-foreground">الأولوية</th>
+                <th className="px-3 py-3 text-center text-xs font-semibold text-muted-foreground">التقدم</th>
+                <th className="px-3 py-3 text-center text-xs font-semibold text-muted-foreground">إجراءات</th>
+              </tr></thead>
+              <tbody>
+                {filtered.map((t, idx) => (
+                  <motion.tr key={t.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: idx * 0.02 }} className="border-b border-border/30 hover:bg-surface2/50 transition-colors">
+                    <td className="px-4 py-3"><p className="text-sm font-medium text-foreground">{t.title}</p><p className="text-[10px] text-muted-foreground">{t.event}</p></td>
+                    <td className="px-3 py-3 text-xs text-muted-foreground">{t.assignee}</td>
+                    <td className="px-3 py-3"><span className={cn('text-xs px-2 py-0.5 rounded-full', statusColors[t.status])}>{statusLabels[t.status]}</span></td>
+                    <td className="px-3 py-3"><span className={cn('text-xs px-2 py-0.5 rounded-full', priorityColors[t.priority])}>{priorityLabels[t.priority]}</span></td>
+                    <td className="px-3 py-3">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <div className="w-14 h-1.5 rounded-full bg-surface3"><div className={cn('h-full rounded-full', t.progress >= 80 ? 'bg-success' : t.progress >= 40 ? 'bg-gold' : 'bg-chrome')} style={{ width: `${t.progress}%` }} /></div>
+                        <span className="text-[10px] font-mono">{t.progress}%</span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3">
+                      <div className="flex items-center justify-center gap-0.5">
+                        <button onClick={() => setDetailTask(t)} className="p-1.5 rounded-lg hover:bg-surface2 text-muted-foreground hover:text-gold transition-colors"><Eye size={14} /></button>
+                        <button onClick={() => updateProgress(t.id, 10)} className="p-1.5 rounded-lg hover:bg-success/10 text-muted-foreground hover:text-success transition-colors" title="+10%"><ArrowRight size={14} /></button>
+                        <button onClick={() => setDeleteConfirm(t.id)} className="p-1.5 rounded-lg hover:bg-danger/10 text-muted-foreground hover:text-danger transition-colors"><Trash2 size={14} /></button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
+      )}
+
+      {/* نافذة تفاصيل المهمة */}
+      <AnimatePresence>
+        {detailTask && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDetailTask(null)}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-bold text-foreground">{detailTask.title}</h2>
+                <button onClick={() => setDetailTask(null)} className="p-2 rounded-lg hover:bg-surface2 text-muted-foreground"><X size={18} /></button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 sm:mb-4">
+                <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">الفعالية</p><p className="text-xs text-foreground">{detailTask.event}</p></div>
+                <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">المسؤول</p><p className="text-xs text-foreground">{detailTask.assignee}</p></div>
+                <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">الحالة</p><span className={cn('text-xs px-2 py-0.5 rounded-full', statusColors[detailTask.status])}>{statusLabels[detailTask.status]}</span></div>
+                <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">الأولوية</p><span className={cn('text-xs px-2 py-0.5 rounded-full', priorityColors[detailTask.priority])}>{priorityLabels[detailTask.priority]}</span></div>
+              </div>
+              <div className="p-3 rounded-xl bg-gold/5 border border-gold/20 mb-3">
+                <div className="flex items-center justify-between mb-1.5"><span className="text-[10px] text-muted-foreground">التقدم</span><span className="text-sm font-bold font-mono text-gold">{detailTask.progress}%</span></div>
+                <div className="w-full h-2 rounded-full bg-surface3"><div className={cn('h-full rounded-full', detailTask.progress >= 80 ? 'bg-success' : detailTask.progress >= 40 ? 'bg-gold' : 'bg-chrome')} style={{ width: `${detailTask.progress}%` }} /></div>
+              </div>
+              {detailTask.notes && <div className="p-3 rounded-xl bg-surface2/50 border border-border/30 mb-3"><p className="text-[10px] text-muted-foreground mb-1">ملاحظات</p><p className="text-sm text-foreground">{detailTask.notes}</p></div>}
+              <p className="text-[10px] text-muted-foreground mb-4">الموعد النهائي: {detailTask.dueDate}</p>
+              <div className="flex items-center gap-2">
+                <button onClick={() => { updateProgress(detailTask.id, 10); setDetailTask(null) }} className="flex-1 h-10 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all">+10% تقدم</button>
+                <button onClick={() => { moveTask(detailTask.id, 'completed'); setDetailTask(null) }} className="h-10 px-4 rounded-xl bg-success/10 border border-success/20 text-success font-medium text-sm hover:bg-success/20 transition-all flex items-center gap-1"><CheckCircle size={13} /></button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* نافذة إضافة مهمة */}
+      <AnimatePresence>
+        {showAddModal && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowAddModal(false)}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
+                <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><ClipboardList size={18} className="text-gold" /></div>
+                <div><h3 className="text-base font-bold text-foreground">مهمة جديدة</h3><p className="text-xs text-muted-foreground">إضافة مهمة تشغيلية</p></div>
+              </div>
+              <div className="space-y-3">
+                <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">عنوان المهمة <span className="text-danger">*</span></label><input type="text" value={newTask.title} onChange={(e) => setNewTask(p => ({ ...p, title: e.target.value }))} placeholder="عنوان المهمة" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">المسؤول</label><input type="text" value={newTask.assignee} onChange={(e) => setNewTask(p => ({ ...p, assignee: e.target.value }))} placeholder="الفريق/الشخص" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
+                  <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الأولوية</label><select value={newTask.priority} onChange={(e) => setNewTask(p => ({ ...p, priority: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option value="high">عالية</option><option value="medium">متوسطة</option><option value="low">منخفضة</option></select></div>
+                </div>
+                <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الموعد النهائي</label><input type="date" value={newTask.dueDate} onChange={(e) => setNewTask(p => ({ ...p, dueDate: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
+                <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">ملاحظات</label><textarea value={newTask.notes} onChange={(e) => setNewTask(p => ({ ...p, notes: e.target.value }))} placeholder="ملاحظات..." rows={2} className="w-full p-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 resize-none transition-all" /></div>
+              </div>
+              <div className="flex items-center gap-3 mt-5">
+                <button onClick={handleAdd} className="flex-1 h-10 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all">إضافة المهمة</button>
+                <button onClick={() => setShowAddModal(false)} className="flex-1 h-10 rounded-xl bg-surface2 border border-border/50 text-muted-foreground font-medium text-sm hover:text-foreground transition-all">إلغاء</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* تأكيد الحذف */}
+      <AnimatePresence>
+        {deleteConfirm !== null && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDeleteConfirm(null)}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-4 sm:p-6 text-center" onClick={(e) => e.stopPropagation()}>
+              <div className="w-14 h-14 rounded-2xl bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={24} className="text-danger" /></div>
+              <h3 className="text-base font-bold text-foreground mb-2">حذف المهمة</h3>
+              <p className="text-sm text-muted-foreground mb-5">هل أنت متأكد من حذف <span className="text-foreground font-medium">{tasks.find(t => t.id === deleteConfirm)?.title}</span>؟</p>
+              <div className="flex items-center gap-3">
+                <button onClick={() => handleDelete(deleteConfirm)} className="flex-1 h-10 rounded-xl bg-danger/10 border border-danger/20 text-danger font-bold text-sm hover:bg-danger/20 transition-all">حذف</button>
+                <button onClick={() => setDeleteConfirm(null)} className="flex-1 h-10 rounded-xl bg-surface2 border border-border/50 text-muted-foreground font-medium text-sm hover:text-foreground transition-all">إلغاء</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AdminLayout>
-  );
+  )
 }

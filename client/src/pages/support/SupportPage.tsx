@@ -1,250 +1,272 @@
-/*
- * SupportPage — خدمة العملاء
- * تابات: نظرة عامة | التذاكر | قاعدة المعرفة | الدردشة الحية | التقييمات
+/**
+ * ═══════════════════════════════════════════════════════
+ * Nour Theme — الدعم الفني (Support & Helpdesk)
+ * Features: تذاكر، قاعدة معرفة، إحصائيات، CRUD
+ * ═══════════════════════════════════════════════════════
  */
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Headphones, MessageSquare, BookOpen, Star, BarChart3, Plus,
-  CheckCircle, Clock, AlertTriangle, Search, Send,
-  ThumbsUp, ThumbsDown, Phone, Mail
-} from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RPieChart, Pie, Cell } from 'recharts';
-import AdminLayout from '@/components/layout/AdminLayout';
-import PageHeader from '@/components/shared/PageHeader';
-import DataTable, { Column } from '@/components/shared/DataTable';
-import StatsCard from '@/components/shared/StatsCard';
-import StatusBadge from '@/components/shared/StatusBadge';
-import { Button } from '@/components/ui/button';
-import { cn, formatDate } from '@/lib/utils';
-import { toast } from 'sonner';
+  Headphones, MessageSquare, Clock, CheckCircle, AlertTriangle,
+  Users, Star, TrendingUp, Plus, Eye, Phone, Mail, X,
+  Trash2, Search, BookOpen, LifeBuoy, Zap, Filter
+} from 'lucide-react'
+import AdminLayout from '@/components/layout/AdminLayout'
+import PageHeader from '@/components/shared/PageHeader'
+import StatsCard from '@/components/shared/StatsCard'
+import { cn, formatDate } from '@/lib/utils'
+import { toast } from 'sonner'
 
 interface Ticket {
-  id: number; subject: string; client: string; category: string;
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
-  priority: 'high' | 'medium' | 'low'; agent: string; created: string; lastReply: string; channel: 'email' | 'phone' | 'chat';
+  id: string; subject: string; customer: string; priority: string; status: string
+  assignee: string; time: string; channel: string; description: string; category: string
 }
 
-const mockTickets: Ticket[] = [
-  { id: 1001, subject: 'مشكلة في حجز الجناح B3', client: 'شركة الفيصل', category: 'حجوزات', status: 'open', priority: 'high', agent: 'نورة الشمري', created: '2026-04-01', lastReply: '2026-04-01', channel: 'email' },
-  { id: 1002, subject: 'طلب تغيير موقع الجناح', client: 'مجموعة المراعي', category: 'حجوزات', status: 'in_progress', priority: 'medium', agent: 'أحمد العتيبي', created: '2026-03-30', lastReply: '2026-03-31', channel: 'phone' },
-  { id: 1003, subject: 'استفسار عن باقات الرعاية', client: 'بنك الراجحي', category: 'رعاية', status: 'resolved', priority: 'low', agent: 'سارة المالكي', created: '2026-03-28', lastReply: '2026-03-29', channel: 'chat' },
-  { id: 1004, subject: 'مشكلة في الفاتورة الإلكترونية', client: 'DHL السعودية', category: 'مالية', status: 'open', priority: 'high', agent: 'نورة الشمري', created: '2026-04-01', lastReply: '2026-04-01', channel: 'email' },
-  { id: 1005, subject: 'طلب خدمات كهرباء إضافية', client: 'شركة جرير', category: 'خدمات', status: 'in_progress', priority: 'medium', agent: 'أحمد العتيبي', created: '2026-03-29', lastReply: '2026-03-30', channel: 'phone' },
-  { id: 1006, subject: 'استفسار عن مواعيد التركيب', client: 'STC', category: 'عمليات', status: 'closed', priority: 'low', agent: 'سارة المالكي', created: '2026-03-25', lastReply: '2026-03-26', channel: 'chat' },
-  { id: 1007, subject: 'شكوى — تأخر في الرد', client: 'موبايلي', category: 'عام', status: 'open', priority: 'high', agent: 'نورة الشمري', created: '2026-04-01', lastReply: '2026-04-01', channel: 'email' },
-];
+const demoTickets: Ticket[] = [
+  { id: 'T-2026-001', subject: 'مشكلة في حجز الجناح B-12', customer: 'شركة الفيصل للتجارة', priority: 'high', status: 'open', assignee: 'أحمد محمد', time: '2026-03-31 14:30', channel: 'email', description: 'العميل يواجه خطأ عند محاولة تأكيد حجز الجناح B-12 في معرض الرياض. الخطأ يظهر عند الدفع.', category: 'حجوزات' },
+  { id: 'T-2026-002', subject: 'طلب تعديل موقع الجناح', customer: 'مجموعة المراعي', priority: 'medium', status: 'in_progress', assignee: 'سارة العلي', time: '2026-03-31 11:00', channel: 'phone', description: 'العميل يريد نقل جناحه من الموقع C-5 إلى A-3 بسبب قربه من المدخل الرئيسي.', category: 'تعديلات' },
+  { id: 'T-2026-003', subject: 'استفسار عن باقات الرعاية', customer: 'بنك الراجحي', priority: 'low', status: 'open', assignee: 'فاطمة أحمد', time: '2026-03-30 16:45', channel: 'email', description: 'العميل يستفسر عن تفاصيل باقة الرعاية البلاتينية والخدمات المشمولة.', category: 'استفسارات' },
+  { id: 'T-2026-004', subject: 'مشكلة في الفاتورة الإلكترونية', customer: 'شركة التقنية المتقدمة', priority: 'high', status: 'in_progress', assignee: 'نورة السبيعي', time: '2026-03-30 09:20', channel: 'email', description: 'الفاتورة الإلكترونية تظهر مبلغ خاطئ. الفرق 15,000 ر.س عن المبلغ المتفق عليه.', category: 'مالية' },
+  { id: 'T-2026-005', subject: 'طلب خدمات إضافية للجناح', customer: 'شركة نسما القابضة', priority: 'medium', status: 'resolved', assignee: 'خالد الحربي', time: '2026-03-29 13:00', channel: 'phone', description: 'العميل يطلب إضافة شاشة LED كبيرة وتوصيلات كهربائية إضافية.', category: 'خدمات' },
+  { id: 'T-2026-006', subject: 'شكوى من جودة الخدمة', customer: 'مؤسسة الحلول الذكية', priority: 'high', status: 'open', assignee: 'ريم الغامدي', time: '2026-03-29 10:30', channel: 'email', description: 'العميل غير راضٍ عن تأخر الرد على استفساراته. يطلب تعويض أو خصم.', category: 'شكاوى' },
+  { id: 'T-2026-007', subject: 'طلب إلغاء حجز', customer: 'شركة الأفق للتطوير', priority: 'medium', status: 'resolved', assignee: 'تركي الشمري', time: '2026-03-28 15:00', channel: 'phone', description: 'العميل يطلب إلغاء حجز الجناح D-8 واسترداد المبلغ المدفوع.', category: 'إلغاءات' },
+  { id: 'T-2026-008', subject: 'مشكلة تقنية في البوابة', customer: 'مجموعة بن لادن', priority: 'low', status: 'open', assignee: 'عمر الزهراني', time: '2026-03-28 11:15', channel: 'email', description: 'العميل لا يستطيع تسجيل الدخول إلى بوابة العارضين. يظهر خطأ 403.', category: 'تقنية' },
+]
 
-const kbArticles = [
-  { id: 1, title: 'كيفية حجز جناح في المعرض', category: 'حجوزات', views: 1250, helpful: 89 },
-  { id: 2, title: 'شروط وأحكام الرعاية', category: 'رعاية', views: 890, helpful: 76 },
-  { id: 3, title: 'دليل الخدمات اللوجستية', category: 'خدمات', views: 650, helpful: 92 },
-  { id: 4, title: 'الأسئلة الشائعة — الفواتير والمدفوعات', category: 'مالية', views: 1100, helpful: 85 },
-  { id: 5, title: 'سياسة الإلغاء والاسترداد', category: 'حجوزات', views: 780, helpful: 71 },
-  { id: 6, title: 'متطلبات التحقق KYC', category: 'عام', views: 450, helpful: 95 },
-];
+const priorityColors: Record<string, string> = { high: 'bg-danger/10 text-danger', medium: 'bg-warning/10 text-warning', low: 'bg-info/10 text-info' }
+const priorityLabels: Record<string, string> = { high: 'عالية', medium: 'متوسطة', low: 'منخفضة' }
+const statusColors: Record<string, string> = { open: 'bg-gold/10 text-gold', in_progress: 'bg-info/10 text-info', resolved: 'bg-success/10 text-success', closed: 'bg-chrome/10 text-chrome' }
+const statusLabels: Record<string, string> = { open: 'مفتوحة', in_progress: 'قيد المعالجة', resolved: 'محلولة', closed: 'مغلقة' }
+const channelIcons: Record<string, typeof Mail> = { email: Mail, phone: Phone, chat: MessageSquare }
 
-const chatSessions = [
-  { id: 1, client: 'أحمد — شركة الفيصل', status: 'active' as const, messages: 12, duration: '8 دقائق', agent: 'نورة' },
-  { id: 2, client: 'سارة — بنك الراجحي', status: 'active' as const, messages: 5, duration: '3 دقائق', agent: 'أحمد' },
-  { id: 3, client: 'خالد — DHL', status: 'waiting' as const, messages: 1, duration: '0 دقيقة', agent: 'غير محدد' },
-  { id: 4, client: 'فاطمة — جرير', status: 'ended' as const, messages: 18, duration: '15 دقيقة', agent: 'سارة' },
-];
+const knowledgeBase = [
+  { title: 'كيفية حجز جناح في المعرض', category: 'حجوزات', views: 1250 },
+  { title: 'سياسة الإلغاء والاسترداد', category: 'سياسات', views: 890 },
+  { title: 'الخدمات المتاحة للعارضين', category: 'خدمات', views: 720 },
+  { title: 'دليل بوابة العارضين', category: 'تقنية', views: 650 },
+  { title: 'باقات الرعاية والشراكة', category: 'رعاية', views: 580 },
+  { title: 'متطلبات السلامة والأمان', category: 'سلامة', views: 430 },
+]
 
-const ratingsData = [
-  { client: 'شركة الفيصل', rating: 5, comment: 'خدمة ممتازة وسريعة', date: '2026-03-30', agent: 'نورة' },
-  { client: 'مجموعة المراعي', rating: 4, comment: 'جيد لكن يحتاج تحسين في سرعة الرد', date: '2026-03-29', agent: 'أحمد' },
-  { client: 'بنك الراجحي', rating: 5, comment: 'احترافية عالية', date: '2026-03-28', agent: 'سارة' },
-  { client: 'DHL', rating: 3, comment: 'تأخر في حل المشكلة', date: '2026-03-27', agent: 'نورة' },
-  { client: 'STC', rating: 5, comment: 'شكراً على الدعم السريع', date: '2026-03-26', agent: 'سارة' },
-];
+export default function SupportPage() {
+  const [tickets, setTickets] = useState(demoTickets)
+  const [activeTab, setActiveTab] = useState('tickets')
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [detailTicket, setDetailTicket] = useState<Ticket | null>(null)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [newTicket, setNewTicket] = useState({ subject: '', customer: '', priority: 'medium', channel: 'email', description: '', category: 'استفسارات' })
 
-const ticketTrend = [
-  { day: 'السبت', opened: 5, resolved: 3 }, { day: 'الأحد', opened: 8, resolved: 6 },
-  { day: 'الاثنين', opened: 12, resolved: 10 }, { day: 'الثلاثاء', opened: 7, resolved: 8 },
-  { day: 'الأربعاء', opened: 9, resolved: 7 }, { day: 'الخميس', opened: 4, resolved: 5 },
-  { day: 'الجمعة', opened: 2, resolved: 3 },
-];
+  const stats = useMemo(() => ({
+    total: tickets.length,
+    open: tickets.filter(t => t.status === 'open').length,
+    inProgress: tickets.filter(t => t.status === 'in_progress').length,
+    resolved: tickets.filter(t => t.status === 'resolved').length,
+    highPriority: tickets.filter(t => t.priority === 'high' && t.status !== 'resolved').length,
+  }), [tickets])
 
-const categoryData = [
-  { name: 'حجوزات', value: 35, color: '#C9A84C' }, { name: 'رعاية', value: 20, color: '#3B82F6' },
-  { name: 'خدمات', value: 15, color: '#10B981' }, { name: 'مالية', value: 20, color: '#F59E0B' },
-  { name: 'عام', value: 10, color: '#8B5CF6' },
-];
+  const filtered = useMemo(() => {
+    let result = [...tickets]
+    if (statusFilter !== 'all') result = result.filter(t => t.status === statusFilter)
+    if (search) { const s = search.toLowerCase(); result = result.filter(t => t.subject.includes(s) || t.customer.includes(s) || t.id.includes(s)) }
+    return result
+  }, [tickets, statusFilter, search])
 
-type TabKey = 'overview' | 'tickets' | 'knowledge' | 'chat' | 'ratings';
-const tabsList: { key: TabKey; label: string; icon: any }[] = [
-  { key: 'overview', label: 'نظرة عامة', icon: BarChart3 },
-  { key: 'tickets', label: 'التذاكر', icon: Headphones },
-  { key: 'knowledge', label: 'قاعدة المعرفة', icon: BookOpen },
-  { key: 'chat', label: 'الدردشة الحية', icon: MessageSquare },
-  { key: 'ratings', label: 'التقييمات', icon: Star },
-];
+  const handleAdd = () => {
+    if (!newTicket.subject || !newTicket.customer) { toast.error('يرجى ملء الحقول المطلوبة'); return }
+    const t: Ticket = {
+      id: `T-2026-${String(tickets.length + 1).padStart(3, '0')}`, subject: newTicket.subject, customer: newTicket.customer,
+      priority: newTicket.priority, status: 'open', assignee: 'غير محدد', time: new Date().toISOString().slice(0, 16).replace('T', ' '),
+      channel: newTicket.channel, description: newTicket.description, category: newTicket.category,
+    }
+    setTickets(prev => [t, ...prev])
+    toast.success(`تم إنشاء التذكرة: ${t.id}`)
+    setShowAddModal(false)
+    setNewTicket({ subject: '', customer: '', priority: 'medium', channel: 'email', description: '', category: 'استفسارات' })
+  }
 
-function OverviewTab() {
-  const open = mockTickets.filter(t => t.status === 'open').length;
-  const resolved = mockTickets.filter(t => t.status === 'resolved' || t.status === 'closed').length;
-  const avgRating = (ratingsData.reduce((s, r) => s + r.rating, 0) / ratingsData.length).toFixed(1);
+  const handleDelete = (id: string) => {
+    setTickets(prev => prev.filter(t => t.id !== id))
+    toast.success(`تم حذف التذكرة: ${id}`)
+    setDeleteConfirm(null)
+  }
+
+  const handleStatusChange = (id: string, newStatus: string) => {
+    setTickets(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t))
+    toast.success(`تم تحديث حالة التذكرة ${id}`)
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="تذاكر مفتوحة" value={open} icon={Headphones} />
-        <StatsCard title="تم الحل" value={resolved} icon={CheckCircle} trend={15} delay={0.1} />
-        <StatsCard title="متوسط وقت الرد" value="12 دقيقة" icon={Clock} trend={-20} delay={0.2} />
-        <StatsCard title="تقييم العملاء" value={`${avgRating}/5`} icon={Star} trend={5} delay={0.3} />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass-card p-5 lg:col-span-2">
-          <h3 className="text-sm font-bold mb-4">اتجاه التذاكر (أسبوعي)</h3>
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={ticketTrend}><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" /><XAxis dataKey="day" tick={{ fontSize: 10, fill: '#888' }} /><YAxis tick={{ fontSize: 10, fill: '#888' }} /><Tooltip contentStyle={{ background: '#1a1917', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', fontSize: '11px', color: '#fff' }} /><Area type="monotone" dataKey="opened" fill="rgba(239,68,68,0.1)" stroke="#EF4444" name="مفتوحة" /><Area type="monotone" dataKey="resolved" fill="rgba(16,185,129,0.1)" stroke="#10B981" name="محلولة" /></AreaChart>
-          </ResponsiveContainer>
-        </motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="glass-card p-5">
-          <h3 className="text-sm font-bold mb-4">التذاكر حسب الفئة</h3>
-          <ResponsiveContainer width="100%" height={160}>
-            <RPieChart><Pie data={categoryData} cx="50%" cy="50%" innerRadius={40} outerRadius={65} dataKey="value" stroke="none">{categoryData.map((e, i) => <Cell key={i} fill={e.color} />)}</Pie></RPieChart>
-          </ResponsiveContainer>
-          <div className="space-y-1 mt-2">{categoryData.map(c => <div key={c.name} className="flex items-center justify-between text-xs"><span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full" style={{ background: c.color }} />{c.name}</span><span className="font-mono">{c.value}%</span></div>)}</div>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
+    <AdminLayout>
+      <PageHeader
+        title="الدعم الفني"
+        subtitle={`${stats.total} تذكرة — ${stats.open} مفتوحة — ${stats.highPriority} عالية الأولوية`}
+        actions={
+          <button onClick={() => setShowAddModal(true)} className="h-9 px-4 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all flex items-center gap-2">
+            <Plus size={16} /> تذكرة جديدة
+          </button>
+        }
+      />
 
-function TicketsTab() {
-  const [search, setSearch] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const filtered = mockTickets.filter(t => {
-    const ms = t.subject.includes(search) || t.client.includes(search);
-    const mf = filterStatus === 'all' || t.status === filterStatus;
-    return ms && mf;
-  });
-  const columns: Column<Ticket>[] = [
-    { key: 'id', label: '#', render: v => <span className="font-mono text-xs text-accent">#{v}</span> },
-    { key: 'subject', label: 'الموضوع', render: (_, r) => (
-      <div className="flex items-center gap-2">
-        <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center shrink-0', r.channel === 'email' ? 'bg-accent/10 text-accent' : r.channel === 'phone' ? 'bg-info/10 text-info' : 'bg-success/10 text-success')}>
-          {r.channel === 'email' ? <Mail className="w-3.5 h-3.5" /> : r.channel === 'phone' ? <Phone className="w-3.5 h-3.5" /> : <MessageSquare className="w-3.5 h-3.5" />}
-        </div>
-        <div><p className="font-medium text-sm">{r.subject}</p><p className="text-xs text-muted-foreground">{r.client} — {r.category}</p></div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
+        <StatsCard title="التذاكر المفتوحة" value={String(stats.open)} icon={MessageSquare} delay={0} />
+        <StatsCard title="قيد المعالجة" value={String(stats.inProgress)} icon={Clock} delay={0.05} />
+        <StatsCard title="تم الحل" value={String(stats.resolved)} icon={CheckCircle} delay={0.1} />
+        <StatsCard title="رضا العملاء" value="4.6/5" icon={Star} trend={8} trendLabel="تحسن" delay={0.15} />
       </div>
-    )},
-    { key: 'priority', label: 'الأولوية', render: v => <span className={`text-xs px-2 py-0.5 rounded-full ${v === 'high' ? 'bg-danger/15 text-danger' : v === 'medium' ? 'bg-warning/15 text-warning' : 'bg-success/15 text-success'}`}>{v === 'high' ? 'عالية' : v === 'medium' ? 'متوسطة' : 'منخفضة'}</span> },
-    { key: 'agent', label: 'الوكيل', render: v => <span className="text-xs">{v}</span> },
-    { key: 'status', label: 'الحالة', render: (_, r) => <StatusBadge status={r.status === 'resolved' || r.status === 'closed' ? 'active' : r.status === 'in_progress' ? 'approved' : 'pending'} /> },
-    { key: 'lastReply', label: 'آخر رد', render: v => <span className="text-xs">{formatDate(v)}</span> },
-  ];
-  return (
-    <div className="space-y-4">
-      <div className="flex gap-2 flex-wrap">
-        {['all', 'open', 'in_progress', 'resolved', 'closed'].map(s => (
-          <button key={s} onClick={() => setFilterStatus(s)} className={cn('px-3 py-1.5 rounded-lg text-xs transition-colors', filterStatus === s ? 'bg-accent/20 text-accent border border-accent/30' : 'bg-card/50 text-muted-foreground border border-border/50 hover:bg-card')}>
-            {s === 'all' ? 'الكل' : s === 'open' ? 'مفتوحة' : s === 'in_progress' ? 'قيد المعالجة' : s === 'resolved' ? 'محلولة' : 'مغلقة'}
+
+      {/* تبويبات */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-3 sm:mb-4">
+        {[{ key: 'tickets', label: 'التذاكر', icon: Headphones }, { key: 'knowledge', label: 'قاعدة المعرفة', icon: BookOpen }].map(t => (
+          <button key={t.key} onClick={() => setActiveTab(t.key)}
+            className={cn('h-9 px-4 rounded-xl text-sm font-medium transition-all flex items-center gap-2', activeTab === t.key ? 'bg-gold/10 text-gold border border-gold/20' : 'bg-surface2/50 text-muted-foreground hover:text-foreground border border-transparent')}>
+            <t.icon size={14} /> {t.label}
           </button>
         ))}
       </div>
-      <DataTable columns={columns} data={filtered} searchValue={search} onSearch={setSearch} searchPlaceholder="بحث في التذاكر..." emptyMessage="لا توجد تذاكر" />
-    </div>
-  );
-}
 
-function KnowledgeTab() {
-  const [search, setSearch] = useState('');
-  const filtered = kbArticles.filter(a => a.title.includes(search) || a.category.includes(search));
-  return (
-    <div className="space-y-4">
-      <div className="relative"><Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث في قاعدة المعرفة..." className="w-full h-10 pr-10 pl-4 rounded-xl bg-card/50 border border-border/50 text-sm focus:outline-none focus:border-accent/50" /></div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filtered.map((a, i) => (
-          <motion.div key={a.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }} className="glass-card p-4 hover:border-accent/30 transition-colors cursor-pointer" onClick={() => toast.info('عرض المقال — قريباً')}>
-            <div className="flex items-start justify-between mb-2">
-              <div className="flex items-center gap-2"><BookOpen className="w-4 h-4 text-accent" /><span className="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full">{a.category}</span></div>
-              <span className="text-xs text-muted-foreground">{a.views} مشاهدة</span>
+      {/* التذاكر */}
+      {activeTab === 'tickets' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card overflow-hidden">
+          <div className="flex items-center justify-between p-4 border-b border-border/50 flex-wrap gap-3">
+            <div className="relative w-64">
+              <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="بحث في التذاكر..."
+                className="w-full h-9 pr-10 pl-4 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" />
             </div>
-            <h4 className="font-medium text-sm mb-2">{a.title}</h4>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground"><ThumbsUp className="w-3 h-3" />{a.helpful}% وجدوه مفيداً</div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-}
+            <div className="flex items-center gap-1.5">
+              {[{ key: 'all', label: 'الكل' }, { key: 'open', label: 'مفتوحة' }, { key: 'in_progress', label: 'قيد المعالجة' }, { key: 'resolved', label: 'محلولة' }].map(f => (
+                <button key={f.key} onClick={() => setStatusFilter(f.key)} className={cn('h-7 px-2.5 rounded-lg text-[11px] font-medium transition-all', statusFilter === f.key ? 'bg-gold/10 text-gold border border-gold/20' : 'text-muted-foreground hover:text-foreground')}>{f.label}</button>
+              ))}
+            </div>
+          </div>
+          <div className="divide-y divide-border/30">
+            {filtered.length === 0 ? (
+              <div className="px-4 py-16 text-center"><Headphones size={40} className="mx-auto text-muted-foreground/30 mb-3" /><p className="text-muted-foreground text-sm">لا يوجد تذاكر مطابقة</p></div>
+            ) : filtered.map((ticket, idx) => {
+              const ChIcon = channelIcons[ticket.channel] || Mail
+              return (
+                <motion.div key={ticket.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: idx * 0.02 }}
+                  className="px-4 py-3 hover:bg-surface2/30 transition-colors flex items-center gap-4">
+                  <div className="flex-shrink-0">
+                    <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center', ticket.priority === 'high' ? 'bg-danger/10' : ticket.priority === 'medium' ? 'bg-warning/10' : 'bg-info/10')}>
+                      <ChIcon size={16} className={ticket.priority === 'high' ? 'text-danger' : ticket.priority === 'medium' ? 'text-warning' : 'text-info'} />
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-[10px] font-mono text-muted-foreground">{ticket.id}</span>
+                      <span className={cn('text-[10px] px-1.5 py-0.5 rounded-full', priorityColors[ticket.priority])}>{priorityLabels[ticket.priority]}</span>
+                      <span className={cn('text-[10px] px-1.5 py-0.5 rounded-full', statusColors[ticket.status])}>{statusLabels[ticket.status]}</span>
+                    </div>
+                    <p className="text-sm font-medium text-foreground truncate">{ticket.subject}</p>
+                    <p className="text-[10px] text-muted-foreground">{ticket.customer} — {ticket.assignee} — {ticket.time}</p>
+                  </div>
+                  <div className="flex items-center gap-0.5 flex-shrink-0">
+                    <button onClick={() => setDetailTicket(ticket)} className="p-1.5 rounded-lg hover:bg-surface2 text-muted-foreground hover:text-gold transition-colors"><Eye size={14} /></button>
+                    {ticket.status === 'open' && <button onClick={() => handleStatusChange(ticket.id, 'in_progress')} className="p-1.5 rounded-lg hover:bg-info/10 text-muted-foreground hover:text-info transition-colors" title="بدء المعالجة"><Zap size={14} /></button>}
+                    {ticket.status === 'in_progress' && <button onClick={() => handleStatusChange(ticket.id, 'resolved')} className="p-1.5 rounded-lg hover:bg-success/10 text-muted-foreground hover:text-success transition-colors" title="تم الحل"><CheckCircle size={14} /></button>}
+                    <button onClick={() => setDeleteConfirm(ticket.id)} className="p-1.5 rounded-lg hover:bg-danger/10 text-muted-foreground hover:text-danger transition-colors"><Trash2 size={14} /></button>
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
+        </motion.div>
+      )}
 
-function ChatTab() {
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatsCard title="محادثات نشطة" value={chatSessions.filter(c => c.status === 'active').length} icon={MessageSquare} />
-        <StatsCard title="في الانتظار" value={chatSessions.filter(c => c.status === 'waiting').length} icon={Clock} delay={0.1} />
-        <StatsCard title="منتهية اليوم" value={chatSessions.filter(c => c.status === 'ended').length} icon={CheckCircle} delay={0.2} />
-      </div>
-      <div className="space-y-3">
-        {chatSessions.map((c, i) => (
-          <motion.div key={c.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }} className={`glass-card p-4 flex items-center justify-between ${c.status === 'active' ? 'border-success/30' : c.status === 'waiting' ? 'border-warning/30' : ''}`}>
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${c.status === 'active' ? 'bg-success/10 border border-success/20' : c.status === 'waiting' ? 'bg-warning/10 border border-warning/20' : 'bg-card border border-border/50'}`}>
-                <MessageSquare className={`w-4 h-4 ${c.status === 'active' ? 'text-success' : c.status === 'waiting' ? 'text-warning' : 'text-muted-foreground'}`} />
+      {/* قاعدة المعرفة */}
+      {activeTab === 'knowledge' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {knowledgeBase.map((article, i) => (
+            <motion.div key={article.title} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              className="glass-card p-3 sm:p-4 lg:p-5 hover:border-gold/20 transition-all cursor-pointer group" onClick={() => toast.info(`عرض المقال: ${article.title}`)}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center group-hover:scale-105 transition-transform"><BookOpen size={18} className="text-gold" /></div>
+                <div className="flex-1 min-w-0"><h3 className="text-sm font-bold text-foreground truncate">{article.title}</h3><p className="text-[10px] text-muted-foreground">{article.category}</p></div>
               </div>
-              <div><p className="font-medium text-sm">{c.client}</p><p className="text-xs text-muted-foreground">{c.messages} رسالة — {c.duration} — {c.agent}</p></div>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className={`text-xs px-2 py-0.5 rounded-full ${c.status === 'active' ? 'bg-success/15 text-success' : c.status === 'waiting' ? 'bg-warning/15 text-warning' : 'bg-muted/50 text-muted-foreground'}`}>{c.status === 'active' ? 'نشطة' : c.status === 'waiting' ? 'انتظار' : 'منتهية'}</span>
-              {c.status !== 'ended' && <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => toast.info('فتح المحادثة — قريباً')}><Send className="w-3 h-3" /> رد</Button>}
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function RatingsTab() {
-  const avgRating = (ratingsData.reduce((s, r) => s + r.rating, 0) / ratingsData.length).toFixed(1);
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatsCard title="متوسط التقييم" value={`${avgRating}/5`} icon={Star} />
-        <StatsCard title="تقييمات ممتازة (5)" value={ratingsData.filter(r => r.rating === 5).length} icon={ThumbsUp} delay={0.1} />
-        <StatsCard title="تقييمات سلبية (≤3)" value={ratingsData.filter(r => r.rating <= 3).length} icon={ThumbsDown} delay={0.2} />
-      </div>
-      <div className="space-y-3">
-        {ratingsData.map((r, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }} className="glass-card p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-sm font-bold text-accent">{r.client.charAt(0)}</div>
-                <div><p className="font-medium text-sm">{r.client}</p><p className="text-xs text-muted-foreground">الوكيل: {r.agent} — {formatDate(r.date)}</p></div>
+              <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                <span className="flex items-center gap-1"><Eye size={10} />{article.views} مشاهدة</span>
+                <span className="group-hover:text-gold transition-colors">قراءة المقال →</span>
               </div>
-              <div className="flex items-center gap-0.5">{Array.from({ length: 5 }).map((_, si) => <Star key={si} className={`w-4 h-4 ${si < r.rating ? 'text-accent fill-accent' : 'text-muted-foreground/30'}`} />)}</div>
-            </div>
-            <p className="text-sm text-muted-foreground mr-13">{r.comment}</p>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-export default function SupportPage() {
-  const [activeTab, setActiveTab] = useState<TabKey>('overview');
-  return (
-    <AdminLayout>
-      <div className="p-6 space-y-6">
-        <PageHeader title="خدمة العملاء" subtitle="التذاكر والدردشة وقاعدة المعرفة والتقييمات" actions={<Button onClick={() => toast.info('تذكرة جديدة — قريباً')} className="bg-accent hover:bg-accent/90 text-accent-foreground gap-2"><Plus className="w-4 h-4" /> تذكرة جديدة</Button>} />
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
-          {tabsList.map(t => <button key={t.key} onClick={() => setActiveTab(t.key)} className={cn('flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all', activeTab === t.key ? 'bg-accent/15 text-accent border border-accent/25' : 'bg-card/50 text-muted-foreground border border-border/50 hover:bg-card hover:text-foreground')}><t.icon className="w-4 h-4" />{t.label}</button>)}
+            </motion.div>
+          ))}
         </div>
-        <AnimatePresence mode="wait">
-          <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-            {activeTab === 'overview' && <OverviewTab />}
-            {activeTab === 'tickets' && <TicketsTab />}
-            {activeTab === 'knowledge' && <KnowledgeTab />}
-            {activeTab === 'chat' && <ChatTab />}
-            {activeTab === 'ratings' && <RatingsTab />}
+      )}
+
+      {/* نافذة تفاصيل التذكرة */}
+      <AnimatePresence>
+        {detailTicket && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDetailTicket(null)}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-5">
+                <div><span className="text-xs font-mono text-muted-foreground">{detailTicket.id}</span><h2 className="text-base font-bold text-foreground mt-1">{detailTicket.subject}</h2></div>
+                <button onClick={() => setDetailTicket(null)} className="p-2 rounded-lg hover:bg-surface2 text-muted-foreground"><X size={18} /></button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 sm:mb-4">
+                <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">العميل</p><p className="text-xs text-foreground">{detailTicket.customer}</p></div>
+                <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">المسؤول</p><p className="text-xs text-foreground">{detailTicket.assignee}</p></div>
+                <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">القناة</p><p className="text-xs text-foreground">{detailTicket.channel === 'email' ? 'بريد إلكتروني' : detailTicket.channel === 'phone' ? 'هاتف' : 'محادثة'}</p></div>
+                <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">التصنيف</p><p className="text-xs text-foreground">{detailTicket.category}</p></div>
+              </div>
+              <div className="p-3 rounded-xl bg-surface2/50 border border-border/30 mb-4"><p className="text-[10px] text-muted-foreground mb-1">الوصف</p><p className="text-sm text-foreground leading-relaxed">{detailTicket.description}</p></div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={cn('text-xs px-2 py-0.5 rounded-full', priorityColors[detailTicket.priority])}>{priorityLabels[detailTicket.priority]}</span>
+                  <span className={cn('text-xs px-2 py-0.5 rounded-full', statusColors[detailTicket.status])}>{statusLabels[detailTicket.status]}</span>
+                </div>
+                <span className="text-[10px] text-muted-foreground">{detailTicket.time}</span>
+              </div>
+            </motion.div>
           </motion.div>
-        </AnimatePresence>
-      </div>
+        )}
+      </AnimatePresence>
+
+      {/* نافذة تذكرة جديدة */}
+      <AnimatePresence>
+        {showAddModal && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowAddModal(false)}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
+                <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Headphones size={18} className="text-gold" /></div>
+                <div><h3 className="text-base font-bold text-foreground">تذكرة جديدة</h3><p className="text-xs text-muted-foreground">إنشاء تذكرة دعم فني</p></div>
+              </div>
+              <div className="space-y-3">
+                <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الموضوع <span className="text-danger">*</span></label><input type="text" value={newTicket.subject} onChange={(e) => setNewTicket(p => ({ ...p, subject: e.target.value }))} placeholder="موضوع التذكرة" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
+                <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">العميل <span className="text-danger">*</span></label><input type="text" value={newTicket.customer} onChange={(e) => setNewTicket(p => ({ ...p, customer: e.target.value }))} placeholder="اسم العميل/الشركة" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الأولوية</label><select value={newTicket.priority} onChange={(e) => setNewTicket(p => ({ ...p, priority: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option value="high">عالية</option><option value="medium">متوسطة</option><option value="low">منخفضة</option></select></div>
+                  <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">القناة</label><select value={newTicket.channel} onChange={(e) => setNewTicket(p => ({ ...p, channel: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option value="email">بريد</option><option value="phone">هاتف</option><option value="chat">محادثة</option></select></div>
+                  <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">التصنيف</label><select value={newTicket.category} onChange={(e) => setNewTicket(p => ({ ...p, category: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option>استفسارات</option><option>حجوزات</option><option>مالية</option><option>تقنية</option><option>شكاوى</option></select></div>
+                </div>
+                <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الوصف</label><textarea value={newTicket.description} onChange={(e) => setNewTicket(p => ({ ...p, description: e.target.value }))} placeholder="وصف المشكلة..." rows={3} className="w-full p-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 resize-none transition-all" /></div>
+              </div>
+              <div className="flex items-center gap-3 mt-5">
+                <button onClick={handleAdd} className="flex-1 h-10 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all">إنشاء التذكرة</button>
+                <button onClick={() => setShowAddModal(false)} className="flex-1 h-10 rounded-xl bg-surface2 border border-border/50 text-muted-foreground font-medium text-sm hover:text-foreground transition-all">إلغاء</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* تأكيد الحذف */}
+      <AnimatePresence>
+        {deleteConfirm !== null && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDeleteConfirm(null)}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-4 sm:p-6 text-center" onClick={(e) => e.stopPropagation()}>
+              <div className="w-14 h-14 rounded-2xl bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={24} className="text-danger" /></div>
+              <h3 className="text-base font-bold text-foreground mb-2">حذف التذكرة</h3>
+              <p className="text-sm text-muted-foreground mb-5">هل أنت متأكد من حذف التذكرة <span className="text-foreground font-medium font-mono">{deleteConfirm}</span>؟</p>
+              <div className="flex items-center gap-3">
+                <button onClick={() => handleDelete(deleteConfirm)} className="flex-1 h-10 rounded-xl bg-danger/10 border border-danger/20 text-danger font-bold text-sm hover:bg-danger/20 transition-all">حذف</button>
+                <button onClick={() => setDeleteConfirm(null)} className="flex-1 h-10 rounded-xl bg-surface2 border border-border/50 text-muted-foreground font-medium text-sm hover:text-foreground transition-all">إلغاء</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AdminLayout>
-  );
+  )
 }

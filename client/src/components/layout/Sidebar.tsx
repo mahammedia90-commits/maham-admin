@@ -14,7 +14,8 @@ import {
   MessageSquare, Bell, Fingerprint, MapPin, BookOpen, Clock,
   UserPlus, Target, Wrench, Image, Star, DoorOpen, Cpu,
   Activity, Radio, Eye, Gift, PieChart, Network, Award,
-  Crosshair, Kanban, PhoneForwarded, ShieldAlert, Trophy, CreditCard, Zap
+  Crosshair, Kanban, PhoneForwarded, ShieldAlert, Trophy, CreditCard, Zap,
+  Tags, ImageIcon, HelpCircle, Map, Package, Building, FileCode, Landmark, Monitor
 } from 'lucide-react'
 
 interface NavItem {
@@ -112,6 +113,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
       { label: 'سير العمل', icon: Workflow, path: '/workflows' },
       { label: 'خدمات العارضين', icon: Wrench, path: '/exhibitor-services' },
       { label: 'التواصل والشبكات', icon: Network, path: '/networking' },
+      { label: 'خريطة المعرض', icon: Map, path: '/exhibition-map' },
     ],
   },
   {
@@ -130,6 +132,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
       { label: 'الرسائل', icon: MessageSquare, path: '/messages' },
       { label: 'الإشعارات', icon: Bell, path: '/notifications' },
       { label: 'خزنة المستندات', icon: FileArchive, path: '/documents' },
+      { label: 'الشارات', icon: Award, path: '/badges' },
     ],
   },
   {
@@ -137,6 +140,8 @@ const navSections: { title: string; items: NavItem[] }[] = [
     items: [
       { label: 'التوأم الرقمي', icon: Cpu, path: '/digital-twin' },
       { label: 'الاقتصاد الحي', icon: Activity, path: '/live-economy' },
+      { label: 'الجهات الحكومية', icon: Landmark, path: '/government' },
+      { label: 'المراقبة والرصد', icon: Monitor, path: '/monitoring' },
     ],
   },
   {
@@ -147,6 +152,19 @@ const navSections: { title: string; items: NavItem[] }[] = [
       { label: 'سجل التدقيق', icon: Shield, path: '/audit' },
       { label: 'إدارة الملفات', icon: FileArchive, path: '/files' },
       { label: 'الإعدادات', icon: Settings, path: '/settings' },
+    ],
+  },
+  {
+    title: 'إدارة المحتوى',
+    items: [
+      { label: 'الفئات', icon: Tags, path: '/categories' },
+      { label: 'المدن', icon: MapPin, path: '/cities' },
+      { label: 'البانرات', icon: ImageIcon, path: '/banners' },
+      { label: 'صفحات المحتوى', icon: FileCode, path: '/cms-pages' },
+      { label: 'الأسئلة الشائعة', icon: HelpCircle, path: '/faqs' },
+      { label: 'الحزم والقطاعات', icon: Package, path: '/packages' },
+      { label: 'مزايا الرعاية', icon: Gift, path: '/sponsor-benefits' },
+      { label: 'الملفات التجارية', icon: Building, path: '/business-profiles' },
     ],
   },
 ]

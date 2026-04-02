@@ -1,261 +1,317 @@
-// Design: Nour Theme — Marketing Module
-// 5 tabs: Campaigns, Content, Social, Email, Analytics
-import { useState } from 'react'
+/**
+ * ═══════════════════════════════════════════════════════
+ * Nour Theme — التسويق والعلاقات العامة (Marketing & PR)
+ * Design: Dark/Light glassmorphism, Gold accents, RTL-first
+ * Features: حملات تسويقية، أداء، محتوى، CRUD
+ * ═══════════════════════════════════════════════════════
+ */
+import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Megaphone, FileText, Share2, Mail, BarChart3, Plus,
-  Eye, TrendingUp, Target, DollarSign, Users,
-  Clock, ArrowUpRight, Globe,
-  MousePointerClick, Send, Inbox, Video, Image
+  Megaphone, BarChart3, Eye, TrendingUp, Globe, Mail, Share2,
+  Plus, Target, Zap, MousePointer, Users, ArrowUpRight,
+  Instagram, Play, Pause, Edit, Trash2, X, AlertTriangle,
+  Calendar, DollarSign, ExternalLink
 } from 'lucide-react'
-import { BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import AdminLayout from '@/components/layout/AdminLayout'
 import PageHeader from '@/components/shared/PageHeader'
 import StatsCard from '@/components/shared/StatsCard'
 import StatusBadge from '@/components/shared/StatusBadge'
-import { cn, formatCurrency, formatDate, formatNumber } from '@/lib/utils'
+import { cn, formatNumber, formatCurrency } from '@/lib/utils'
 import { toast } from 'sonner'
 
-const tabs = [
-  { id: 'campaigns', label: 'الحملات', icon: Megaphone },
-  { id: 'content', label: 'المحتوى', icon: FileText },
-  { id: 'social', label: 'سوشيال ميديا', icon: Share2 },
-  { id: 'email', label: 'البريد الإلكتروني', icon: Mail },
-  { id: 'analytics', label: 'التحليلات', icon: BarChart3 },
+interface Campaign {
+  id: number; name: string; channel: string; status: string; budget: number; spent: number
+  roi: string; impressions: string; clicks: string; conversions: number; startDate: string; endDate: string
+}
+
+const performanceData = [
+  { week: 'الأسبوع 1', impressions: 45000, clicks: 3200, conversions: 180 },
+  { week: 'الأسبوع 2', impressions: 52000, clicks: 4100, conversions: 220 },
+  { week: 'الأسبوع 3', impressions: 68000, clicks: 5500, conversions: 310 },
+  { week: 'الأسبوع 4', impressions: 75000, clicks: 6200, conversions: 380 },
 ]
 
-const campaigns = [
-  { id: 'CMP-001', name: 'حملة معرض الرياض التقني 2026', type: 'متكاملة', status: 'active', budget: 250000, spent: 180000, leads: 342, conversions: 45, roi: 285, startDate: '2026-02-01', endDate: '2026-04-30' },
-  { id: 'CMP-002', name: 'استقطاب رعاة — Q2', type: 'بريد إلكتروني', status: 'active', budget: 50000, spent: 32000, leads: 128, conversions: 18, roi: 420, startDate: '2026-03-01', endDate: '2026-06-30' },
-  { id: 'CMP-003', name: 'حملة التجار الجدد', type: 'سوشيال ميديا', status: 'active', budget: 80000, spent: 55000, leads: 215, conversions: 32, roi: 195, startDate: '2026-03-15', endDate: '2026-05-15' },
-  { id: 'CMP-004', name: 'إعلان معرض جدة الدولي', type: 'إعلانات مدفوعة', status: 'draft', budget: 150000, spent: 0, leads: 0, conversions: 0, roi: 0, startDate: '2026-05-01', endDate: '2026-07-31' },
-  { id: 'CMP-005', name: 'حملة ولاء المستثمرين', type: 'بريد إلكتروني', status: 'completed', budget: 30000, spent: 28000, leads: 95, conversions: 22, roi: 380, startDate: '2026-01-01', endDate: '2026-02-28' },
+const channelData = [
+  { channel: 'Google Ads', spend: 32400, leads: 245, cpl: 132 },
+  { channel: 'Instagram', spend: 18000, leads: 180, cpl: 100 },
+  { channel: 'Email', spend: 3200, leads: 95, cpl: 34 },
+  { channel: 'LinkedIn', spend: 12000, leads: 65, cpl: 185 },
+  { channel: 'Twitter/X', spend: 8500, leads: 42, cpl: 202 },
 ]
 
-const contentItems = [
-  { id: 1, title: 'دليل المستثمر — معرض الرياض التقني', type: 'PDF', status: 'published', views: 1240, downloads: 345, date: '2026-03-20' },
-  { id: 2, title: 'فيديو ترويجي — ماهم إكسبو 2026', type: 'فيديو', status: 'published', views: 8500, downloads: 0, date: '2026-03-15' },
-  { id: 3, title: 'إنفوجرافيك — إحصائيات المعارض', type: 'صورة', status: 'published', views: 3200, downloads: 890, date: '2026-03-10' },
-  { id: 4, title: 'مقال — مستقبل المعارض في السعودية', type: 'مقال', status: 'draft', views: 0, downloads: 0, date: '2026-03-28' },
-  { id: 5, title: 'كتيب حزم الرعاية 2026', type: 'PDF', status: 'review', views: 0, downloads: 0, date: '2026-03-25' },
+const demoCampaigns: Campaign[] = [
+  { id: 1, name: 'حملة معرض الرياض 2026', channel: 'Google Ads', status: 'active', budget: 50000, spent: 32400, roi: '+245%', impressions: '1.2M', clicks: '45K', conversions: 380, startDate: '2026-02-01', endDate: '2026-04-30' },
+  { id: 2, name: 'حملة البريد — دعوات VIP', channel: 'Email', status: 'active', budget: 5000, spent: 3200, roi: '+180%', impressions: '25K', clicks: '8.5K', conversions: 95, startDate: '2026-03-01', endDate: '2026-03-31' },
+  { id: 3, name: 'حملة السوشال ميديا', channel: 'Instagram', status: 'paused', budget: 30000, spent: 18000, roi: '+120%', impressions: '850K', clicks: '32K', conversions: 180, startDate: '2026-01-15', endDate: '2026-04-15' },
+  { id: 4, name: 'حملة إعادة الاستهداف', channel: 'Facebook', status: 'draft', budget: 20000, spent: 0, roi: '—', impressions: '0', clicks: '0', conversions: 0, startDate: '2026-04-01', endDate: '2026-05-31' },
+  { id: 5, name: 'حملة LinkedIn — B2B', channel: 'LinkedIn', status: 'active', budget: 15000, spent: 12000, roi: '+95%', impressions: '320K', clicks: '12K', conversions: 65, startDate: '2026-02-15', endDate: '2026-04-30' },
+  { id: 6, name: 'حملة Twitter — الوعي', channel: 'Twitter/X', status: 'completed', budget: 10000, spent: 8500, roi: '+78%', impressions: '450K', clicks: '18K', conversions: 42, startDate: '2026-01-01', endDate: '2026-02-28' },
 ]
 
-const socialPlatforms = [
-  { platform: 'Instagram', followers: 45200, growth: 12, posts: 85, engagement: 4.2, color: 'bg-pink-500/10 text-pink-400', icon: '📸' },
-  { platform: 'Twitter/X', followers: 28500, growth: 8, posts: 120, engagement: 2.8, color: 'bg-sky-500/10 text-sky-400', icon: '🐦' },
-  { platform: 'LinkedIn', followers: 18900, growth: 15, posts: 45, engagement: 5.1, color: 'bg-blue-500/10 text-blue-400', icon: '💼' },
-]
-
-const emailCampaigns = [
-  { id: 1, name: 'نشرة مارس — فرص الاستثمار', sent: 4500, opened: 2800, clicked: 890, bounced: 45, date: '2026-03-01' },
-  { id: 2, name: 'دعوة معرض الرياض التقني', sent: 3200, opened: 2400, clicked: 1200, bounced: 32, date: '2026-03-10' },
-  { id: 3, name: 'عرض خاص — حزم الرعاية', sent: 1800, opened: 1100, clicked: 450, bounced: 18, date: '2026-03-20' },
-  { id: 4, name: 'تذكير — آخر موعد للتسجيل', sent: 5200, opened: 3800, clicked: 1600, bounced: 52, date: '2026-03-25' },
-]
-
-const trafficData = [
-  { week: 'W1', organic: 3200, paid: 1800, social: 950, email: 680 },
-  { week: 'W2', organic: 3500, paid: 2100, social: 1100, email: 720 },
-  { week: 'W3', organic: 4100, paid: 2500, social: 1300, email: 850 },
-  { week: 'W4', organic: 4800, paid: 2800, social: 1500, email: 920 },
-]
-
-const conversionData = [
-  { month: 'يناير', leads: 180, qualified: 95, converted: 28 },
-  { month: 'فبراير', leads: 220, qualified: 128, converted: 42 },
-  { month: 'مارس', leads: 342, qualified: 185, converted: 65 },
-]
+const channelIcons: Record<string, typeof Globe> = {
+  'Google Ads': Globe, 'Email': Mail, 'Instagram': Instagram, 'Facebook': Share2, 'LinkedIn': ExternalLink, 'Twitter/X': Zap,
+}
 
 export default function MarketingPage() {
   const [activeTab, setActiveTab] = useState('campaigns')
+  const [campaigns, setCampaigns] = useState(demoCampaigns)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [detailCampaign, setDetailCampaign] = useState<Campaign | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null)
+  const [newCamp, setNewCamp] = useState({ name: '', channel: 'Google Ads', budget: '', startDate: '', endDate: '' })
+
+  const stats = useMemo(() => ({
+    totalBudget: campaigns.reduce((s, c) => s + c.budget, 0),
+    totalSpent: campaigns.reduce((s, c) => s + c.spent, 0),
+    totalConversions: campaigns.reduce((s, c) => s + c.conversions, 0),
+    activeCampaigns: campaigns.filter(c => c.status === 'active').length,
+  }), [campaigns])
+
+  const handleAdd = () => {
+    if (!newCamp.name || !newCamp.budget) { toast.error('يرجى ملء الحقول المطلوبة'); return }
+    const c: Campaign = {
+      id: Math.max(...campaigns.map(c => c.id)) + 1, name: newCamp.name, channel: newCamp.channel,
+      status: 'draft', budget: parseFloat(newCamp.budget), spent: 0, roi: '—', impressions: '0', clicks: '0',
+      conversions: 0, startDate: newCamp.startDate || '2026-04-01', endDate: newCamp.endDate || '2026-05-31',
+    }
+    setCampaigns(prev => [c, ...prev])
+    toast.success(`تم إنشاء الحملة: ${c.name}`)
+    setShowAddModal(false)
+    setNewCamp({ name: '', channel: 'Google Ads', budget: '', startDate: '', endDate: '' })
+  }
+
+  const toggleCampaignStatus = (id: number) => {
+    setCampaigns(prev => prev.map(c => {
+      if (c.id !== id) return c
+      const newStatus = c.status === 'active' ? 'paused' : 'active'
+      toast.info(`تم ${newStatus === 'active' ? 'تفعيل' : 'إيقاف'} الحملة: ${c.name}`)
+      return { ...c, status: newStatus }
+    }))
+  }
+
+  const handleDelete = (id: number) => {
+    const c = campaigns.find(c => c.id === id)
+    setCampaigns(prev => prev.filter(c => c.id !== id))
+    toast.success(`تم حذف الحملة: ${c?.name}`)
+    setDeleteConfirm(null)
+  }
 
   return (
     <AdminLayout>
       <PageHeader
-        title="التسويق والحملات"
-        subtitle="إدارة الحملات التسويقية والمحتوى وسوشيال ميديا والبريد الإلكتروني"
+        title="التسويق والعلاقات العامة"
+        subtitle={`${campaigns.length} حملة — ${stats.activeCampaigns} نشطة — إجمالي الإنفاق: ${formatCurrency(stats.totalSpent)}`}
         actions={
-          <button onClick={() => toast.info('إنشاء حملة — قريباً')} className="h-9 px-4 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all flex items-center gap-2">
+          <button onClick={() => setShowAddModal(true)} className="h-9 px-4 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all flex items-center gap-2">
             <Plus size={16} /> حملة جديدة
           </button>
         }
       />
 
-      <div className="flex gap-1 p-1 bg-card/50 rounded-xl border border-border/50 overflow-x-auto mb-6">
-        {tabs.map(tab => (
-          <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={cn('flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all', activeTab === tab.id ? 'bg-gold/10 text-gold border border-gold/20 shadow-lg' : 'text-muted-foreground hover:text-foreground hover:bg-surface2/50')}>
-            <tab.icon size={16} /> {tab.label}
+      {/* إحصائيات */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
+        <StatsCard title="إجمالي الميزانية" value={formatCurrency(stats.totalBudget)} icon={DollarSign} delay={0} />
+        <StatsCard title="الإنفاق الفعلي" value={formatCurrency(stats.totalSpent)} icon={TrendingUp} trend={12} trendLabel="هذا الشهر" delay={0.05} />
+        <StatsCard title="التحويلات" value={formatNumber(stats.totalConversions)} icon={Target} trend={28} trendLabel="هذا الشهر" delay={0.1} />
+        <StatsCard title="الحملات النشطة" value={String(stats.activeCampaigns)} icon={Megaphone} delay={0.15} />
+      </div>
+
+      {/* تبويبات */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-3 sm:mb-4">
+        {[
+          { key: 'campaigns', label: 'الحملات', icon: Megaphone },
+          { key: 'performance', label: 'الأداء', icon: BarChart3 },
+          { key: 'channels', label: 'القنوات', icon: Share2 },
+        ].map(t => (
+          <button key={t.key} onClick={() => setActiveTab(t.key)}
+            className={cn('h-9 px-4 rounded-xl text-sm font-medium transition-all flex items-center gap-2', activeTab === t.key ? 'bg-gold/10 text-gold border border-gold/20' : 'bg-surface2/50 text-muted-foreground hover:text-foreground border border-transparent')}>
+            <t.icon size={14} /> {t.label}
           </button>
         ))}
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-
-          {activeTab === 'campaigns' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatsCard title="حملات نشطة" value="3" icon={Megaphone} delay={0} />
-                <StatsCard title="إجمالي الميزانية" value={formatCurrency(560000)} icon={DollarSign} delay={0.1} />
-                <StatsCard title="عملاء محتملون" value="685" icon={Users} trend={28} delay={0.2} />
-                <StatsCard title="متوسط ROI" value="320%" icon={TrendingUp} trend={15} delay={0.3} />
-              </div>
-              <div className="glass-card overflow-hidden">
-                <table className="w-full">
-                  <thead><tr className="border-b border-border/50">
-                    {['الحملة','النوع','الحالة','الميزانية','المنفق','العملاء','التحويلات','ROI'].map(h => (
-                      <th key={h} className="text-right p-4 text-xs font-medium text-muted-foreground">{h}</th>
-                    ))}
-                  </tr></thead>
-                  <tbody>
-                    {campaigns.map((c, i) => (
-                      <motion.tr key={c.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }} className="border-b border-border/30 hover:bg-surface2/30 transition-colors">
-                        <td className="p-4"><div><p className="text-sm font-bold text-foreground">{c.name}</p><p className="text-[10px] font-mono text-muted-foreground">{c.id} • {formatDate(c.startDate)} — {formatDate(c.endDate)}</p></div></td>
-                        <td className="p-4 text-xs text-muted-foreground">{c.type}</td>
-                        <td className="p-4"><StatusBadge status={c.status === 'active' ? 'approved' : c.status === 'completed' ? 'approved' : 'pending'} /></td>
-                        <td className="p-4 text-sm font-mono text-foreground">{formatCurrency(c.budget)}</td>
-                        <td className="p-4"><div><p className="text-sm font-mono text-foreground">{formatCurrency(c.spent)}</p><div className="w-16 h-1 rounded-full bg-surface3 mt-1"><div className="h-full rounded-full bg-gold" style={{ width: `${c.budget > 0 ? (c.spent/c.budget)*100 : 0}%` }} /></div></div></td>
-                        <td className="p-4 text-sm font-bold text-foreground">{formatNumber(c.leads)}</td>
-                        <td className="p-4 text-sm font-bold text-gold">{c.conversions}</td>
-                        <td className="p-4"><span className={cn('text-sm font-bold', c.roi > 300 ? 'text-success' : c.roi > 0 ? 'text-gold' : 'text-muted-foreground')}>{c.roi}%</span></td>
-                      </motion.tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'content' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <StatsCard title="محتوى منشور" value="12" icon={FileText} delay={0} />
-                <StatsCard title="إجمالي المشاهدات" value={formatNumber(12940)} icon={Eye} trend={35} delay={0.1} />
-                <StatsCard title="التحميلات" value={formatNumber(1235)} icon={ArrowUpRight} trend={22} delay={0.2} />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {contentItems.map((item, i) => (
-                  <motion.div key={item.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-card p-4 hover:border-gold/30 transition-colors">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center', item.type === 'PDF' ? 'bg-danger/10 text-danger' : item.type === 'فيديو' ? 'bg-info/10 text-info' : item.type === 'صورة' ? 'bg-success/10 text-success' : 'bg-gold/10 text-gold')}>
-                        {item.type === 'PDF' ? <FileText size={14} /> : item.type === 'فيديو' ? <Video size={14} /> : item.type === 'صورة' ? <Image size={14} /> : <FileText size={14} />}
-                      </div>
-                      <StatusBadge status={item.status === 'published' ? 'approved' : item.status === 'review' ? 'pending' : 'draft'} />
+      {/* الحملات */}
+      {activeTab === 'campaigns' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {campaigns.map((camp, i) => {
+            const CIcon = channelIcons[camp.channel] || Globe
+            const spentPct = camp.budget > 0 ? Math.round((camp.spent / camp.budget) * 100) : 0
+            return (
+              <motion.div key={camp.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
+                className="glass-card p-3 sm:p-4 lg:p-5 hover:border-gold/20 transition-all group">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><CIcon size={18} className="text-gold" /></div>
+                    <div>
+                      <h3 className="text-sm font-bold text-foreground">{camp.name}</h3>
+                      <p className="text-[10px] text-muted-foreground flex items-center gap-1"><CIcon size={9} />{camp.channel}</p>
                     </div>
-                    <h4 className="text-sm font-bold text-foreground mb-2">{item.title}</h4>
-                    <div className="flex items-center gap-4 text-[10px] text-muted-foreground">
-                      <span className="flex items-center gap-1"><Eye size={10} /> {formatNumber(item.views)}</span>
-                      <span className="flex items-center gap-1"><ArrowUpRight size={10} /> {formatNumber(item.downloads)}</span>
-                      <span>{formatDate(item.date)}</span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'social' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {socialPlatforms.map((s, i) => (
-                  <motion.div key={s.platform} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="glass-card p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center text-xl', s.color)}>{s.icon}</div>
-                      <div>
-                        <h4 className="text-sm font-bold text-foreground">{s.platform}</h4>
-                        <p className="text-[10px] text-muted-foreground">{formatNumber(s.followers)} متابع</p>
-                      </div>
-                      <span className="mr-auto text-xs text-success flex items-center gap-1"><ArrowUpRight size={12} /> +{s.growth}%</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="p-3 rounded-xl bg-surface2/30"><p className="text-[10px] text-muted-foreground">المنشورات</p><p className="text-lg font-bold text-foreground">{s.posts}</p></div>
-                      <div className="p-3 rounded-xl bg-surface2/30"><p className="text-[10px] text-muted-foreground">التفاعل</p><p className="text-lg font-bold text-gold">{s.engagement}%</p></div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'email' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <StatsCard title="رسائل مرسلة" value={formatNumber(14700)} icon={Send} delay={0} />
-                <StatsCard title="معدل الفتح" value="68%" icon={Inbox} trend={5} delay={0.1} />
-                <StatsCard title="معدل النقر" value="28%" icon={MousePointerClick} trend={8} delay={0.2} />
-                <StatsCard title="معدل الارتداد" value="1.0%" icon={Clock} trend={-2} delay={0.3} />
-              </div>
-              <div className="glass-card overflow-hidden">
-                <table className="w-full">
-                  <thead><tr className="border-b border-border/50">
-                    {['الحملة','المرسلة','المفتوحة','النقرات','الارتداد','التاريخ'].map(h => (
-                      <th key={h} className="text-right p-4 text-xs font-medium text-muted-foreground">{h}</th>
-                    ))}
-                  </tr></thead>
-                  <tbody>
-                    {emailCampaigns.map((e, i) => (
-                      <motion.tr key={e.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }} className="border-b border-border/30 hover:bg-surface2/30 transition-colors">
-                        <td className="p-4 text-sm font-bold text-foreground">{e.name}</td>
-                        <td className="p-4 text-sm font-mono text-foreground">{formatNumber(e.sent)}</td>
-                        <td className="p-4"><div className="flex items-center gap-2"><span className="text-sm font-mono">{formatNumber(e.opened)}</span><span className="text-[10px] text-success">{Math.round(e.opened/e.sent*100)}%</span></div></td>
-                        <td className="p-4"><div className="flex items-center gap-2"><span className="text-sm font-mono">{formatNumber(e.clicked)}</span><span className="text-[10px] text-gold">{Math.round(e.clicked/e.sent*100)}%</span></div></td>
-                        <td className="p-4 text-sm font-mono text-muted-foreground">{e.bounced}</td>
-                        <td className="p-4 text-sm text-muted-foreground">{formatDate(e.date)}</td>
-                      </motion.tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'analytics' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatsCard title="زيارات الموقع" value={formatNumber(42800)} icon={Globe} trend={22} delay={0} />
-                <StatsCard title="معدل التحويل" value="3.8%" icon={Target} trend={12} delay={0.1} />
-                <StatsCard title="تكلفة الاكتساب" value={formatCurrency(185)} icon={DollarSign} trend={-8} delay={0.2} />
-                <StatsCard title="عائد الإنفاق" value="4.2x" icon={TrendingUp} trend={15} delay={0.3} />
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="glass-card p-6">
-                  <h3 className="text-sm font-bold text-foreground mb-4">مصادر الزيارات — مارس 2026</h3>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <AreaChart data={trafficData}>
-                      <defs>
-                        <linearGradient id="mktOrgGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#C9A84C" stopOpacity={0.3} /><stop offset="95%" stopColor="#C9A84C" stopOpacity={0} /></linearGradient>
-                        <linearGradient id="mktPaidGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} /><stop offset="95%" stopColor="#3b82f6" stopOpacity={0} /></linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                      <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#888' }} />
-                      <YAxis tick={{ fontSize: 10, fill: '#888' }} />
-                      <Tooltip contentStyle={{ background: '#1a1917', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', fontSize: '11px', color: '#fff' }} />
-                      <Area type="monotone" dataKey="organic" stroke="#C9A84C" fill="url(#mktOrgGrad)" strokeWidth={2} name="عضوي" />
-                      <Area type="monotone" dataKey="paid" stroke="#3b82f6" fill="url(#mktPaidGrad)" strokeWidth={2} name="مدفوع" />
-                      <Area type="monotone" dataKey="social" stroke="#ec4899" fill="transparent" strokeWidth={2} name="سوشيال" />
-                      <Area type="monotone" dataKey="email" stroke="#10b981" fill="transparent" strokeWidth={2} name="بريد" />
-                    </AreaChart>
-                  </ResponsiveContainer>
+                  </div>
+                  <StatusBadge status={camp.status} />
                 </div>
-                <div className="glass-card p-6">
-                  <h3 className="text-sm font-bold text-foreground mb-4">قمع التحويل — Q1 2026</h3>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <BarChart data={conversionData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                      <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#888' }} />
-                      <YAxis tick={{ fontSize: 10, fill: '#888' }} />
-                      <Tooltip contentStyle={{ background: '#1a1917', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', fontSize: '11px', color: '#fff' }} />
-                      <Bar dataKey="leads" fill="#A0A0A0" name="عملاء محتملون" radius={[4,4,0,0]} />
-                      <Bar dataKey="qualified" fill="#3b82f6" name="مؤهلون" radius={[4,4,0,0]} />
-                      <Bar dataKey="converted" fill="#C9A84C" name="محولون" radius={[4,4,0,0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          )}
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
+                  <div><p className="text-[10px] text-muted-foreground">الظهور</p><p className="text-sm font-bold font-mono text-foreground">{camp.impressions}</p></div>
+                  <div><p className="text-[10px] text-muted-foreground">النقرات</p><p className="text-sm font-bold font-mono text-foreground">{camp.clicks}</p></div>
+                  <div><p className="text-[10px] text-muted-foreground">ROI</p><p className={cn('text-sm font-bold font-mono', camp.roi.startsWith('+') ? 'text-success' : 'text-muted-foreground')}>{camp.roi}</p></div>
+                </div>
+
+                <div className="mb-3">
+                  <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
+                    <span>الإنفاق: {formatCurrency(camp.spent)}</span>
+                    <span>الميزانية: {formatCurrency(camp.budget)}</span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-surface3">
+                    <div className={cn('h-full rounded-full transition-all', spentPct > 90 ? 'bg-danger' : spentPct > 70 ? 'bg-warning' : 'bg-gold')} style={{ width: `${Math.min(spentPct, 100)}%` }} />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-border/30">
+                  <span className="text-[10px] text-muted-foreground">{camp.conversions} تحويل</span>
+                  <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => setDetailCampaign(camp)} className="p-1.5 rounded-lg hover:bg-surface2 text-muted-foreground hover:text-gold transition-colors"><Eye size={13} /></button>
+                    {(camp.status === 'active' || camp.status === 'paused') && (
+                      <button onClick={() => toggleCampaignStatus(camp.id)} className="p-1.5 rounded-lg hover:bg-surface2 text-muted-foreground hover:text-info transition-colors">
+                        {camp.status === 'active' ? <Pause size={13} /> : <Play size={13} />}
+                      </button>
+                    )}
+                    <button onClick={() => setDeleteConfirm(camp.id)} className="p-1.5 rounded-lg hover:bg-danger/10 text-muted-foreground hover:text-danger transition-colors"><Trash2 size={13} /></button>
+                  </div>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* الأداء */}
+      {activeTab === 'performance' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-3 sm:p-4 lg:p-5">
+          <h3 className="text-sm font-bold text-foreground mb-4">أداء الحملات — آخر 4 أسابيع</h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart data={performanceData}>
+              <defs>
+                <linearGradient id="impGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#C9A84C" stopOpacity={0.3} /><stop offset="95%" stopColor="#C9A84C" stopOpacity={0} /></linearGradient>
+                <linearGradient id="clkGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} /><stop offset="95%" stopColor="#3B82F6" stopOpacity={0} /></linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <XAxis dataKey="week" tick={{ fontSize: 11, fill: '#888' }} />
+              <YAxis tick={{ fontSize: 11, fill: '#888' }} />
+              <Tooltip contentStyle={{ background: '#1a1917', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', fontSize: '12px', color: '#fff' }} />
+              <Area type="monotone" dataKey="impressions" stroke="#C9A84C" fill="url(#impGrad)" strokeWidth={2} name="الظهور" />
+              <Area type="monotone" dataKey="clicks" stroke="#3B82F6" fill="url(#clkGrad)" strokeWidth={2} name="النقرات" />
+            </AreaChart>
+          </ResponsiveContainer>
         </motion.div>
+      )}
+
+      {/* القنوات */}
+      {activeTab === 'channels' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card overflow-hidden">
+          <div className="p-4 border-b border-border/50"><h3 className="text-sm font-bold text-foreground">أداء القنوات التسويقية</h3></div>
+          <div className="overflow-x-auto scrollbar-hide">
+            <table className="w-full">
+              <thead><tr className="border-b border-border/50">
+                <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground">القناة</th>
+                <th className="px-3 py-3 text-right text-xs font-semibold text-muted-foreground">الإنفاق</th>
+                <th className="px-3 py-3 text-right text-xs font-semibold text-muted-foreground">العملاء المحتملون</th>
+                <th className="px-3 py-3 text-right text-xs font-semibold text-muted-foreground">تكلفة العميل</th>
+                <th className="px-3 py-3 text-center text-xs font-semibold text-muted-foreground">الكفاءة</th>
+              </tr></thead>
+              <tbody>
+                {channelData.map((ch, idx) => {
+                  const CIcon = channelIcons[ch.channel] || Globe
+                  const efficiency = ch.cpl < 100 ? 'ممتاز' : ch.cpl < 150 ? 'جيد' : 'متوسط'
+                  return (
+                    <motion.tr key={ch.channel} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: idx * 0.03 }} className="border-b border-border/30 hover:bg-surface2/50 transition-colors">
+                      <td className="px-4 py-3"><span className="flex items-center gap-2 text-sm text-foreground"><CIcon size={14} className="text-gold" />{ch.channel}</span></td>
+                      <td className="px-3 py-3"><span className="font-mono text-sm text-foreground">{formatCurrency(ch.spend)}</span></td>
+                      <td className="px-3 py-3"><span className="font-mono text-sm font-bold text-foreground">{ch.leads}</span></td>
+                      <td className="px-3 py-3"><span className="font-mono text-sm text-muted-foreground">{formatCurrency(ch.cpl)}</span></td>
+                      <td className="px-3 py-3 text-center">
+                        <span className={cn('text-xs px-2 py-0.5 rounded-full', efficiency === 'ممتاز' ? 'bg-success/10 text-success' : efficiency === 'جيد' ? 'bg-gold/10 text-gold' : 'bg-warning/10 text-warning')}>{efficiency}</span>
+                      </td>
+                    </motion.tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
+      )}
+
+      {/* نافذة تفاصيل الحملة */}
+      <AnimatePresence>
+        {detailCampaign && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDetailCampaign(null)}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-lg p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-5">
+                <div><h2 className="text-lg font-bold text-foreground">{detailCampaign.name}</h2><p className="text-xs text-muted-foreground">{detailCampaign.channel}</p></div>
+                <button onClick={() => setDetailCampaign(null)} className="p-2 rounded-lg hover:bg-surface2 text-muted-foreground"><X size={18} /></button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 sm:mb-4">
+                <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">الميزانية</p><p className="text-sm font-bold font-mono text-foreground">{formatCurrency(detailCampaign.budget)}</p></div>
+                <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">الإنفاق</p><p className="text-sm font-bold font-mono text-foreground">{formatCurrency(detailCampaign.spent)}</p></div>
+                <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">الظهور</p><p className="text-sm font-bold font-mono text-foreground">{detailCampaign.impressions}</p></div>
+                <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">النقرات</p><p className="text-sm font-bold font-mono text-foreground">{detailCampaign.clicks}</p></div>
+                <div className="p-3 rounded-xl bg-gold/5 border border-gold/20"><p className="text-[10px] text-muted-foreground">ROI</p><p className={cn('text-lg font-bold font-mono', detailCampaign.roi.startsWith('+') ? 'text-success' : 'text-muted-foreground')}>{detailCampaign.roi}</p></div>
+                <div className="p-3 rounded-xl bg-surface2/50 border border-border/30"><p className="text-[10px] text-muted-foreground">التحويلات</p><p className="text-sm font-bold font-mono text-foreground">{detailCampaign.conversions}</p></div>
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-xl bg-surface2/50 border border-border/30 mb-3">
+                <span className="text-xs text-muted-foreground">الفترة: {detailCampaign.startDate} — {detailCampaign.endDate}</span>
+                <StatusBadge status={detailCampaign.status} />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* نافذة حملة جديدة */}
+      <AnimatePresence>
+        {showAddModal && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowAddModal(false)}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-md p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
+                <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center"><Megaphone size={18} className="text-gold" /></div>
+                <div><h3 className="text-base font-bold text-foreground">حملة تسويقية جديدة</h3><p className="text-xs text-muted-foreground">إنشاء حملة تسويقية جديدة</p></div>
+              </div>
+              <div className="space-y-3">
+                <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">اسم الحملة <span className="text-danger">*</span></label><input type="text" value={newCamp.name} onChange={(e) => setNewCamp(p => ({ ...p, name: e.target.value }))} placeholder="اسم الحملة" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">القناة</label><select value={newCamp.channel} onChange={(e) => setNewCamp(p => ({ ...p, channel: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50"><option>Google Ads</option><option>Instagram</option><option>Facebook</option><option>Email</option><option>LinkedIn</option><option>Twitter/X</option></select></div>
+                  <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">الميزانية (ر.س) <span className="text-danger">*</span></label><input type="number" value={newCamp.budget} onChange={(e) => setNewCamp(p => ({ ...p, budget: e.target.value }))} placeholder="0" dir="ltr" className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">تاريخ البدء</label><input type="date" value={newCamp.startDate} onChange={(e) => setNewCamp(p => ({ ...p, startDate: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
+                  <div><label className="text-xs font-medium text-muted-foreground mb-1.5 block">تاريخ الانتهاء</label><input type="date" value={newCamp.endDate} onChange={(e) => setNewCamp(p => ({ ...p, endDate: e.target.value }))} className="w-full h-9 px-3 rounded-lg bg-surface2 border border-border/50 text-sm text-foreground focus:outline-none focus:border-gold/50 transition-all" /></div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 mt-5">
+                <button onClick={handleAdd} className="flex-1 h-10 rounded-xl bg-gradient-to-l from-gold via-gold-light to-gold text-black font-bold text-sm hover:shadow-lg hover:shadow-gold/25 transition-all">إنشاء الحملة</button>
+                <button onClick={() => setShowAddModal(false)} className="flex-1 h-10 rounded-xl bg-surface2 border border-border/50 text-muted-foreground font-medium text-sm hover:text-foreground transition-all">إلغاء</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* تأكيد الحذف */}
+      <AnimatePresence>
+        {deleteConfirm !== null && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setDeleteConfirm(null)}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-4 sm:p-6 text-center" onClick={(e) => e.stopPropagation()}>
+              <div className="w-14 h-14 rounded-2xl bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={24} className="text-danger" /></div>
+              <h3 className="text-base font-bold text-foreground mb-2">حذف الحملة</h3>
+              <p className="text-sm text-muted-foreground mb-5">هل أنت متأكد من حذف <span className="text-foreground font-medium">{campaigns.find(c => c.id === deleteConfirm)?.name}</span>؟</p>
+              <div className="flex items-center gap-3">
+                <button onClick={() => handleDelete(deleteConfirm)} className="flex-1 h-10 rounded-xl bg-danger/10 border border-danger/20 text-danger font-bold text-sm hover:bg-danger/20 transition-all">حذف</button>
+                <button onClick={() => setDeleteConfirm(null)} className="flex-1 h-10 rounded-xl bg-surface2 border border-border/50 text-muted-foreground font-medium text-sm hover:text-foreground transition-all">إلغاء</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </AdminLayout>
   )
